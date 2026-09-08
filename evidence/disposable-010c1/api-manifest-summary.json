@@ -1,0 +1,10 @@
+{
+  "has_manifest": true,
+  "community_route": "/community",
+  "general_live_available": false,
+  "group_labels": [
+    "Community",
+    "Technician Topics",
+    "Brands"
+  ]
+}

@@ -1,0 +1,3 @@
+forum_http=200
+community_http=200
+api_http=200
