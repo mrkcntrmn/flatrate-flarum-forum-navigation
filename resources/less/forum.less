@@ -3,6 +3,13 @@
   padding: 0;
 }
 
+/* Presentation owner: hide native primary TagLinkButton list while this extension is active. */
+.IndexPage-nav .TagLinkButton,
+.IndexPage-nav .item-separator,
+.IndexPage-nav .item-moreTags {
+  display: none !important;
+}
+
 .FlatRatePresentationNav-list,
 .FlatRatePresentationNav-tree,
 .FlatRatePresentationNav-children {
