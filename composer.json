@@ -44,9 +44,11 @@
                 "backgroundColor": "#111827",
                 "color": "#ffffff"
             }
+        },
+        "branch-alias": {
+            "dev-main": "0.1.x-dev"
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true,
-    "version": "0.1.0"
+    "prefer-stable": true
 }

@@ -1,0 +1,7 @@
+{
+  "CONTROL_REPO": "mrkcntrmn/flatrate-wiki",
+  "MANIFEST_SOURCE_PATH": "configs/forum/navigation-runtime-manifest.json",
+  "SOURCE_MANIFEST_SHA256": "cbeb640ecfa50c30cf667a9b0fa97bb7667f0f31cb315c9f83283b599dfb122f",
+  "EMBEDDED_ASSET_PATH": "resources/navigation-runtime-manifest.json",
+  "NOTES": "SOURCE_MANIFEST_SHA256 is the SHA-256 of the embedded package asset bytes. Control-repo remains canonical; sync must update both the JSON asset and this provenance file. No runtime network dependency."
+}

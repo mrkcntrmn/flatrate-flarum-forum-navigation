@@ -125,6 +125,10 @@ final class NavigationManifest
             throw new InvalidArgumentException('CDJR children mismatch');
         }
 
+        if (($manifest['community']['route'] ?? null) !== '/community') {
+            throw new InvalidArgumentException('Community route must be /community');
+        }
+
         if (($manifest['community']['generalLiveAvailable'] ?? null) !== false) {
             throw new InvalidArgumentException('GENERAL_LIVE_AVAILABLE must be false in C1');
         }
