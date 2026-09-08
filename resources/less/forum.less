@@ -1,0 +1,117 @@
+.FlatRatePresentationNav {
+  margin: 0;
+  padding: 0;
+}
+
+.FlatRatePresentationNav-list,
+.FlatRatePresentationNav-tree,
+.FlatRatePresentationNav-children {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.FlatRatePresentationNav-item {
+  margin: 0.15rem 0;
+}
+
+.FlatRatePresentationNav-row {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  min-height: 2rem;
+}
+
+.FlatRatePresentationNav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0.25rem 0.35rem;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 4px;
+}
+
+.FlatRatePresentationNav-link:hover,
+.FlatRatePresentationNav-link:focus-visible,
+.FlatRatePresentationNav-expander:hover,
+.FlatRatePresentationNav-expander:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.FlatRatePresentationNav-expander {
+  min-width: 2rem;
+  min-height: 2rem;
+  padding: 0.15rem 0.35rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.FlatRatePresentationNav-expanderSpacer {
+  display: inline-block;
+  width: 1.25rem;
+}
+
+.FlatRatePresentationNav-tree.is-collapsed,
+.FlatRatePresentationNav-tree[hidden],
+.FlatRatePresentationNav-children[hidden] {
+  display: none;
+}
+
+.FlatRatePresentationNav-brand.depth-1 {
+  margin-left: 1rem;
+}
+
+.FlatRatePresentationNav-brandLink {
+  flex: 1;
+}
+
+.FlatRateCommunityPage-hero {
+  margin-bottom: 1.5rem;
+}
+
+.FlatRateCommunityPage-title {
+  margin: 0 0 0.5rem;
+}
+
+.FlatRateCommunityPage-lede {
+  margin: 0;
+  opacity: 0.85;
+}
+
+.FlatRateCommunityPage-section {
+  margin: 1.5rem 0;
+  padding: 1rem 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.FlatRateCommunityPage-comingSoon {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin: 0;
+  opacity: 0.9;
+  cursor: default;
+  user-select: none;
+  pointer-events: none;
+}
+
+.FlatRateCommunityPage-comingSoonBadge {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  font-size: 0.85em;
+  letter-spacing: 0.02em;
+  opacity: 0.8;
+}
+
+@media (max-width: 767px) {
+  .FlatRatePresentationNav-link,
+  .FlatRatePresentationNav-expander {
+    min-height: 2.5rem;
+  }
+}
