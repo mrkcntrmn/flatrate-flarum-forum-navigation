@@ -48,3 +48,16 @@ composer test
 ## Manifest sync
 
 The control repo generates `configs/forum/navigation-runtime-manifest.json` and syncs it into `resources/navigation-runtime-manifest.json`.
+
+## Package CI
+
+GitHub Actions validates Composer, PHPUnit, the embedded navigation manifest (+ provenance), JS build, and a disposable Flarum **1.8.19** path-install smoke.
+
+```bash
+php scripts/validate-manifest.php
+bash scripts/ci-flarum-install-smoke.sh
+BASE_URL=http://127.0.0.1:8080 bash scripts/disposable-smoke.sh
+```
+
+Provenance for the embedded manifest is recorded in `resources/navigation-runtime-manifest.provenance.json` (no runtime network dependency).
+
