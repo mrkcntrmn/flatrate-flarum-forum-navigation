@@ -49,6 +49,8 @@ jobs:
       - name: Build forum assets
         working-directory: js
         run: npm run build
+      - name: Static Brands navigation contract
+        run: node --test js/tests/presentation-nav-static.test.mjs
 
   flarum-install-smoke:
     name: Flarum 1.8.19 install smoke

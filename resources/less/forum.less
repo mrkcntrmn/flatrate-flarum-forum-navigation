@@ -40,31 +40,17 @@
 }
 
 .FlatRatePresentationNav-link:hover,
-.FlatRatePresentationNav-link:focus-visible,
-.FlatRatePresentationNav-expander:hover,
-.FlatRatePresentationNav-expander:focus-visible {
+.FlatRatePresentationNav-link:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 2px;
 }
 
-.FlatRatePresentationNav-expander {
-  min-width: 2rem;
-  min-height: 2rem;
-  padding: 0.15rem 0.35rem;
+.FlatRatePresentationNav-groupLabel {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-}
-
-.FlatRatePresentationNav-expanderSpacer {
-  display: inline-block;
-  width: 1.25rem;
-}
-
-.FlatRatePresentationNav-tree.is-collapsed,
-.FlatRatePresentationNav-tree[hidden],
-.FlatRatePresentationNav-children[hidden] {
-  display: none;
+  min-height: 2rem;
+  padding: 0.25rem 0.35rem;
+  font-weight: 600;
 }
 
 .FlatRatePresentationNav-brand.depth-1 {
@@ -118,7 +104,7 @@
 
 @media (max-width: 767px) {
   .FlatRatePresentationNav-link,
-  .FlatRatePresentationNav-expander {
+  .FlatRatePresentationNav-groupLabel {
     min-height: 2.5rem;
   }
 }

@@ -7,7 +7,7 @@ FlatRate.wiki presentation navigation for Flarum 1.8.x.
 - Replaces the native flat primary-tag sideNav presentation with:
   - **Community** → `/community`
   - **Technician Topics** → `/t/general-shop-discussion`
-  - **Brands** expandable tree (41 boards; GM/CDJR nesting preserved)
+  - **Brands** static tree (41 boards; GM/CDJR always expanded, no collapse arrows)
 - Serves a FlatRate-owned Community page with Start Here CTA and non-interactive General Live coming-soon state (`GENERAL_LIVE_AVAILABLE=false`)
 - Embeds a generated navigation runtime manifest asset; does not read the main wiki repo at runtime
 
@@ -43,6 +43,7 @@ npm run build
 ```bash
 composer install
 composer test
+node --test js/tests/presentation-nav-static.test.mjs
 ```
 
 ## Manifest sync
