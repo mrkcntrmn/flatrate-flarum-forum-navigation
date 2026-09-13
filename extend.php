@@ -14,7 +14,7 @@ return [
     (new Extend\Frontend('forum'))
         ->js(__DIR__ . '/js/dist/forum.js')
         ->css(__DIR__ . '/resources/less/forum.less')
-        ->route('/community', 'flatrate-forum-navigation.community'),
+        ->route('/community', 'flatrate-forum-navigation.community', CommunityCanonical::class),
 
     new Extend\Locales(__DIR__ . '/resources/locale'),
 

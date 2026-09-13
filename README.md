@@ -9,6 +9,7 @@ FlatRate.wiki presentation navigation for Flarum 1.8.x.
   - **Technician Topics** → `/t/general-shop-discussion`
   - **Brands** static tree (41 boards; GM/CDJR always expanded, no collapse arrows)
 - Serves a FlatRate-owned Community page with Start Here and live-ready General Live (`GENERAL_LIVE_AVAILABLE=true`, `/live/community-general-live`)
+- Emits one server-rendered `/community` self-canonical from the configured Flarum base URL (`Document::$canonicalUrl`; no JavaScript, no HTML rewrite)
 - Embeds a generated navigation runtime manifest asset; does not read the main wiki repo at runtime
 
 ## Hard boundaries
