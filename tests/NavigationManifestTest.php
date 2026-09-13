@@ -17,9 +17,11 @@ class NavigationManifestTest extends TestCase
             ['Community', 'Technician Topics', 'Brands'],
             array_column($manifest['groups'], 'label')
         );
-        $this->assertFalse($manifest['community']['generalLiveAvailable']);
+        $this->assertTrue($manifest['community']['generalLiveAvailable']);
         $this->assertSame('/community', NavigationManifest::communityRoute());
-        $this->assertFalse(NavigationManifest::generalLiveAvailable());
+        $this->assertTrue(NavigationManifest::generalLiveAvailable());
+        $this->assertSame('/live/community-general-live', NavigationManifest::generalLiveRoute());
+        $this->assertSame('community-general-live', $manifest['community']['generalLive']['roomKey']);
     }
 
     public function testTechnicianTopicsDestinationIsGeneralShopDiscussion(): void

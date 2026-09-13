@@ -4,11 +4,12 @@ import IndexPage from 'flarum/forum/components/IndexPage';
 import listItems from 'flarum/common/helpers/listItems';
 import app from 'flarum/forum/app';
 
-import { getNavigationManifest, isGeneralLiveAvailable, startHereHref } from '../utils/manifest';
+import { getNavigationManifest, startHereHref } from '../utils/manifest';
+import { resolveGeneralLiveHref } from '../utils/generalLiveRoute';
 
 /**
  * FlatRate Community landing page.
- * GENERAL_LIVE_AVAILABLE=false → non-interactive coming-soon (no dead link).
+ * General Live uses the embedded canonical manifest route, never `#`.
  */
 export default class CommunityPage extends Page {
   oninit(vnode) {
@@ -24,8 +25,11 @@ export default class CommunityPage extends Page {
         startHere: { boardKey: 'start-here', slug: 'start-here' },
       },
     };
-    const liveAvailable = isGeneralLiveAvailable();
     const startHref = startHereHref(manifest);
+    const liveHref = resolveGeneralLiveHref({
+      runtimeRoute: app.forum.attribute('flatrateGeneralLiveRoute'),
+      manifest,
+    });
 
     return (
       <div className="IndexPage FlatRateCommunityPage">
@@ -38,7 +42,7 @@ export default class CommunityPage extends Page {
               <div className="FlatRateCommunityPage-hero">
                 <h2 className="FlatRateCommunityPage-title">Community</h2>
                 <p className="FlatRateCommunityPage-lede">
-                  Start Here for orientation. General Live chat arrives with the dedicated chat rollout.
+                  Start Here for orientation, or jump into General Live.
                 </p>
               </div>
 
@@ -52,17 +56,15 @@ export default class CommunityPage extends Page {
 
               <section className="FlatRateCommunityPage-section" aria-labelledby="flatrate-general-live-heading">
                 <h3 id="flatrate-general-live-heading">General Live</h3>
-                {liveAvailable ? (
+                {liveHref ? (
                   <p>
-                    <LinkButton className="Button" href={app.forum.attribute('flatrateGeneralLiveRoute') || '#'}>
+                    <LinkButton className="Button" href={liveHref}>
                       Open General Live
                     </LinkButton>
                   </p>
                 ) : (
-                  <p className="FlatRateCommunityPage-comingSoon" aria-disabled="true">
-                    <span className="FlatRateCommunityPage-comingSoonBadge">Coming soon</span>
-                    General Live is unavailable until the chat rollout. This control is intentionally
-                    non-interactive.
+                  <p className="FlatRateCommunityPage-unavailable" aria-disabled="true">
+                    General Live is unavailable because its route metadata is missing.
                   </p>
                 )}
               </section>

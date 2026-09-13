@@ -46,6 +46,12 @@ final class NavigationManifest
         return (bool) (self::load()['community']['generalLiveAvailable'] ?? false);
     }
 
+    public static function generalLiveRoute(): ?string
+    {
+        $route = self::load()['community']['generalLive']['route'] ?? null;
+        return is_string($route) && $route !== '' ? $route : null;
+    }
+
     public static function assertValid(array $manifest): void
     {
         if (($manifest['schemaVersion'] ?? null) !== 1) {
@@ -129,8 +135,14 @@ final class NavigationManifest
             throw new InvalidArgumentException('Community route must be /community');
         }
 
-        if (($manifest['community']['generalLiveAvailable'] ?? null) !== false) {
-            throw new InvalidArgumentException('GENERAL_LIVE_AVAILABLE must be false in C1');
+        if (($manifest['community']['generalLiveAvailable'] ?? null) !== true) {
+            throw new InvalidArgumentException('GENERAL_LIVE_AVAILABLE must be true');
+        }
+        $live = $manifest['community']['generalLive'] ?? null;
+        if (!is_array($live)
+            || ($live['roomKey'] ?? null) !== 'community-general-live'
+            || ($live['route'] ?? null) !== '/live/community-general-live') {
+            throw new InvalidArgumentException('community.generalLive must be community-general-live');
         }
     }
 }

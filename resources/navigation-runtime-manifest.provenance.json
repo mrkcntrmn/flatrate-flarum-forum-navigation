@@ -1,7 +1,9 @@
 {
   "CONTROL_REPO": "mrkcntrmn/flatrate-wiki",
   "MANIFEST_SOURCE_PATH": "configs/forum/navigation-runtime-manifest.json",
-  "SOURCE_MANIFEST_SHA256": "cbeb640ecfa50c30cf667a9b0fa97bb7667f0f31cb315c9f83283b599dfb122f",
+  "SOURCE_MANIFEST_SHA256": "f262df400d7f8c1070cb14978472c3b549843e7d2678bdd934e538baa9903c65",
+  "CONTROL_SOURCE_SHA": "26518b0a8059829755079913a5c4d77313e254a6",
+  "CONTROL_PR": "https://github.com/mrkcntrmn/flatrate-wiki/pull/271",
   "EMBEDDED_ASSET_PATH": "resources/navigation-runtime-manifest.json",
-  "NOTES": "SOURCE_MANIFEST_SHA256 is the SHA-256 of the embedded package asset bytes. Control-repo remains canonical; sync must update both the JSON asset and this provenance file. No runtime network dependency."
+  "NOTES": "SOURCE_MANIFEST_SHA256 is the SHA-256 of the embedded package asset bytes. CONTROL_SOURCE_SHA is the exact control-repo commit that generated this asset. No runtime network dependency."
 }

@@ -161,15 +161,28 @@ if (($manifest['community']['route'] ?? null) !== '/community') {
     fail('Community route must be /community');
 }
 
-if (($manifest['community']['generalLiveAvailable'] ?? null) !== false) {
-    fail('GENERAL_LIVE_AVAILABLE must be false');
+if (($manifest['community']['generalLiveAvailable'] ?? null) !== true) {
+    fail('GENERAL_LIVE_AVAILABLE must be true');
+}
+
+$live = $manifest['community']['generalLive'] ?? null;
+if (!is_array($live)
+    || ($live['roomKey'] ?? null) !== 'community-general-live'
+    || ($live['route'] ?? null) !== '/live/community-general-live') {
+    fail('community.generalLive must be community-general-live');
+}
+
+if (($provenance['CONTROL_SOURCE_SHA'] ?? null) !== '26518b0a8059829755079913a5c4d77313e254a6') {
+    fail('CONTROL_SOURCE_SHA must match the generating control commit');
 }
 
 fwrite(STDOUT, "MANIFEST_VALIDATE=PASS\n");
 fwrite(STDOUT, "SOURCE_MANIFEST_SHA256={$sha256}\n");
 fwrite(STDOUT, "CONTROL_REPO={$provenance['CONTROL_REPO']}\n");
+fwrite(STDOUT, "CONTROL_SOURCE_SHA={$provenance['CONTROL_SOURCE_SHA']}\n");
 fwrite(STDOUT, "MANIFEST_SOURCE_PATH={$provenance['MANIFEST_SOURCE_PATH']}\n");
 fwrite(STDOUT, "BRAND_BOARD_COUNT=41\n");
 fwrite(STDOUT, "COMMUNITY_ROUTE=/community\n");
-fwrite(STDOUT, "GENERAL_LIVE_AVAILABLE=false\n");
+fwrite(STDOUT, "GENERAL_LIVE_AVAILABLE=true\n");
+fwrite(STDOUT, "GENERAL_LIVE_ROUTE=/live/community-general-live\n");
 exit(0);
