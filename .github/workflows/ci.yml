@@ -50,7 +50,7 @@ jobs:
         working-directory: js
         run: npm run build
       - name: Static Brands navigation contract
-        run: node --test js/tests/presentation-nav-static.test.mjs
+        run: node --test js/tests/presentation-nav-static.test.mjs js/tests/presentation-nav-picker.test.mjs js/tests/community-live-route.test.mjs
 
   flarum-install-smoke:
     name: Flarum 1.8.19 install smoke

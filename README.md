@@ -8,7 +8,7 @@ FlatRate.wiki presentation navigation for Flarum 1.8.x.
   - **Community** → `/community`
   - **Technician Topics** → `/t/general-shop-discussion`
   - **Brands** static tree (41 boards; GM/CDJR always expanded, no collapse arrows)
-- Serves a FlatRate-owned Community page with Start Here CTA and non-interactive General Live coming-soon state (`GENERAL_LIVE_AVAILABLE=false`)
+- Serves a FlatRate-owned Community page with Start Here and live-ready General Live (`GENERAL_LIVE_AVAILABLE=true`, `/live/community-general-live`)
 - Embeds a generated navigation runtime manifest asset; does not read the main wiki repo at runtime
 
 ## Hard boundaries
@@ -43,7 +43,7 @@ npm run build
 ```bash
 composer install
 composer test
-node --test js/tests/presentation-nav-static.test.mjs
+node --test js/tests/presentation-nav-static.test.mjs js/tests/presentation-nav-picker.test.mjs js/tests/community-live-route.test.mjs
 ```
 
 ## Manifest sync

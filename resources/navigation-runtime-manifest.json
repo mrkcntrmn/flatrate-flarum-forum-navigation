@@ -281,7 +281,11 @@
   "community": {
     "route": "/community",
     "routeKey": "community",
-    "generalLiveAvailable": false,
+    "generalLiveAvailable": true,
+    "generalLive": {
+      "roomKey": "community-general-live",
+      "route": "/live/community-general-live"
+    },
     "startHere": {
       "boardKey": "start-here",
       "slug": "start-here"
