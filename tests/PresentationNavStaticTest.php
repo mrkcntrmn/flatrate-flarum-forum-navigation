@@ -30,6 +30,9 @@ class PresentationNavStaticTest extends TestCase
         $this->assertStringNotContainsString('FlatRatePresentationNav-groupLabel', $src);
         $this->assertStringContainsString('START_NAV_LABEL', $src);
         $this->assertStringContainsString('FlatRatePresentationNav-link--start', $src);
+        $this->assertStringContainsString('TECHNICIAN_TOPICS_ICON', $src);
+        $this->assertStringContainsString('FlatRatePresentationNav-link--technician', $src);
+        $this->assertStringContainsString('fa-wrench', $dist);
         $this->assertStringContainsString('#66ff00', $less);
         $this->assertStringNotContainsString('FlatRatePresentationNav-groupLabel', $dist);
         $this->assertStringNotContainsString('FlatRatePresentationNav-groupLabel', $less);
@@ -38,6 +41,9 @@ class PresentationNavStaticTest extends TestCase
         $this->assertStringContainsString('text-align: center', $less);
         $this->assertStringContainsString('.App-drawer .item-session', $less);
         $this->assertStringContainsString('padding: 0.75rem 10px 1rem', $less);
+        $this->assertStringContainsString('padding: 15px 20px 15px 50px', $less);
+        $this->assertStringContainsString('margin-left: 1.25rem', $less);
+        $this->assertStringNotContainsString('margin-left: 0;', $less);
         $index = (string) file_get_contents($root . '/js/src/forum/index.js');
         $this->assertStringContainsString("from 'flarum/forum/components/HeaderSecondary'", $index);
         $this->assertStringContainsString('flatrateDrawerNav', $index);

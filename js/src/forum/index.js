@@ -7,8 +7,8 @@ import icon from 'flarum/common/helpers/icon';
 
 import PresentationNav from './components/PresentationNav';
 import { getNavigationManifest } from './utils/manifest';
-import { resolvePresentationTitle } from './utils/presentationTitle';
-import { START_NAV_ICON, START_NAV_LABEL } from './utils/startNav';
+import { resolvePresentationTitle, TECHNICIAN_TOPICS_LABEL } from './utils/presentationTitle';
+import { START_NAV_ICON, START_NAV_LABEL, TECHNICIAN_TOPICS_ICON } from './utils/startNav';
 import { stripNativeTagPresentation } from './utils/stripNativeTagPresentation';
 
 function hideDrawerAfterLinkClick(event) {
@@ -139,6 +139,7 @@ app.initializers.add(
         (node) => node && node.attrs && String(node.attrs.className || '').includes('Button-label')
       );
       const isStart = resolved === START_NAV_LABEL;
+      const isTechnician = resolved === TECHNICIAN_TOPICS_LABEL;
       const label = (
         <span className={isStart ? 'Button-label FlatRatePresentationTitle--start' : 'Button-label'}>
           {resolved}
@@ -149,12 +150,14 @@ app.initializers.add(
       } else {
         next[0] = label;
       }
-      if (isStart) {
-        const hasStartIcon = next.some((node) =>
-          String((node && node.attrs && node.attrs.className) || '').includes('fa-play-circle')
+      const iconNeedle = isStart ? 'fa-play-circle' : isTechnician ? 'fa-wrench' : '';
+      const linkIcon = isStart ? START_NAV_ICON : isTechnician ? TECHNICIAN_TOPICS_ICON : null;
+      if (linkIcon) {
+        const hasItemIcon = next.some((node) =>
+          String((node && node.attrs && node.attrs.className) || '').includes(iconNeedle)
         );
-        if (!hasStartIcon) {
-          next.splice(labelIndex >= 0 ? labelIndex : 0, 0, icon(START_NAV_ICON));
+        if (!hasItemIcon) {
+          next.splice(labelIndex >= 0 ? labelIndex : 0, 0, icon(linkIcon));
         }
       }
       return next;
