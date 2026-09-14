@@ -45,12 +45,16 @@
   outline-offset: 2px;
 }
 
-.FlatRatePresentationNav-groupLabel {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2rem;
-  padding: 0.25rem 0.35rem;
-  font-weight: 600;
+.FlatRatePresentationNav-link--start,
+.FlatRatePresentationTitle--start {
+  color: #66ff00 !important;
+  font-weight: 700;
+  gap: 0.4rem;
+}
+
+.FlatRatePresentationNav-link--start .icon,
+.App-titleControl .fa-play-circle {
+  color: #66ff00 !important;
 }
 
 .FlatRatePresentationNav-brand.depth-1 {
@@ -62,8 +66,7 @@
 }
 
 @media (max-width: 767px) {
-  .FlatRatePresentationNav-link,
-  .FlatRatePresentationNav-groupLabel {
+  .FlatRatePresentationNav-link {
     min-height: 2.5rem;
   }
 
@@ -84,13 +87,11 @@
 
   .App-drawer .FlatRateDrawerNav,
   .App-drawer .FlatRatePresentationNav,
-  .App-drawer .FlatRatePresentationNav-link,
-  .App-drawer .FlatRatePresentationNav-groupLabel {
+  .App-drawer .FlatRatePresentationNav-link {
     width: 100%;
   }
 
-  .App-drawer .FlatRatePresentationNav-link,
-  .App-drawer .FlatRatePresentationNav-groupLabel {
+  .App-drawer .FlatRatePresentationNav-link {
     display: flex;
   }
 }

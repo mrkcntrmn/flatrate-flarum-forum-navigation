@@ -63,8 +63,9 @@ test('title matrix uses tag data and explicit aliases', () => {
     resolvePresentationTitle({ currentTag: tag('general-shop-discussion', 'General Shop Discussion') }),
     'Technician Topics'
   );
-  assert.equal(resolvePresentationTitle({ currentTag: tag('start-here', 'Start Here') }), 'Push to Start');
-  assert.equal(resolvePresentationTitle({ currentTag: tag('start-here', 'Push to Start') }), 'Push to Start');
+  assert.equal(resolvePresentationTitle({ currentTag: tag('start-here', 'Start Here') }), 'START');
+  assert.equal(resolvePresentationTitle({ currentTag: tag('start-here', 'Push to Start') }), 'START');
+  assert.equal(resolvePresentationTitle({ currentTag: tag('start-here', 'START') }), 'START');
   assert.equal(resolvePresentationTitle({ routeName: 'community', manifest: {} }), null);
 });
 

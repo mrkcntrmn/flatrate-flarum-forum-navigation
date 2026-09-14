@@ -7,12 +7,14 @@
  * label, or null to leave core SelectDropdown behavior unchanged.
  */
 
+import { START_NAV_LABEL } from './startNav.js';
+
 export const TECHNICIAN_TOPICS_SLUG = 'general-shop-discussion';
 export const START_HERE_SLUG = 'start-here';
 export const PICK_A_BRAND = 'Pick a Brand';
 export const TECHNICIAN_TOPICS_LABEL = 'Technician Topics';
-export const START_HERE_LABEL = 'Push to Start';
-export const PUSH_TO_START_LABEL = START_HERE_LABEL;
+export const START_HERE_LABEL = START_NAV_LABEL;
+export const PUSH_TO_START_LABEL = START_NAV_LABEL;
 
 function tagSlug(currentTag) {
   if (!currentTag) return '';
