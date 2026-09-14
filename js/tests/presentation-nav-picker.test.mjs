@@ -40,8 +40,10 @@ test('phone hamburger drawer mounts presentation nav via HeaderSecondary', () =>
   assert.match(indexSrc, /from 'flarum\/forum\/components\/HeaderSecondary'/);
   assert.match(indexSrc, /extend\(HeaderSecondary\.prototype, 'items'/);
   assert.match(indexSrc, /flatrateDrawerNav/);
+  assert.match(indexSrc, /flatrateDrawerFollowing/);
   assert.match(indexSrc, /hideDrawerAfterLinkClick/);
   assert.match(indexSrc, /app\.drawer\.hide/);
+  assert.match(indexSrc, /flarum-subscriptions\.forum\.index\.following_link/);
   // Drawer session/avatar order is CSS-only so the desktop header pin stays.
   assert.doesNotMatch(indexSrc, /items\.(add|remove)\(\s*['\"]session['\"]/);
 });
@@ -53,16 +55,18 @@ test('SelectDropdown override is annotation-scoped', () => {
   assert.match(indexSrc, /extend\(IndexPage\.prototype, 'sidebarItems'/);
   assert.match(indexSrc, /TECHNICIAN_TOPICS_ICON/);
   assert.match(indexSrc, /fa-wrench/);
+  assert.match(indexSrc, /BRAND_NAV_ICON/);
+  assert.match(indexSrc, /PICK_A_BRAND/);
 });
 
 test('title matrix uses tag data and explicit aliases', () => {
   assert.equal(resolvePresentationTitle({ routeName: 'index' }), PICK_A_BRAND);
   assert.equal(resolvePresentationTitle({ routeName: 'index', searchContext: { sort: 'newest' } }), PICK_A_BRAND);
-  assert.equal(resolvePresentationTitle({ currentTag: tag('nissan', 'Nissan') }), 'Nissan');
-  assert.equal(resolvePresentationTitle({ currentTag: tag('gm', 'GM') }), 'GM');
-  assert.equal(resolvePresentationTitle({ currentTag: tag('chevrolet', 'Chevrolet') }), 'Chevrolet');
-  assert.equal(resolvePresentationTitle({ currentTag: tag('cdjr', 'CDJR') }), 'CDJR');
-  assert.equal(resolvePresentationTitle({ currentTag: tag('jeep', 'Jeep') }), 'Jeep');
+  assert.equal(resolvePresentationTitle({ currentTag: tag('nissan', 'Nissan') }), PICK_A_BRAND);
+  assert.equal(resolvePresentationTitle({ currentTag: tag('gm', 'GM') }), PICK_A_BRAND);
+  assert.equal(resolvePresentationTitle({ currentTag: tag('chevrolet', 'Chevrolet') }), PICK_A_BRAND);
+  assert.equal(resolvePresentationTitle({ currentTag: tag('cdjr', 'CDJR') }), PICK_A_BRAND);
+  assert.equal(resolvePresentationTitle({ currentTag: tag('jeep', 'Jeep') }), PICK_A_BRAND);
   assert.equal(
     resolvePresentationTitle({ currentTag: tag('general-shop-discussion', 'General Shop Discussion') }),
     'Technician Topics'

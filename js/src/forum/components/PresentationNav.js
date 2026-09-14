@@ -8,6 +8,7 @@ import {
   START_NAV_ICON,
   START_NAV_LABEL,
   TECHNICIAN_TOPICS_ICON,
+  BRAND_NAV_ICON,
   isStartNavGroup,
   isTechnicianTopicsGroup,
 } from '../utils/startNav';
@@ -76,7 +77,11 @@ export default class PresentationNav extends Component {
         key={board.boardKey}
       >
         <div className="FlatRatePresentationNav-row">
-          <Link className="FlatRatePresentationNav-link FlatRatePresentationNav-brandLink" href={brandHref(board)}>
+          <Link
+            className={classList('FlatRatePresentationNav-link', 'FlatRatePresentationNav-brandLink', 'hasIcon')}
+            href={brandHref(board)}
+          >
+            {icon(BRAND_NAV_ICON)}
             {board.name}
           </Link>
         </div>

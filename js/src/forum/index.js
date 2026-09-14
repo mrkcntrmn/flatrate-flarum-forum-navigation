@@ -2,13 +2,14 @@ import app from 'flarum/forum/app';
 import { extend, override } from 'flarum/common/extend';
 import IndexPage from 'flarum/forum/components/IndexPage';
 import HeaderSecondary from 'flarum/forum/components/HeaderSecondary';
+import LinkButton from 'flarum/common/components/LinkButton';
 import SelectDropdown from 'flarum/common/components/SelectDropdown';
 import icon from 'flarum/common/helpers/icon';
 
 import PresentationNav from './components/PresentationNav';
 import { getNavigationManifest } from './utils/manifest';
-import { resolvePresentationTitle, TECHNICIAN_TOPICS_LABEL } from './utils/presentationTitle';
-import { START_NAV_ICON, START_NAV_LABEL, TECHNICIAN_TOPICS_ICON } from './utils/startNav';
+import { PICK_A_BRAND, resolvePresentationTitle, TECHNICIAN_TOPICS_LABEL } from './utils/presentationTitle';
+import { BRAND_NAV_ICON, START_NAV_ICON, START_NAV_LABEL, TECHNICIAN_TOPICS_ICON } from './utils/startNav';
 import { stripNativeTagPresentation } from './utils/stripNativeTagPresentation';
 
 function hideDrawerAfterLinkClick(event) {
@@ -19,6 +20,15 @@ function hideDrawerAfterLinkClick(event) {
   if (app.drawer && typeof app.drawer.hide === 'function') {
     app.drawer.hide();
   }
+}
+
+function followingDrawerHref() {
+  const params =
+    app.search && typeof app.search.stickyParams === 'function' ? app.search.stickyParams() : {};
+  if (app.routes && app.routes.following) {
+    return app.route('following', params);
+  }
+  return '/following';
 }
 
 /**
@@ -55,8 +65,29 @@ app.initializers.add(
     });
 
     // Phone hamburger is Flarum's App-drawer, which renders HeaderSecondary.
-    // Desktop keeps IndexPage sideNav; CSS hides this copy at tablet-up.
+    // Desktop keeps IndexPage sideNav; CSS hides these copies at tablet-up.
     extend(HeaderSecondary.prototype, 'items', function (items) {
+      if (app.session && app.session.user && app.routes && app.routes.following) {
+        if (items.items && items.items.flatrateDrawerFollowing) {
+          items.remove('flatrateDrawerFollowing');
+        }
+
+        items.add(
+          'flatrateDrawerFollowing',
+          <div
+            className="FlatRateDrawerFollowing"
+            oncreate={(vnode) => {
+              vnode.dom.addEventListener('click', hideDrawerAfterLinkClick);
+            }}
+          >
+            <LinkButton href={followingDrawerHref()} icon="fas fa-star">
+              {app.translator.trans('flarum-subscriptions.forum.index.following_link')}
+            </LinkButton>
+          </div>,
+          -10
+        );
+      }
+
       const manifest = getNavigationManifest();
       if (!manifest) {
         return;
@@ -140,6 +171,7 @@ app.initializers.add(
       );
       const isStart = resolved === START_NAV_LABEL;
       const isTechnician = resolved === TECHNICIAN_TOPICS_LABEL;
+      const isPickABrand = resolved === PICK_A_BRAND;
       const label = (
         <span className={isStart ? 'Button-label FlatRatePresentationTitle--start' : 'Button-label'}>
           {resolved}
@@ -150,8 +182,14 @@ app.initializers.add(
       } else {
         next[0] = label;
       }
-      const iconNeedle = isStart ? 'fa-play-circle' : isTechnician ? 'fa-wrench' : '';
-      const linkIcon = isStart ? START_NAV_ICON : isTechnician ? TECHNICIAN_TOPICS_ICON : null;
+      const iconNeedle = isStart ? 'fa-play-circle' : isTechnician ? 'fa-wrench' : isPickABrand ? 'fa-car' : '';
+      const linkIcon = isStart
+        ? START_NAV_ICON
+        : isTechnician
+          ? TECHNICIAN_TOPICS_ICON
+          : isPickABrand
+            ? BRAND_NAV_ICON
+            : null;
       if (linkIcon) {
         const hasItemIcon = next.some((node) =>
           String((node && node.attrs && node.attrs.className) || '').includes(iconNeedle)

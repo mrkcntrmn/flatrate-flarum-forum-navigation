@@ -22,12 +22,6 @@ function tagSlug(currentTag) {
   return String(currentTag.slug || '');
 }
 
-function tagName(currentTag) {
-  if (!currentTag) return '';
-  if (typeof currentTag.name === 'function') return String(currentTag.name() || '');
-  return String(currentTag.name || currentTag.displayName || '');
-}
-
 function hasSearchQuery(searchContext) {
   if (!searchContext || typeof searchContext !== 'object') return false;
   const q = searchContext.q ?? searchContext.query;
@@ -77,8 +71,7 @@ export function resolvePresentationTitle({
   if (slug) {
     if (slug === TECHNICIAN_TOPICS_SLUG) return TECHNICIAN_TOPICS_LABEL;
     if (slug === START_HERE_SLUG) return PUSH_TO_START_LABEL;
-    const name = tagName(currentTag);
-    return name || null;
+    return PICK_A_BRAND;
   }
 
   if (isCanonicalUnfilteredIndex({ currentTag, routeName, searchContext, routeContext })) {
