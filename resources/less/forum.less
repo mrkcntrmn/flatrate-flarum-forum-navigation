@@ -119,13 +119,43 @@
     padding-right: 13px;
   }
 
-  /* Phone title-control is a full-width bottom sheet. START and Technician
-     Topics must use the same hasIcon gutter as All Discussions / Following. */
+  .App-drawer .FlatRatePresentationNav-brandLink {
+    gap: 0.4rem;
+  }
+
+  /* Live Chat is a HeaderSecondary LinkButton without the same drawer
+     padding as Notifications. Do not mutate the live-chat package. */
+  .App-drawer .item-LiveChats > a {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 13px;
+    text-align: left;
+    min-height: 36px;
+  }
+
+  .App-drawer .item-LiveChats .icon,
+  .App-drawer .item-LiveChats .Button-icon {
+    margin-right: 7px;
+    font-size: 14px;
+    width: 16px;
+    text-align: center;
+  }
+
+  .App-drawer .FlatRatePresentationNav-item--technician-topics,
+  .App-titleControl .FlatRatePresentationNav-item--technician-topics {
+    display: none !important;
+  }
+
+  /* Phone title-control is a full-width bottom sheet. START and brands
+     must use the same hasIcon gutter as All Discussions / Following. */
   .App-titleControl .Dropdown-menu .FlatRatePresentationNav-item--link {
     margin: 0;
   }
 
-  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-item--link .FlatRatePresentationNav-link {
+  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-item--link .FlatRatePresentationNav-link,
+  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-brandLink {
     width: 100%;
     box-sizing: border-box;
     justify-content: flex-start;
@@ -135,7 +165,8 @@
     padding: 15px 20px 15px 50px;
   }
 
-  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-item--link .icon {
+  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-item--link .icon,
+  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-brandLink .icon {
     width: 16px;
     margin-left: -30px;
     margin-right: 14px;
@@ -143,36 +174,35 @@
     text-align: center;
   }
 
-  /* Phone title-control is a full-width bottom sheet. Center the brand
-     column; indent GM/CDJR children inside it. Sidebar/hamburger stay
-     start-aligned. */
-  .App-titleControl .FlatRatePresentationNav-item--brands {
-    text-align: center;
+  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-item--brands {
+    margin: 0;
 
-    .FlatRatePresentationNav-tree {
-      display: inline-block;
-      text-align: left;
-    }
-
+    .FlatRatePresentationNav-tree,
+    .FlatRatePresentationNav-children,
     .FlatRatePresentationNav-row {
-      justify-content: flex-start;
-    }
-
-    .FlatRatePresentationNav-link {
-      justify-content: flex-start;
-      width: auto;
+      width: 100%;
     }
 
     .FlatRatePresentationNav-brand.depth-1 {
-      margin-left: 1.25rem;
+      margin-left: 0;
+    }
+
+    .FlatRatePresentationNav-brand.depth-1 .FlatRatePresentationNav-brandLink {
+      padding-left: 70px;
     }
   }
 }
 
 /* HeaderSecondary also renders in the desktop top bar. Do not mount the
-   41-board tree there; IndexPage sideNav already owns desktop presentation. */
+   41-board tree or Following copy there; IndexPage sideNav already owns
+   desktop presentation. */
 @media (min-width: 768px) {
-  .item-flatrateDrawerNav {
+  .item-flatrateDrawerNav,
+  .item-flatrateDrawerFollowing {
     display: none !important;
+  }
+
+  .IndexPage-nav .FlatRatePresentationNav-brandLink .icon {
+    display: none;
   }
 }
