@@ -75,13 +75,30 @@
     -webkit-overflow-scrolling: touch;
   }
 
+  /* Phone drawer stacks HeaderSecondary vertically. Keep Search first,
+     then the session avatar/profile above Notifications. Desktop header
+     order is unchanged because this rule is phone-only. */
+  .App-drawer .Header-controls {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .App-drawer .item-search {
+    order: -2;
+  }
+
+  .App-drawer .item-session {
+    order: -1;
+  }
+
   .App-drawer .item-flatrateDrawerNav {
     float: none !important;
     display: block !important;
     width: 100%;
     clear: both;
     margin: 0.75rem 0 0;
-    padding: 0.75rem 0 1rem;
+    /* Match Header-controls > li horizontal inset (10px). */
+    padding: 0.75rem 10px 1rem;
     border-top: 1px solid rgba(255, 255, 255, 0.12);
   }
 
@@ -93,6 +110,28 @@
 
   .App-drawer .FlatRatePresentationNav-link {
     display: flex;
+    /* Match Flarum 1.8.19 .Button horizontal padding in the drawer. */
+    padding-left: 13px;
+    padding-right: 13px;
+  }
+
+  /* Phone title-control is a full-width bottom sheet. Center only the
+     brand tree there; sidebar and hamburger stay start-aligned. */
+  .App-titleControl .FlatRatePresentationNav-item--brands {
+    text-align: center;
+
+    .FlatRatePresentationNav-row {
+      justify-content: center;
+    }
+
+    .FlatRatePresentationNav-link {
+      justify-content: center;
+      width: 100%;
+    }
+
+    .FlatRatePresentationNav-brand.depth-1 {
+      margin-left: 0;
+    }
   }
 }
 

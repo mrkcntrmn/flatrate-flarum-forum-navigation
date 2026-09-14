@@ -50,6 +50,12 @@ test('obsolete expander LESS is gone after becoming unused', () => {
   assert.match(less, /\.item-flatrateDrawerNav/);
   assert.match(less, /min-width: 768px/);
   assert.match(less, /\.App-drawer \.item-flatrateDrawerNav/);
+  assert.match(less, /\.App-titleControl \.FlatRatePresentationNav-item--brands/);
+  assert.match(less, /text-align:\s*center/);
+  assert.match(less, /\.App-drawer \.item-session/);
+  assert.match(less, /order:\s*-1/);
+  assert.match(less, /padding:\s*0\.75rem 10px 1rem/);
+  assert.match(less, /padding-left:\s*13px/);
 });
 
 test('GM and CDJR children are always emitted as nested presentation', () => {

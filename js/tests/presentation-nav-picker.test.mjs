@@ -42,6 +42,8 @@ test('phone hamburger drawer mounts presentation nav via HeaderSecondary', () =>
   assert.match(indexSrc, /flatrateDrawerNav/);
   assert.match(indexSrc, /hideDrawerAfterLinkClick/);
   assert.match(indexSrc, /app\.drawer\.hide/);
+  // Drawer session/avatar order is CSS-only so the desktop header pin stays.
+  assert.doesNotMatch(indexSrc, /items\.(add|remove)\(\s*['\"]session['\"]/);
 });
 
 test('SelectDropdown override is annotation-scoped', () => {
