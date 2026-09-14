@@ -7,7 +7,7 @@ import SelectDropdown from 'flarum/common/components/SelectDropdown';
 import icon from 'flarum/common/helpers/icon';
 
 import PresentationNav from './components/PresentationNav';
-import { getNavigationManifest } from './utils/manifest';
+import { getNavigationManifest, pushToStartHref } from './utils/manifest';
 import { resolvePresentationTitle, TECHNICIAN_TOPICS_LABEL } from './utils/presentationTitle';
 import { START_NAV_ICON, START_NAV_LABEL, TECHNICIAN_TOPICS_ICON } from './utils/startNav';
 import { stripNativeTagPresentation } from './utils/stripNativeTagPresentation';
@@ -92,6 +92,29 @@ app.initializers.add(
       if (!manifest) {
         return;
       }
+
+      if (items.items && items.items.flatrateDrawerStart) {
+        items.remove('flatrateDrawerStart');
+      }
+
+      items.add(
+        'flatrateDrawerStart',
+        <div
+          className="FlatRateDrawerStart"
+          oncreate={(vnode) => {
+            vnode.dom.addEventListener('click', hideDrawerAfterLinkClick);
+          }}
+        >
+          <LinkButton
+            className="Button--flat FlatRateDrawerStart-link"
+            href={pushToStartHref(manifest)}
+            icon={START_NAV_ICON}
+          >
+            {START_NAV_LABEL}
+          </LinkButton>
+        </div>,
+        -15
+      );
 
       if (items.items && items.items.flatrateDrawerNav) {
         items.remove('flatrateDrawerNav');

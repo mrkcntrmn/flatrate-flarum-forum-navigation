@@ -65,6 +65,10 @@ test('obsolete expander LESS is gone after becoming unused', () => {
   assert.match(less, /display:\s*none !important/);
   assert.match(less, /\.item-flatrateDrawerFollowing/);
   assert.match(less, /\.App-drawer \.item-flatrateDrawerFollowing \.Button/);
+  assert.match(less, /\.item-flatrateDrawerStart/);
+  assert.match(less, /display:\s*contents/);
+  assert.match(less, /FlatRatePresentationNav-item--community/);
+  assert.match(less, /\.App-titleControl \.FlatRatePresentationNav-brandLink \.icon/);
   assert.match(less, /FlatRatePresentationNav-item--technician-topics/);
   assert.doesNotMatch(less, /padding-left:\s*70px/);
 });
