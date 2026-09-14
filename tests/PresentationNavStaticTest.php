@@ -34,6 +34,10 @@ class PresentationNavStaticTest extends TestCase
         $this->assertStringNotContainsString('FlatRatePresentationNav-groupLabel', $dist);
         $this->assertStringNotContainsString('FlatRatePresentationNav-groupLabel', $less);
         $this->assertStringContainsString('.item-flatrateDrawerNav', $less);
+        $this->assertStringContainsString('.App-titleControl .FlatRatePresentationNav-item--brands', $less);
+        $this->assertStringContainsString('text-align: center', $less);
+        $this->assertStringContainsString('.App-drawer .item-session', $less);
+        $this->assertStringContainsString('padding: 0.75rem 10px 1rem', $less);
         $index = (string) file_get_contents($root . '/js/src/forum/index.js');
         $this->assertStringContainsString("from 'flarum/forum/components/HeaderSecondary'", $index);
         $this->assertStringContainsString('flatrateDrawerNav', $index);
