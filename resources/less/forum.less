@@ -130,27 +130,59 @@
   }
 
   .App-drawer .item-flatrateDrawerFollowing,
-  .App-drawer .FlatRateDrawerFollowing {
+  .App-drawer .item-flatrateDrawerStart {
     width: 100%;
   }
 
-  /* Match Notifications / Direct Messages Header-controls Button padding. */
-  .App-drawer .item-flatrateDrawerFollowing .Button {
-    display: flex;
+  /* Collapse wrappers so Following/START participate in Header-controls
+     Button layout the same way Notifications does. */
+  .App-drawer .FlatRateDrawerFollowing,
+  .App-drawer .FlatRateDrawerStart {
+    display: contents;
+  }
+
+  /* Match Notifications / Direct Messages: li 10px + Button 13px.
+     Beat .Button.hasIcon extra left padding so labels sit at ~49px. */
+  .App-drawer .item-flatrateDrawerFollowing a,
+  .App-drawer .item-flatrateDrawerFollowing .Button,
+  .App-drawer .item-flatrateDrawerStart a,
+  .App-drawer .item-flatrateDrawerStart .Button {
+    display: flex !important;
     align-items: center;
     width: 100%;
     box-sizing: border-box;
-    padding: 8px 13px;
+    padding: 8px 13px !important;
     text-align: left;
     min-height: 36px;
   }
 
   .App-drawer .item-flatrateDrawerFollowing .Button-icon,
-  .App-drawer .item-flatrateDrawerFollowing .icon {
-    margin-right: 7px;
+  .App-drawer .item-flatrateDrawerFollowing .icon,
+  .App-drawer .item-flatrateDrawerStart .Button-icon,
+  .App-drawer .item-flatrateDrawerStart .icon {
+    float: none !important;
+    margin: 0 7px 0 0 !important;
     font-size: 14px;
     width: 16px;
     text-align: center;
+  }
+
+  .App-drawer .FlatRateDrawerStart-link,
+  .App-drawer .FlatRateDrawerStart-link .Button-label,
+  .App-drawer .FlatRateDrawerStart-link .icon {
+    color: #66ff00 !important;
+    font-weight: 700;
+  }
+
+  /* START is a HeaderSecondary peer under Following in the hamburger.
+     Keep the lime START link in the desktop sidebar and title-sheet list. */
+  .App-drawer .FlatRatePresentationNav-item--community {
+    display: none !important;
+  }
+
+  /* Center popup brand list: text only. Hamburger keeps car icons. */
+  .App-titleControl .FlatRatePresentationNav-brandLink .icon {
+    display: none !important;
   }
 
   .App-drawer .FlatRatePresentationNav-item--technician-topics,
@@ -213,7 +245,8 @@
    desktop presentation. */
 @media (min-width: 768px) {
   .item-flatrateDrawerNav,
-  .item-flatrateDrawerFollowing {
+  .item-flatrateDrawerFollowing,
+  .item-flatrateDrawerStart {
     display: none !important;
   }
 

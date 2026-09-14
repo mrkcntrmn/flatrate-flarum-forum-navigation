@@ -49,10 +49,15 @@ class PresentationNavStaticTest extends TestCase
         $this->assertStringNotContainsString('padding-left: 70px', $less);
         $this->assertStringContainsString('.App-drawer .item-LiveChats', $less);
         $this->assertStringContainsString('.App-drawer .item-flatrateDrawerFollowing .Button', $less);
+        $this->assertStringContainsString('.item-flatrateDrawerStart', $less);
+        $this->assertStringContainsString('display: contents', $less);
+        $this->assertStringContainsString('FlatRatePresentationNav-item--community', $less);
+        $this->assertStringContainsString('.App-titleControl .FlatRatePresentationNav-brandLink .icon', $less);
         $this->assertStringContainsString('FlatRatePresentationNav-item--technician-topics', $less);
         $index = (string) file_get_contents($root . '/js/src/forum/index.js');
         $this->assertStringContainsString("from 'flarum/forum/components/HeaderSecondary'", $index);
         $this->assertStringContainsString('flatrateDrawerNav', $index);
         $this->assertStringContainsString('flatrateDrawerFollowing', $index);
+        $this->assertStringContainsString('flatrateDrawerStart', $index);
     }
 }

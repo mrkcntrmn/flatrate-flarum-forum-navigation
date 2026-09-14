@@ -70,7 +70,7 @@ export function resolvePresentationTitle({
     '';
   if (slug) {
     if (slug === TECHNICIAN_TOPICS_SLUG) return TECHNICIAN_TOPICS_LABEL;
-    if (slug === START_HERE_SLUG) return PUSH_TO_START_LABEL;
+    if (slug === START_HERE_SLUG) return PICK_A_BRAND;
     return PICK_A_BRAND;
   }
 

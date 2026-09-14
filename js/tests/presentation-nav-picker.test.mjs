@@ -41,6 +41,8 @@ test('phone hamburger drawer mounts presentation nav via HeaderSecondary', () =>
   assert.match(indexSrc, /extend\(HeaderSecondary\.prototype, 'items'/);
   assert.match(indexSrc, /flatrateDrawerNav/);
   assert.match(indexSrc, /flatrateDrawerFollowing/);
+  assert.match(indexSrc, /flatrateDrawerStart/);
+  assert.match(indexSrc, /pushToStartHref/);
   assert.match(indexSrc, /hideDrawerAfterLinkClick/);
   assert.match(indexSrc, /app\.drawer\.hide/);
   assert.match(indexSrc, /flarum-subscriptions\.forum\.index\.following_link/);
@@ -71,9 +73,9 @@ test('title matrix uses tag data and explicit aliases', () => {
     resolvePresentationTitle({ currentTag: tag('general-shop-discussion', 'General Shop Discussion') }),
     'Technician Topics'
   );
-  assert.equal(resolvePresentationTitle({ currentTag: tag('start-here', 'Start Here') }), 'START');
-  assert.equal(resolvePresentationTitle({ currentTag: tag('start-here', 'Push to Start') }), 'START');
-  assert.equal(resolvePresentationTitle({ currentTag: tag('start-here', 'START') }), 'START');
+  assert.equal(resolvePresentationTitle({ currentTag: tag('start-here', 'Start Here') }), PICK_A_BRAND);
+  assert.equal(resolvePresentationTitle({ currentTag: tag('start-here', 'Push to Start') }), PICK_A_BRAND);
+  assert.equal(resolvePresentationTitle({ currentTag: tag('start-here', 'START') }), PICK_A_BRAND);
   assert.equal(resolvePresentationTitle({ routeName: 'community', manifest: {} }), null);
 });
 
