@@ -3,10 +3,12 @@ import { extend, override } from 'flarum/common/extend';
 import IndexPage from 'flarum/forum/components/IndexPage';
 import HeaderSecondary from 'flarum/forum/components/HeaderSecondary';
 import SelectDropdown from 'flarum/common/components/SelectDropdown';
+import icon from 'flarum/common/helpers/icon';
 
 import PresentationNav from './components/PresentationNav';
 import { getNavigationManifest } from './utils/manifest';
 import { resolvePresentationTitle } from './utils/presentationTitle';
+import { START_NAV_ICON, START_NAV_LABEL } from './utils/startNav';
 import { stripNativeTagPresentation } from './utils/stripNativeTagPresentation';
 
 function hideDrawerAfterLinkClick(event) {
@@ -136,11 +138,24 @@ app.initializers.add(
       const labelIndex = next.findIndex(
         (node) => node && node.attrs && String(node.attrs.className || '').includes('Button-label')
       );
-      const label = <span className="Button-label">{resolved}</span>;
+      const isStart = resolved === START_NAV_LABEL;
+      const label = (
+        <span className={isStart ? 'Button-label FlatRatePresentationTitle--start' : 'Button-label'}>
+          {resolved}
+        </span>
+      );
       if (labelIndex >= 0) {
         next[labelIndex] = label;
       } else {
         next[0] = label;
+      }
+      if (isStart) {
+        const hasStartIcon = next.some((node) =>
+          String((node && node.attrs && node.attrs.className) || '').includes('fa-play-circle')
+        );
+        if (!hasStartIcon) {
+          next.splice(labelIndex >= 0 ? labelIndex : 0, 0, icon(START_NAV_ICON));
+        }
       }
       return next;
     });

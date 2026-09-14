@@ -1,8 +1,10 @@
 import Component from 'flarum/common/Component';
 import Link from 'flarum/common/components/Link';
 import classList from 'flarum/common/utils/classList';
+import icon from 'flarum/common/helpers/icon';
 
 import { brandHref, groupLinkHref } from '../utils/manifest';
+import { START_NAV_ICON, START_NAV_LABEL, isStartNavGroup } from '../utils/startNav';
 
 export default class PresentationNav extends Component {
   view() {
@@ -20,13 +22,18 @@ export default class PresentationNav extends Component {
 
   renderGroup(group) {
     if (group.mode === 'link') {
+      const start = isStartNavGroup(group);
       return (
         <li
           className={`FlatRatePresentationNav-item FlatRatePresentationNav-item--link FlatRatePresentationNav-item--${group.id}`}
           key={group.id}
         >
-          <Link className="FlatRatePresentationNav-link" href={groupLinkHref(group, this.attrs.manifest)}>
-            {group.label}
+          <Link
+            className={classList('FlatRatePresentationNav-link', start && 'FlatRatePresentationNav-link--start')}
+            href={groupLinkHref(group, this.attrs.manifest)}
+          >
+            {start ? icon(START_NAV_ICON) : null}
+            {start ? START_NAV_LABEL : group.label}
           </Link>
         </li>
       );
