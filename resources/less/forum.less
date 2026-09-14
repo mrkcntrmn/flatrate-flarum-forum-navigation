@@ -123,9 +123,19 @@
     gap: 0.4rem;
   }
 
-  /* Live Chat is a HeaderSecondary LinkButton without the same drawer
-     padding as Notifications. Do not mutate the live-chat package. */
-  .App-drawer .item-LiveChats > a {
+  /* Hide Live Chat in the phone hamburger only. Desktop header keeps it.
+     Do not mutate the live-chat package. */
+  .App-drawer .item-LiveChats {
+    display: none !important;
+  }
+
+  .App-drawer .item-flatrateDrawerFollowing,
+  .App-drawer .FlatRateDrawerFollowing {
+    width: 100%;
+  }
+
+  /* Match Notifications / Direct Messages Header-controls Button padding. */
+  .App-drawer .item-flatrateDrawerFollowing .Button {
     display: flex;
     align-items: center;
     width: 100%;
@@ -135,8 +145,8 @@
     min-height: 36px;
   }
 
-  .App-drawer .item-LiveChats .icon,
-  .App-drawer .item-LiveChats .Button-icon {
+  .App-drawer .item-flatrateDrawerFollowing .Button-icon,
+  .App-drawer .item-flatrateDrawerFollowing .icon {
     margin-right: 7px;
     font-size: 14px;
     width: 16px;
@@ -148,14 +158,13 @@
     display: none !important;
   }
 
-  /* Phone title-control is a full-width bottom sheet. START and brands
-     must use the same hasIcon gutter as All Discussions / Following. */
+  /* Phone title-control is a full-width bottom sheet. START must use the
+     same hasIcon gutter as All Discussions / Following. */
   .App-titleControl .Dropdown-menu .FlatRatePresentationNav-item--link {
     margin: 0;
   }
 
-  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-item--link .FlatRatePresentationNav-link,
-  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-brandLink {
+  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-item--link .FlatRatePresentationNav-link {
     width: 100%;
     box-sizing: border-box;
     justify-content: flex-start;
@@ -165,8 +174,7 @@
     padding: 15px 20px 15px 50px;
   }
 
-  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-item--link .icon,
-  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-brandLink .icon {
+  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-item--link .icon {
     width: 16px;
     margin-left: -30px;
     margin-right: 14px;
@@ -174,21 +182,28 @@
     text-align: center;
   }
 
-  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-item--brands {
-    margin: 0;
+  /* Phone title-control brand column is centered; GM/CDJR children indent
+     inside it. Sidebar/hamburger stay start-aligned. */
+  .App-titleControl .FlatRatePresentationNav-item--brands {
+    text-align: center;
 
-    .FlatRatePresentationNav-tree,
-    .FlatRatePresentationNav-children,
+    .FlatRatePresentationNav-tree {
+      display: inline-block;
+      text-align: left;
+    }
+
     .FlatRatePresentationNav-row {
-      width: 100%;
+      justify-content: flex-start;
+    }
+
+    .FlatRatePresentationNav-link {
+      justify-content: flex-start;
+      width: auto;
+      font-size: 16px;
     }
 
     .FlatRatePresentationNav-brand.depth-1 {
-      margin-left: 0;
-    }
-
-    .FlatRatePresentationNav-brand.depth-1 .FlatRatePresentationNav-brandLink {
-      padding-left: 70px;
+      margin-left: 1.25rem;
     }
   }
 }
