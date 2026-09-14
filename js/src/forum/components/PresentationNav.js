@@ -35,9 +35,6 @@ export default class PresentationNav extends Component {
     if (group.mode === 'tree' && group.id === 'brands') {
       return (
         <li className="FlatRatePresentationNav-item FlatRatePresentationNav-item--brands" key={group.id}>
-          <div className="FlatRatePresentationNav-row">
-            <span className="FlatRatePresentationNav-groupLabel">{group.label}</span>
-          </div>
           <ul className="FlatRatePresentationNav-tree">
             {(group.boards || []).map((board) => this.renderBrandNode(board, 0))}
           </ul>
