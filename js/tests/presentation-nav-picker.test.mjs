@@ -55,8 +55,8 @@ test('SelectDropdown override is annotation-scoped', () => {
   assert.match(indexSrc, /extend\(IndexPage\.prototype, 'sidebarItems'/);
   assert.match(indexSrc, /TECHNICIAN_TOPICS_ICON/);
   assert.match(indexSrc, /fa-wrench/);
-  assert.match(indexSrc, /BRAND_NAV_ICON/);
-  assert.match(indexSrc, /PICK_A_BRAND/);
+  assert.doesNotMatch(indexSrc, /BRAND_NAV_ICON/);
+  assert.doesNotMatch(indexSrc, /isPickABrand/);
 });
 
 test('title matrix uses tag data and explicit aliases', () => {
