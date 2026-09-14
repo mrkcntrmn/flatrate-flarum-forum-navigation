@@ -27,5 +27,9 @@ class PresentationNavStaticTest extends TestCase
         $this->assertStringNotContainsString('FlatRatePresentationNav-expander', $less);
         $this->assertStringContainsString('children.map((child) => this.renderBrandNode(child, depth + 1))', $src);
         $this->assertStringContainsString('brandHref(board)', $src);
+        $this->assertStringContainsString('.item-flatrateDrawerNav', $less);
+        $index = (string) file_get_contents($root . '/js/src/forum/index.js');
+        $this->assertStringContainsString("from 'flarum/forum/components/HeaderSecondary'", $index);
+        $this->assertStringContainsString('flatrateDrawerNav', $index);
     }
 }

@@ -36,6 +36,14 @@ test('IndexPage.navItems remains the Flarum Tags 1.8.19 seam', () => {
   assert.doesNotMatch(indexSrc, /from 'flarum\/forum\/components\/IndexSidebar'/);
 });
 
+test('phone hamburger drawer mounts presentation nav via HeaderSecondary', () => {
+  assert.match(indexSrc, /from 'flarum\/forum\/components\/HeaderSecondary'/);
+  assert.match(indexSrc, /extend\(HeaderSecondary\.prototype, 'items'/);
+  assert.match(indexSrc, /flatrateDrawerNav/);
+  assert.match(indexSrc, /hideDrawerAfterLinkClick/);
+  assert.match(indexSrc, /app\.drawer\.hide/);
+});
+
 test('SelectDropdown override is annotation-scoped', () => {
   assert.match(indexSrc, /flatratePresentationTitle !== true/);
   assert.match(indexSrc, /override\(SelectDropdown\.prototype, 'getButtonContent'/);

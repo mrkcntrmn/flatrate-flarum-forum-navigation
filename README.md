@@ -8,6 +8,7 @@ FlatRate.wiki presentation navigation for Flarum 1.8.x.
   - **Push to Start** → `/t/start-here`
   - **Technician Topics** → `/t/general-shop-discussion`
   - **Brands** static tree (41 boards; GM/CDJR always expanded, no collapse arrows)
+- Puts the same presentation list in the phone hamburger drawer (`HeaderSecondary`); hidden in the desktop header bar
 - Retires the public Community landing page
 - Redirects legacy `/community` to `/t/start-here` with HTTP 301
 - Leaves General Live on its durable `/live/community-general-live` identity
