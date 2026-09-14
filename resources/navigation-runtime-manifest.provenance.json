@@ -1,9 +1,9 @@
 {
   "CONTROL_REPO": "mrkcntrmn/flatrate-wiki",
   "MANIFEST_SOURCE_PATH": "configs/forum/navigation-runtime-manifest.json",
-  "SOURCE_MANIFEST_SHA256": "f262df400d7f8c1070cb14978472c3b549843e7d2678bdd934e538baa9903c65",
-  "CONTROL_SOURCE_SHA": "26518b0a8059829755079913a5c4d77313e254a6",
-  "CONTROL_PR": "https://github.com/mrkcntrmn/flatrate-wiki/pull/271",
+  "SOURCE_MANIFEST_SHA256": "cc2f232176351791ff05a128152b149af3dca0dd6bcecea32678f80e5e7ba30a",
+  "CONTROL_SOURCE_SHA": "38ebf69bbee14ea0f1c69929051e8c74896ba190",
+  "CONTROL_PR": "https://github.com/mrkcntrmn/flatrate-wiki/pull/272",
   "EMBEDDED_ASSET_PATH": "resources/navigation-runtime-manifest.json",
-  "NOTES": "SOURCE_MANIFEST_SHA256 is the SHA-256 of the embedded package asset bytes. CONTROL_SOURCE_SHA is the exact control-repo commit that generated this asset. No runtime network dependency."
+  "NOTES": "IA-011 schema v2 generated from origin/main 38ebf69 plus feat/forum-ia-011-push-to-start. SOURCE_MANIFEST_SHA256 is the SHA-256 of the embedded package asset bytes. CONTROL_SOURCE_SHA is the control-repo base used to generate this asset. No runtime network dependency."
 }

@@ -10,12 +10,23 @@ export function isGeneralLiveAvailable() {
     return fromAttr;
   }
   const manifest = getNavigationManifest();
+  if (typeof manifest?.generalLive?.available === 'boolean') {
+    return manifest.generalLive.available;
+  }
   return Boolean(manifest?.community?.generalLiveAvailable);
 }
 
-export function startHereHref(manifest) {
-  const slug = manifest?.community?.startHere?.slug || 'start-here';
+export function pushToStartHref(manifest) {
+  const slug =
+    manifest?.groups?.find((group) => group.destination?.type === 'tag' && group.destination?.slug === 'start-here')
+      ?.destination?.slug ||
+    manifest?.pushToStart?.slug ||
+    'start-here';
   return app.route('tag', { tags: slug });
+}
+
+export function startHereHref(manifest) {
+  return pushToStartHref(manifest);
 }
 
 export function technicianTopicsHref(manifest) {
@@ -23,6 +34,13 @@ export function technicianTopicsHref(manifest) {
     manifest?.groups?.find((group) => group.id === 'technician-topics')?.destination?.slug ||
     'general-shop-discussion';
   return app.route('tag', { tags: slug });
+}
+
+export function groupLinkHref(group, manifest) {
+  if (group?.destination?.type === 'tag' && group.destination.slug) {
+    return app.route('tag', { tags: group.destination.slug });
+  }
+  return pushToStartHref(manifest);
 }
 
 export function brandHref(board) {

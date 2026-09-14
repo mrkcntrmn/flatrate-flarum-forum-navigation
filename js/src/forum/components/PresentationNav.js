@@ -1,9 +1,8 @@
 import Component from 'flarum/common/Component';
 import Link from 'flarum/common/components/Link';
 import classList from 'flarum/common/utils/classList';
-import app from 'flarum/forum/app';
 
-import { brandHref, technicianTopicsHref } from '../utils/manifest';
+import { brandHref, groupLinkHref } from '../utils/manifest';
 
 export default class PresentationNav extends Component {
   view() {
@@ -20,20 +19,13 @@ export default class PresentationNav extends Component {
   }
 
   renderGroup(group) {
-    if (group.mode === 'link' && group.id === 'community') {
+    if (group.mode === 'link') {
       return (
-        <li className="FlatRatePresentationNav-item FlatRatePresentationNav-item--community" key={group.id}>
-          <Link className="FlatRatePresentationNav-link" href={app.route('community')}>
-            {group.label}
-          </Link>
-        </li>
-      );
-    }
-
-    if (group.mode === 'link' && group.id === 'technician-topics') {
-      return (
-        <li className="FlatRatePresentationNav-item FlatRatePresentationNav-item--technician" key={group.id}>
-          <Link className="FlatRatePresentationNav-link" href={technicianTopicsHref(this.attrs.manifest)}>
+        <li
+          className={`FlatRatePresentationNav-item FlatRatePresentationNav-item--link FlatRatePresentationNav-item--${group.id}`}
+          key={group.id}
+        >
+          <Link className="FlatRatePresentationNav-link" href={groupLinkHref(group, this.attrs.manifest)}>
             {group.label}
           </Link>
         </li>

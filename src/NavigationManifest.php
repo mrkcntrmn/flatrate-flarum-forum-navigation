@@ -7,6 +7,8 @@ use RuntimeException;
 
 final class NavigationManifest
 {
+    public const SCHEMA_VERSION = 2;
+
     private static ?array $cached = null;
 
     public static function assetPath(): string
@@ -36,26 +38,39 @@ final class NavigationManifest
         return self::$cached;
     }
 
+    public static function pushToStartPath(): string
+    {
+        return CommunityRedirect::TARGET_PATH;
+    }
+
+    public static function legacyCommunityRoute(): string
+    {
+        return (string) (self::load()['legacyCommunity']['route'] ?? CommunityRedirect::ROUTE_PATH);
+    }
+
+    /**
+     * @deprecated IA-011: /community is a compatibility redirect, not a public destination.
+     */
     public static function communityRoute(): string
     {
-        return (string) (self::load()['community']['route'] ?? '/community');
+        return self::legacyCommunityRoute();
     }
 
     public static function generalLiveAvailable(): bool
     {
-        return (bool) (self::load()['community']['generalLiveAvailable'] ?? false);
+        return (bool) (self::load()['generalLive']['available'] ?? false);
     }
 
     public static function generalLiveRoute(): ?string
     {
-        $route = self::load()['community']['generalLive']['route'] ?? null;
+        $route = self::load()['generalLive']['route'] ?? null;
         return is_string($route) && $route !== '' ? $route : null;
     }
 
     public static function assertValid(array $manifest): void
     {
-        if (($manifest['schemaVersion'] ?? null) !== 1) {
-            throw new InvalidArgumentException('schemaVersion must be 1');
+        if (($manifest['schemaVersion'] ?? null) !== self::SCHEMA_VERSION) {
+            throw new InvalidArgumentException('schemaVersion must be 2');
         }
         if (($manifest['kind'] ?? null) !== 'forum-navigation-runtime-manifest') {
             throw new InvalidArgumentException('kind mismatch');
@@ -65,8 +80,8 @@ final class NavigationManifest
         }
 
         $labels = array_map(static fn ($group) => $group['label'] ?? null, $manifest['groups']);
-        if ($labels !== ['Community', 'Technician Topics', 'Brands']) {
-            throw new InvalidArgumentException('group order must be Community, Technician Topics, Brands');
+        if ($labels !== ['Push to Start', 'Technician Topics', 'Brands']) {
+            throw new InvalidArgumentException('group order must be Push to Start, Technician Topics, Brands');
         }
 
         $modes = array_map(static fn ($group) => [$group['id'] ?? null, $group['mode'] ?? null], $manifest['groups']);
@@ -76,6 +91,13 @@ final class NavigationManifest
             ['brands', 'tree'],
         ]) {
             throw new InvalidArgumentException('sidebar modes mismatch');
+        }
+
+        $pushToStart = $manifest['groups'][0]['destination'] ?? [];
+        if (($pushToStart['type'] ?? null) !== 'tag'
+            || ($pushToStart['boardKey'] ?? null) !== 'start-here'
+            || ($pushToStart['slug'] ?? null) !== 'start-here') {
+            throw new InvalidArgumentException('Push to Start destination must remain /t/start-here');
         }
 
         $technician = $manifest['groups'][1]['destination'] ?? [];
@@ -131,18 +153,28 @@ final class NavigationManifest
             throw new InvalidArgumentException('CDJR children mismatch');
         }
 
-        if (($manifest['community']['route'] ?? null) !== '/community') {
-            throw new InvalidArgumentException('Community route must be /community');
+        if (($manifest['pushToStart']['boardKey'] ?? null) !== 'start-here'
+            || ($manifest['pushToStart']['slug'] ?? null) !== 'start-here') {
+            throw new InvalidArgumentException('pushToStart must remain start-here');
         }
 
-        if (($manifest['community']['generalLiveAvailable'] ?? null) !== true) {
+        if (($manifest['legacyCommunity']['route'] ?? null) !== '/community'
+            || ($manifest['legacyCommunity']['redirectTarget'] ?? null) !== '/t/start-here') {
+            throw new InvalidArgumentException('legacyCommunity must redirect /community to /t/start-here');
+        }
+
+        if (($manifest['generalLive']['available'] ?? null) !== true) {
             throw new InvalidArgumentException('GENERAL_LIVE_AVAILABLE must be true');
         }
-        $live = $manifest['community']['generalLive'] ?? null;
+        $live = $manifest['generalLive'] ?? null;
         if (!is_array($live)
             || ($live['roomKey'] ?? null) !== 'community-general-live'
             || ($live['route'] ?? null) !== '/live/community-general-live') {
-            throw new InvalidArgumentException('community.generalLive must be community-general-live');
+            throw new InvalidArgumentException('generalLive must remain community-general-live');
+        }
+
+        if (array_key_exists('community', $manifest)) {
+            throw new InvalidArgumentException('v2 manifest must not nest public Community metadata');
         }
     }
 }

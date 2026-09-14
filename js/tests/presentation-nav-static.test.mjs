@@ -68,4 +68,9 @@ test('GM and CDJR children are always emitted as nested presentation', () => {
   );
   assert.equal(src.includes("boardKey === 'gm'"), false);
   assert.equal(src.includes('expandedParents'), false);
+  assert.equal(src.includes("app.route('community')"), false);
+  assert.match(src, /groupLinkHref\(group, this\.attrs\.manifest\)/);
+  assert.equal(manifest.groups[0].label, 'Push to Start');
+  assert.equal(manifest.groups[0].destination.slug, 'start-here');
+  assert.equal(manifest.groups.map((group) => group.label).includes('Community'), false);
 });

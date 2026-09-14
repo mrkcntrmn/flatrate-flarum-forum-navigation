@@ -27,14 +27,34 @@ check_http() {
   fi
 }
 
+check_legacy_community_redirect() {
+  local hdr="/tmp/flatrate-nav-smoke-hdr.$$"
+  local code location
+  code="$(curl -sS -D "${hdr}" -o /dev/null -w '%{http_code}' "${BASE_URL}/community")"
+  location="$(awk 'BEGIN{IGNORECASE=1} $1=="Location:" {print $2}' "${hdr}" | tr -d '\r' | tail -n 1)"
+  echo "LEGACY_COMMUNITY_HTTP=${code}"
+  echo "LEGACY_COMMUNITY_LOCATION=${location}"
+  if [[ "${code}" != "301" && "${code}" != "308" ]]; then
+    echo "DISPOSABLE_SMOKE=FAIL LEGACY_COMMUNITY_HTTP=${code} expected 301/308" >&2
+    rm -f "${hdr}"
+    exit 1
+  fi
+  if [[ "${location}" != *"/t/start-here" ]]; then
+    echo "DISPOSABLE_SMOKE=FAIL LEGACY_COMMUNITY_LOCATION=${location} expected /t/start-here" >&2
+    rm -f "${hdr}"
+    exit 1
+  fi
+  rm -f "${hdr}"
+}
+
 check_http "/" "FORUM"
-check_http "/community" "COMMUNITY"
+check_legacy_community_redirect
 check_http "/api" "API"
 
 rm -f /tmp/flatrate-nav-smoke-body.$$
 
 echo "DISPOSABLE_SMOKE=PASS"
 echo "FORUM_HTTP=200"
-echo "COMMUNITY_HTTP=200"
+echo "LEGACY_COMMUNITY_REDIRECT=PASS"
 echo "API_HTTP=200"
 echo "PRODUCTION_INSTALL=false"

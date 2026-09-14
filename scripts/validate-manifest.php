@@ -66,8 +66,8 @@ if (($provenance['SOURCE_MANIFEST_SHA256'] ?? null) !== $sha256) {
     );
 }
 
-if (($manifest['schemaVersion'] ?? null) !== 1) {
-    fail('schemaVersion must be 1');
+if (($manifest['schemaVersion'] ?? null) !== 2) {
+    fail('schemaVersion must be 2');
 }
 
 if (($manifest['kind'] ?? null) !== 'forum-navigation-runtime-manifest') {
@@ -80,8 +80,8 @@ if (!is_array($groups) || count($groups) !== 3) {
 }
 
 $labels = array_map(static fn ($group) => $group['label'] ?? null, $groups);
-if ($labels !== ['Community', 'Technician Topics', 'Brands']) {
-    fail('group order must be Community, Technician Topics, Brands');
+if ($labels !== ['Push to Start', 'Technician Topics', 'Brands']) {
+    fail('group order must be Push to Start, Technician Topics, Brands');
 }
 
 $modes = array_map(
@@ -94,6 +94,13 @@ if ($modes !== [
     ['brands', 'tree'],
 ]) {
     fail('sidebar modes mismatch');
+}
+
+$pushToStart = $groups[0]['destination'] ?? [];
+if (($pushToStart['type'] ?? null) !== 'tag'
+    || ($pushToStart['boardKey'] ?? null) !== 'start-here'
+    || ($pushToStart['slug'] ?? null) !== 'start-here') {
+    fail('Push to Start destination must remain /t/start-here');
 }
 
 $technician = $groups[1]['destination'] ?? [];
@@ -157,23 +164,33 @@ if ($cdjrNames !== ['Chrysler', 'Dodge', 'Jeep', 'Ram']) {
     fail('CDJR children mismatch');
 }
 
-if (($manifest['community']['route'] ?? null) !== '/community') {
-    fail('Community route must be /community');
+if (($manifest['pushToStart']['boardKey'] ?? null) !== 'start-here'
+    || ($manifest['pushToStart']['slug'] ?? null) !== 'start-here') {
+    fail('pushToStart must remain start-here');
 }
 
-if (($manifest['community']['generalLiveAvailable'] ?? null) !== true) {
+if (($manifest['legacyCommunity']['route'] ?? null) !== '/community'
+    || ($manifest['legacyCommunity']['redirectTarget'] ?? null) !== '/t/start-here') {
+    fail('legacyCommunity must redirect /community to /t/start-here');
+}
+
+if (($manifest['generalLive']['available'] ?? null) !== true) {
     fail('GENERAL_LIVE_AVAILABLE must be true');
 }
 
-$live = $manifest['community']['generalLive'] ?? null;
+$live = $manifest['generalLive'] ?? null;
 if (!is_array($live)
     || ($live['roomKey'] ?? null) !== 'community-general-live'
     || ($live['route'] ?? null) !== '/live/community-general-live') {
-    fail('community.generalLive must be community-general-live');
+    fail('generalLive must remain community-general-live');
 }
 
-if (($provenance['CONTROL_SOURCE_SHA'] ?? null) !== '26518b0a8059829755079913a5c4d77313e254a6') {
-    fail('CONTROL_SOURCE_SHA must match the generating control commit');
+if (array_key_exists('community', $manifest)) {
+    fail('v2 manifest must not nest public Community metadata');
+}
+
+if (!preg_match('/^[0-9a-f]{40}$/', (string) ($provenance['CONTROL_SOURCE_SHA'] ?? ''))) {
+    fail('CONTROL_SOURCE_SHA must be a 40-character git SHA');
 }
 
 fwrite(STDOUT, "MANIFEST_VALIDATE=PASS\n");
@@ -182,7 +199,8 @@ fwrite(STDOUT, "CONTROL_REPO={$provenance['CONTROL_REPO']}\n");
 fwrite(STDOUT, "CONTROL_SOURCE_SHA={$provenance['CONTROL_SOURCE_SHA']}\n");
 fwrite(STDOUT, "MANIFEST_SOURCE_PATH={$provenance['MANIFEST_SOURCE_PATH']}\n");
 fwrite(STDOUT, "BRAND_BOARD_COUNT=41\n");
-fwrite(STDOUT, "COMMUNITY_ROUTE=/community\n");
+fwrite(STDOUT, "PUSH_TO_START_PATH=/t/start-here\n");
+fwrite(STDOUT, "LEGACY_COMMUNITY_ROUTE=/community\n");
 fwrite(STDOUT, "GENERAL_LIVE_AVAILABLE=true\n");
 fwrite(STDOUT, "GENERAL_LIVE_ROUTE=/live/community-general-live\n");
 exit(0);

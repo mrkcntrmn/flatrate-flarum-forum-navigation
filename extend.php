@@ -13,8 +13,11 @@ use FlatRate\ForumNavigation\Api\NavigationManifestAttribute;
 return [
     (new Extend\Frontend('forum'))
         ->js(__DIR__ . '/js/dist/forum.js')
-        ->css(__DIR__ . '/resources/less/forum.less')
-        ->route('/community', 'flatrate-forum-navigation.community', CommunityCanonical::class),
+        ->css(__DIR__ . '/resources/less/forum.less'),
+
+    (new Extend\Routes('forum'))
+        ->get('/community', 'flatrate-forum-navigation.community-redirect', CommunityRedirect::class)
+        ->get('/community/', 'flatrate-forum-navigation.community-redirect-slash', CommunityRedirect::class),
 
     new Extend\Locales(__DIR__ . '/resources/locale'),
 

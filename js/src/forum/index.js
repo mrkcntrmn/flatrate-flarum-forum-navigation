@@ -3,7 +3,6 @@ import { extend, override } from 'flarum/common/extend';
 import IndexPage from 'flarum/forum/components/IndexPage';
 import SelectDropdown from 'flarum/common/components/SelectDropdown';
 
-import CommunityPage from './components/CommunityPage';
 import PresentationNav from './components/PresentationNav';
 import { getNavigationManifest } from './utils/manifest';
 import { resolvePresentationTitle } from './utils/presentationTitle';
@@ -20,11 +19,6 @@ import { stripNativeTagPresentation } from './utils/stripNativeTagPresentation';
 app.initializers.add(
   'flatrate-forum-navigation',
   () => {
-    app.routes.community = {
-      path: '/community',
-      component: CommunityPage,
-    };
-
     extend(IndexPage.prototype, 'navItems', function (items) {
       // Registered after flarum-tags so removals apply after tag injection.
       stripNativeTagPresentation(items);

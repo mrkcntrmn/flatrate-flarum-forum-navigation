@@ -11,7 +11,9 @@ class NavigationManifestAttribute
     {
         return [
             'flatrateForumNavigationManifest' => NavigationManifest::load(),
-            'flatrateForumNavigationCommunityRoute' => NavigationManifest::communityRoute(),
+            'flatrateForumNavigationPushToStartPath' => NavigationManifest::pushToStartPath(),
+            'flatrateForumNavigationLegacyCommunityRoute' => NavigationManifest::legacyCommunityRoute(),
+            'flatrateForumNavigationCommunityRoute' => NavigationManifest::legacyCommunityRoute(),
             'flatrateForumNavigationGeneralLiveAvailable' => NavigationManifest::generalLiveAvailable(),
         ];
     }
