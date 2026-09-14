@@ -47,6 +47,9 @@ test('obsolete expander LESS is gone after becoming unused', () => {
     assert.equal(less.includes(needle), false, `less still contains ${needle}`);
   }
   assert.match(less, /\.FlatRatePresentationNav-brand\.depth-1/);
+  assert.match(less, /\.item-flatrateDrawerNav/);
+  assert.match(less, /min-width: 768px/);
+  assert.match(less, /\.App-drawer \.item-flatrateDrawerNav/);
 });
 
 test('GM and CDJR children are always emitted as nested presentation', () => {

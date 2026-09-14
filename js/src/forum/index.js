@@ -1,12 +1,23 @@
 import app from 'flarum/forum/app';
 import { extend, override } from 'flarum/common/extend';
 import IndexPage from 'flarum/forum/components/IndexPage';
+import HeaderSecondary from 'flarum/forum/components/HeaderSecondary';
 import SelectDropdown from 'flarum/common/components/SelectDropdown';
 
 import PresentationNav from './components/PresentationNav';
 import { getNavigationManifest } from './utils/manifest';
 import { resolvePresentationTitle } from './utils/presentationTitle';
 import { stripNativeTagPresentation } from './utils/stripNativeTagPresentation';
+
+function hideDrawerAfterLinkClick(event) {
+  const target = event && event.target;
+  if (!target || typeof target.closest !== 'function' || !target.closest('a')) {
+    return;
+  }
+  if (app.drawer && typeof app.drawer.hide === 'function') {
+    app.drawer.hide();
+  }
+}
 
 /**
  * Flarum Tags 1.8.19 injects tags/separator/tag<ID>/moreTags through
@@ -39,6 +50,32 @@ app.initializers.add(
       );
 
       stripNativeTagPresentation(items);
+    });
+
+    // Phone hamburger is Flarum's App-drawer, which renders HeaderSecondary.
+    // Desktop keeps IndexPage sideNav; CSS hides this copy at tablet-up.
+    extend(HeaderSecondary.prototype, 'items', function (items) {
+      const manifest = getNavigationManifest();
+      if (!manifest) {
+        return;
+      }
+
+      if (items.items && items.items.flatrateDrawerNav) {
+        items.remove('flatrateDrawerNav');
+      }
+
+      items.add(
+        'flatrateDrawerNav',
+        <div
+          className="FlatRateDrawerNav"
+          oncreate={(vnode) => {
+            vnode.dom.addEventListener('click', hideDrawerAfterLinkClick);
+          }}
+        >
+          <PresentationNav manifest={manifest} />
+        </div>,
+        -20
+      );
     });
 
     // Annotate only the IndexPage title-control SelectDropdown.

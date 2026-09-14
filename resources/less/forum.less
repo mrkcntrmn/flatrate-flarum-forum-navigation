@@ -66,4 +66,39 @@
   .FlatRatePresentationNav-groupLabel {
     min-height: 2.5rem;
   }
+
+  .App-drawer {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .App-drawer .item-flatrateDrawerNav {
+    float: none !important;
+    display: block !important;
+    width: 100%;
+    clear: both;
+    margin: 0.75rem 0 0;
+    padding: 0.75rem 0 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .App-drawer .FlatRateDrawerNav,
+  .App-drawer .FlatRatePresentationNav,
+  .App-drawer .FlatRatePresentationNav-link,
+  .App-drawer .FlatRatePresentationNav-groupLabel {
+    width: 100%;
+  }
+
+  .App-drawer .FlatRatePresentationNav-link,
+  .App-drawer .FlatRatePresentationNav-groupLabel {
+    display: flex;
+  }
+}
+
+/* HeaderSecondary also renders in the desktop top bar. Do not mount the
+   41-board tree there; IndexPage sideNav already owns desktop presentation. */
+@media (min-width: 768px) {
+  .item-flatrateDrawerNav {
+    display: none !important;
+  }
 }
