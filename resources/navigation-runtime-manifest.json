@@ -1,15 +1,16 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "kind": "forum-navigation-runtime-manifest",
   "status": "planned-not-live",
   "groups": [
     {
       "id": "community",
-      "label": "Community",
+      "label": "Push to Start",
       "mode": "link",
       "destination": {
-        "type": "route",
-        "routeKey": "community"
+        "type": "tag",
+        "boardKey": "start-here",
+        "slug": "start-here"
       }
     },
     {
@@ -278,17 +279,17 @@
       ]
     }
   ],
-  "community": {
+  "pushToStart": {
+    "boardKey": "start-here",
+    "slug": "start-here"
+  },
+  "legacyCommunity": {
     "route": "/community",
-    "routeKey": "community",
-    "generalLiveAvailable": true,
-    "generalLive": {
-      "roomKey": "community-general-live",
-      "route": "/live/community-general-live"
-    },
-    "startHere": {
-      "boardKey": "start-here",
-      "slug": "start-here"
-    }
+    "redirectTarget": "/t/start-here"
+  },
+  "generalLive": {
+    "roomKey": "community-general-live",
+    "route": "/live/community-general-live",
+    "available": true
   }
 }

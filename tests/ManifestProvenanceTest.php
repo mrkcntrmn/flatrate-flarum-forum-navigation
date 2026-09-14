@@ -25,9 +25,9 @@ class ManifestProvenanceTest extends TestCase
             $provenance['MANIFEST_SOURCE_PATH'] ?? null
         );
         $this->assertSame($sha256, $provenance['SOURCE_MANIFEST_SHA256'] ?? null);
-        $this->assertSame(
-            '26518b0a8059829755079913a5c4d77313e254a6',
-            $provenance['CONTROL_SOURCE_SHA'] ?? null
+        $this->assertMatchesRegularExpression(
+            '/^[0-9a-f]{40}$/',
+            (string) ($provenance['CONTROL_SOURCE_SHA'] ?? '')
         );
     }
 

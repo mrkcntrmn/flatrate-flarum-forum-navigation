@@ -6,9 +6,11 @@ function isSafeLiveRoute(value) {
 }
 
 export function canonicalGeneralLiveRoute(manifest) {
-  const route = manifest?.community?.generalLive?.route;
-  const roomKey = manifest?.community?.generalLive?.roomKey;
-  if (manifest?.community?.generalLiveAvailable !== true) return null;
+  const route = manifest?.generalLive?.route ?? manifest?.community?.generalLive?.route;
+  const roomKey = manifest?.generalLive?.roomKey ?? manifest?.community?.generalLive?.roomKey;
+  const available =
+    manifest?.generalLive?.available ?? manifest?.community?.generalLiveAvailable;
+  if (available !== true) return null;
   if (roomKey && roomKey !== CANONICAL_GENERAL_LIVE_ROOM_KEY) return null;
   if (!isSafeLiveRoute(route)) return null;
   return route;

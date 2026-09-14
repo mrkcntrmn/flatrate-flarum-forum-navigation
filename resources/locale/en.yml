@@ -1,10 +1,7 @@
 flatrate-forum-navigation:
   forum:
-    community:
-      title: Community
-      start_here: Start Here
-      open_start_here: Open Start Here
-      general_live: General Live
-      coming_soon: Coming soon
     nav:
       aria_label: Forum presentation navigation
+      push_to_start: Push to Start
+      technician_topics: Technician Topics
+      brands: Brands

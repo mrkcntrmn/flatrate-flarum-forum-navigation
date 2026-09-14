@@ -12,24 +12,37 @@ import {
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const manifest = JSON.parse(readFileSync(join(root, 'resources/navigation-runtime-manifest.json'), 'utf8'));
-const communitySrc = readFileSync(join(root, 'js/src/forum/components/CommunityPage.js'), 'utf8');
+const indexSrc = readFileSync(join(root, 'js/src/forum/index.js'), 'utf8');
+const navSrc = readFileSync(join(root, 'js/src/forum/components/PresentationNav.js'), 'utf8');
 
-test('embedded manifest exposes exact General Live metadata', () => {
-  assert.equal(manifest.community.generalLiveAvailable, true);
-  assert.equal(manifest.community.generalLive.roomKey, 'community-general-live');
-  assert.equal(manifest.community.generalLive.route, CANONICAL_GENERAL_LIVE_ROUTE);
-  assert.equal(manifest.community.startHere.slug, 'start-here');
+test('embedded manifest exposes exact General Live and Push to Start metadata', () => {
+  assert.equal(manifest.schemaVersion, 2);
+  assert.equal(manifest.generalLive.available, true);
+  assert.equal(manifest.generalLive.roomKey, 'community-general-live');
+  assert.equal(manifest.generalLive.route, CANONICAL_GENERAL_LIVE_ROUTE);
+  assert.equal(manifest.pushToStart.slug, 'start-here');
+  assert.equal(manifest.legacyCommunity.route, '/community');
+  assert.equal(manifest.legacyCommunity.redirectTarget, '/t/start-here');
+  assert.equal(Object.prototype.hasOwnProperty.call(manifest, 'community'), false);
   assert.equal(Object.prototype.hasOwnProperty.call(manifest.groups[0], 'boards'), false);
   assert.equal(Object.prototype.hasOwnProperty.call(manifest.groups[1], 'boards'), false);
 });
 
-test('Community page consumes manifest route and never hashes', () => {
-  assert.match(communitySrc, /resolveGeneralLiveHref/);
-  assert.match(communitySrc, /Open Start Here/);
-  assert.match(communitySrc, /Open General Live/);
-  assert.doesNotMatch(communitySrc, /Coming soon/);
-  assert.doesNotMatch(communitySrc, /\|\| '#'/);
-  assert.doesNotMatch(communitySrc, /href=\{'#'\}/);
+test('Community landing page is retired', () => {
+  assert.doesNotMatch(indexSrc, /CommunityPage/);
+  assert.doesNotMatch(indexSrc, /app\.routes\.community/);
+  assert.doesNotMatch(navSrc, /app\.route\('community'\)/);
+  assert.equal(manifest.groups[0].label, 'Push to Start');
+  assert.deepEqual(manifest.groups[0].destination, {
+    type: 'tag',
+    boardKey: 'start-here',
+    slug: 'start-here',
+  });
+  assert.equal(
+    manifest.groups.map((group) => group.label).includes('Community'),
+    false,
+    'PUBLIC_NAV_CONTAINS_COMMUNITY must be false'
+  );
 });
 
 test('live href prefers valid runtime override, else manifest, never #', () => {
@@ -40,10 +53,10 @@ test('live href prefers valid runtime override, else manifest, never #', () => {
   );
   assert.equal(resolveGeneralLiveHref({ runtimeRoute: '#', manifest }), CANONICAL_GENERAL_LIVE_ROUTE);
   assert.equal(resolveGeneralLiveHref({ runtimeRoute: '/admin', manifest }), CANONICAL_GENERAL_LIVE_ROUTE);
-  assert.equal(resolveGeneralLiveHref({ manifest: { community: { generalLiveAvailable: true } } }), null);
+  assert.equal(resolveGeneralLiveHref({ manifest: { generalLive: { available: true } } }), null);
   assert.equal(
     resolveGeneralLiveHref({
-      manifest: { community: { generalLiveAvailable: false, generalLive: { route: CANONICAL_GENERAL_LIVE_ROUTE } } },
+      manifest: { generalLive: { available: false, route: CANONICAL_GENERAL_LIVE_ROUTE } },
     }),
     null
   );

@@ -1,6 +1,6 @@
 {
     "name": "flatrate/flarum-forum-navigation",
-    "description": "FlatRate.wiki presentation navigation: Community, Technician Topics, and Brands tree.",
+    "description": "FlatRate.wiki presentation navigation: Push to Start, Technician Topics, and Brands tree.",
     "type": "flarum-extension",
     "license": "MIT",
     "keywords": [

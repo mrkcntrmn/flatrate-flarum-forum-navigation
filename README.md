@@ -5,19 +5,21 @@ FlatRate.wiki presentation navigation for Flarum 1.8.x.
 ## What it does
 
 - Replaces the native flat primary-tag sideNav presentation with:
-  - **Community** → `/community`
+  - **Push to Start** → `/t/start-here`
   - **Technician Topics** → `/t/general-shop-discussion`
   - **Brands** static tree (41 boards; GM/CDJR always expanded, no collapse arrows)
-- Serves a FlatRate-owned Community page with Start Here and live-ready General Live (`GENERAL_LIVE_AVAILABLE=true`, `/live/community-general-live`)
-- Emits one server-rendered `/community` self-canonical from the configured Flarum base URL (`Document::$canonicalUrl`; no JavaScript, no HTML rewrite)
+- Retires the public Community landing page
+- Redirects legacy `/community` to `/t/start-here` with HTTP 301
+- Leaves General Live on its durable `/live/community-general-live` identity
 - Embeds a generated navigation runtime manifest asset; does not read the main wiki repo at runtime
 
 ## Hard boundaries
 
 ```text
-PRODUCTION_INSTALL=false in FORUM-IA-010C1
-LIVE_SIDEBAR_CHANGE=false
-LIVE_TAG_RENAME=false
+PRODUCTION_INSTALL=false in FORUM-IA-011A
+PUBLIC_COMMUNITY_SURFACE=false
+PUSH_TO_START_SLUG=start-here
+LIVE_CHAT_CODE_MUTATION=false
 FLARUM_PARENT_GRAPH_CHANGED=false
 ```
 

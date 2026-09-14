@@ -11,7 +11,8 @@ export const TECHNICIAN_TOPICS_SLUG = 'general-shop-discussion';
 export const START_HERE_SLUG = 'start-here';
 export const PICK_A_BRAND = 'Pick a Brand';
 export const TECHNICIAN_TOPICS_LABEL = 'Technician Topics';
-export const START_HERE_LABEL = 'Start Here';
+export const START_HERE_LABEL = 'Push to Start';
+export const PUSH_TO_START_LABEL = START_HERE_LABEL;
 
 function tagSlug(currentTag) {
   if (!currentTag) return '';
@@ -73,17 +74,13 @@ export function resolvePresentationTitle({
     '';
   if (slug) {
     if (slug === TECHNICIAN_TOPICS_SLUG) return TECHNICIAN_TOPICS_LABEL;
-    if (slug === START_HERE_SLUG) return START_HERE_LABEL;
+    if (slug === START_HERE_SLUG) return PUSH_TO_START_LABEL;
     const name = tagName(currentTag);
     return name || null;
   }
 
   if (isCanonicalUnfilteredIndex({ currentTag, routeName, searchContext, routeContext })) {
     return PICK_A_BRAND;
-  }
-
-  if (manifest && routeName === 'community') {
-    return 'Community';
   }
 
   return null;
