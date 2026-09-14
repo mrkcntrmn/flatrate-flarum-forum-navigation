@@ -7,6 +7,7 @@ import test from 'node:test';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const src = readFileSync(join(root, 'js/src/forum/components/PresentationNav.js'), 'utf8');
+const startNav = readFileSync(join(root, 'js/src/forum/utils/startNav.js'), 'utf8');
 const less = readFileSync(join(root, 'resources/less/forum.less'), 'utf8');
 const dist = readFileSync(join(root, 'js/dist/forum.js'), 'utf8');
 const manifest = JSON.parse(readFileSync(join(root, 'resources/navigation-runtime-manifest.json'), 'utf8'));
@@ -56,6 +57,9 @@ test('obsolete expander LESS is gone after becoming unused', () => {
   assert.match(less, /order:\s*-1/);
   assert.match(less, /padding:\s*0\.75rem 10px 1rem/);
   assert.match(less, /padding-left:\s*13px/);
+  assert.match(less, /padding:\s*15px 20px 15px 50px/);
+  assert.match(less, /FlatRatePresentationNav-link--technician/);
+  assert.match(less, /margin-left:\s*1\.25rem/);
 });
 
 test('GM and CDJR children are always emitted as nested presentation', () => {
@@ -81,6 +85,10 @@ test('GM and CDJR children are always emitted as nested presentation', () => {
   assert.match(src, /groupLinkHref\(group, this\.attrs\.manifest\)/);
   assert.match(src, /START_NAV_LABEL/);
   assert.match(src, /FlatRatePresentationNav-link--start/);
+  assert.match(src, /TECHNICIAN_TOPICS_ICON/);
+  assert.match(src, /FlatRatePresentationNav-link--technician/);
+  assert.match(startNav, /fas fa-wrench/);
+  assert.match(dist, /fa-wrench/);
   assert.equal(src.includes('FlatRatePresentationNav-groupLabel'), false);
   assert.equal(dist.includes('FlatRatePresentationNav-groupLabel'), false);
   assert.equal(less.includes('FlatRatePresentationNav-groupLabel'), false);

@@ -46,10 +46,14 @@
 }
 
 .FlatRatePresentationNav-link--start,
+.FlatRatePresentationNav-link--technician {
+  gap: 0.4rem;
+}
+
+.FlatRatePresentationNav-link--start,
 .FlatRatePresentationTitle--start {
   color: #66ff00 !important;
   font-weight: 700;
-  gap: 0.4rem;
 }
 
 .FlatRatePresentationNav-link--start .icon,
@@ -115,22 +119,52 @@
     padding-right: 13px;
   }
 
-  /* Phone title-control is a full-width bottom sheet. Center only the
-     brand tree there; sidebar and hamburger stay start-aligned. */
+  /* Phone title-control is a full-width bottom sheet. START and Technician
+     Topics must use the same hasIcon gutter as All Discussions / Following. */
+  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-item--link {
+    margin: 0;
+  }
+
+  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-item--link .FlatRatePresentationNav-link {
+    width: 100%;
+    box-sizing: border-box;
+    justify-content: flex-start;
+    gap: 0;
+    font-size: 16px;
+    min-height: 0;
+    padding: 15px 20px 15px 50px;
+  }
+
+  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-item--link .icon {
+    width: 16px;
+    margin-left: -30px;
+    margin-right: 14px;
+    font-size: 16px;
+    text-align: center;
+  }
+
+  /* Phone title-control is a full-width bottom sheet. Center the brand
+     column; indent GM/CDJR children inside it. Sidebar/hamburger stay
+     start-aligned. */
   .App-titleControl .FlatRatePresentationNav-item--brands {
     text-align: center;
 
+    .FlatRatePresentationNav-tree {
+      display: inline-block;
+      text-align: left;
+    }
+
     .FlatRatePresentationNav-row {
-      justify-content: center;
+      justify-content: flex-start;
     }
 
     .FlatRatePresentationNav-link {
-      justify-content: center;
-      width: 100%;
+      justify-content: flex-start;
+      width: auto;
     }
 
     .FlatRatePresentationNav-brand.depth-1 {
-      margin-left: 0;
+      margin-left: 1.25rem;
     }
   }
 }
