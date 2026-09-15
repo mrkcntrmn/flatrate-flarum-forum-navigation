@@ -33,22 +33,26 @@ class PresentationNavStaticTest extends TestCase
         $this->assertStringContainsString('TECHNICIAN_TOPICS_ICON', $src);
         $this->assertStringContainsString('FlatRatePresentationNav-link--technician', $src);
         $this->assertStringContainsString('BRAND_NAV_ICON', $src);
+        $this->assertStringContainsString('flatrateFollowedBrandKeys', $src);
+        $this->assertStringContainsString('FlatRatePresentationNav-followingStar', $src);
         $this->assertStringContainsString('fa-wrench', $dist);
         $this->assertStringContainsString('#66ff00', $less);
         $this->assertStringNotContainsString('FlatRatePresentationNav-groupLabel', $dist);
         $this->assertStringNotContainsString('FlatRatePresentationNav-groupLabel', $less);
         $this->assertStringContainsString('.item-flatrateDrawerNav', $less);
-        $this->assertStringContainsString('.item-flatrateDrawerFollowing', $less);
+        $this->assertStringNotContainsString('flatrateDrawerFollowing', $less);
+        $this->assertStringContainsString('.FlatRatePresentationNav-followingStar', $less);
         $this->assertStringContainsString('.App-titleControl .FlatRatePresentationNav-item--brands', $less);
         $this->assertStringContainsString('text-align: center', $less);
         $this->assertStringContainsString('display: inline-block', $less);
         $this->assertStringContainsString('margin-left: 1.25rem', $less);
         $this->assertStringContainsString('.App-drawer .item-session', $less);
+        $this->assertStringContainsString('.App-drawer .item-search', $less);
+        $this->assertStringContainsString('.App-drawer .Header-title', $less);
         $this->assertStringContainsString('padding: 0.75rem 10px 1rem', $less);
         $this->assertStringContainsString('padding: 15px 20px 15px 50px', $less);
         $this->assertStringNotContainsString('padding-left: 70px', $less);
         $this->assertStringContainsString('.App-drawer .item-LiveChats', $less);
-        $this->assertStringContainsString('.App-drawer .item-flatrateDrawerFollowing .Button', $less);
         $this->assertStringContainsString('.item-flatrateDrawerStart', $less);
         $this->assertStringContainsString('display: contents', $less);
         $this->assertStringContainsString('FlatRatePresentationNav-item--community', $less);
@@ -56,8 +60,10 @@ class PresentationNavStaticTest extends TestCase
         $this->assertStringContainsString('FlatRatePresentationNav-item--technician-topics', $less);
         $index = (string) file_get_contents($root . '/js/src/forum/index.js');
         $this->assertStringContainsString("from 'flarum/forum/components/HeaderSecondary'", $index);
+        $this->assertStringContainsString("from 'flarum/forum/components/Search'", $index);
+        $this->assertStringContainsString("node.attrs.placeholder = 'Search'", $index);
         $this->assertStringContainsString('flatrateDrawerNav', $index);
-        $this->assertStringContainsString('flatrateDrawerFollowing', $index);
+        $this->assertStringNotContainsString('flatrateDrawerFollowing', $index);
         $this->assertStringContainsString('flatrateDrawerStart', $index);
     }
 }
