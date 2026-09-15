@@ -36,16 +36,19 @@ test('IndexPage.navItems remains the Flarum Tags 1.8.19 seam', () => {
   assert.doesNotMatch(indexSrc, /from 'flarum\/forum\/components\/IndexSidebar'/);
 });
 
-test('phone hamburger drawer mounts presentation nav via HeaderSecondary', () => {
+test('phone hamburger drawer mounts presentation nav via HeaderSecondary without a duplicate Following row', () => {
   assert.match(indexSrc, /from 'flarum\/forum\/components\/HeaderSecondary'/);
+  assert.match(indexSrc, /from 'flarum\/forum\/components\/Search'/);
   assert.match(indexSrc, /extend\(HeaderSecondary\.prototype, 'items'/);
+  assert.match(indexSrc, /extend\(Search\.prototype, 'view'/);
   assert.match(indexSrc, /flatrateDrawerNav/);
-  assert.match(indexSrc, /flatrateDrawerFollowing/);
+  assert.doesNotMatch(indexSrc, /flatrateDrawerFollowing/);
   assert.match(indexSrc, /flatrateDrawerStart/);
   assert.match(indexSrc, /pushToStartHref/);
   assert.match(indexSrc, /hideDrawerAfterLinkClick/);
   assert.match(indexSrc, /app\.drawer\.hide/);
-  assert.match(indexSrc, /flarum-subscriptions\.forum\.index\.following_link/);
+  assert.match(indexSrc, /node\.attrs\.placeholder = 'Search'/);
+  assert.doesNotMatch(indexSrc, /flarum-subscriptions\.forum\.index\.following_link/);
   // Drawer session/avatar order is CSS-only so the desktop header pin stays.
   assert.doesNotMatch(indexSrc, /items\.(add|remove)\(\s*['\"]session['\"]/);
 });
