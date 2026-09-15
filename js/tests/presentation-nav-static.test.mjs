@@ -7,6 +7,7 @@ import test from 'node:test';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const src = readFileSync(join(root, 'js/src/forum/components/PresentationNav.js'), 'utf8');
+const index = readFileSync(join(root, 'js/src/forum/index.js'), 'utf8');
 const startNav = readFileSync(join(root, 'js/src/forum/utils/startNav.js'), 'utf8');
 const less = readFileSync(join(root, 'resources/less/forum.less'), 'utf8');
 const dist = readFileSync(join(root, 'js/dist/forum.js'), 'utf8');
@@ -38,6 +39,34 @@ test('presentation nav has no collapse state or expander controls', () => {
   }
 });
 
+test('mobile drawer search and Following presentation match the product contract', () => {
+  assert.match(index, /from 'flarum\/forum\/components\/Search'/);
+  assert.match(index, /node\.attrs\.placeholder = 'Search'/);
+  assert.match(index, /extend\(Search\.prototype, 'view'/);
+  assert.doesNotMatch(index, /flatrateDrawerFollowing/);
+  assert.doesNotMatch(less, /flatrateDrawerFollowing/);
+
+  assert.match(less, /\.App-drawer \.App-header > \.container/);
+  assert.match(less, /\.App-drawer \.Header-secondary > \.Header-controls/);
+  assert.match(less, /\.App-drawer \.Header-title/);
+  assert.match(less, /order:\s*-20/);
+  assert.match(less, /\.App-drawer \.item-search/);
+  assert.match(less, /order:\s*-30/);
+  assert.match(less, /\.App-drawer \.item-session/);
+  assert.match(less, /order:\s*-10/);
+});
+
+test('followed brands are starred by the shared sidebar/title-sheet component', () => {
+  assert.match(src, /flatrateFollowedBrandKeys/);
+  assert.match(src, /FlatRatePresentationNav-followingStar/);
+  assert.match(src, /Following \$\{board\.name\}/);
+  assert.match(src, /fas fa-star/);
+  assert.match(less, /\.FlatRatePresentationNav-followingStar/);
+  assert.match(less, /color:\s*@primary-color/);
+  assert.match(dist, /flatrateFollowedBrandKeys/);
+  assert.match(dist, /FlatRatePresentationNav-followingStar/);
+});
+
 test('obsolete expander LESS is gone after becoming unused', () => {
   for (const needle of [
     'FlatRatePresentationNav-expander',
@@ -55,16 +84,12 @@ test('obsolete expander LESS is gone after becoming unused', () => {
   assert.match(less, /text-align:\s*center/);
   assert.match(less, /display:\s*inline-block/);
   assert.match(less, /margin-left:\s*1\.25rem/);
-  assert.match(less, /\.App-drawer \.item-session/);
-  assert.match(less, /order:\s*-1/);
   assert.match(less, /padding:\s*0\.75rem 10px 1rem/);
   assert.match(less, /padding-left:\s*13px/);
   assert.match(less, /padding:\s*15px 20px 15px 50px/);
   assert.match(less, /FlatRatePresentationNav-link--technician/);
   assert.match(less, /\.App-drawer \.item-LiveChats/);
   assert.match(less, /display:\s*none !important/);
-  assert.match(less, /\.item-flatrateDrawerFollowing/);
-  assert.match(less, /\.App-drawer \.item-flatrateDrawerFollowing \.Button/);
   assert.match(less, /\.item-flatrateDrawerStart/);
   assert.match(less, /display:\s*contents/);
   assert.match(less, /FlatRatePresentationNav-item--community/);
