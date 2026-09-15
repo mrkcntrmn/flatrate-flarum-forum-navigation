@@ -9,10 +9,27 @@ FlatRate.wiki presentation navigation for Flarum 1.8.x.
   - **Technician Topics** → `/t/general-shop-discussion`
   - **Brands** static tree (41 boards; GM/CDJR always expanded, no collapse arrows)
 - Puts the same presentation list in the phone hamburger drawer (`HeaderSecondary`); hidden in the desktop header bar
+- On phones, puts Search above the `FlatRate.wiki` drawer title and uses the concise placeholder **Search**
+- Shows a filled star beside followed brands in both the phone hamburger brand tree and the phone center title-sheet brand picker
+- Removes the redundant standalone Following row from the phone hamburger; the normal Following feed remains available through core forum navigation
 - Retires the public Community landing page
 - Redirects legacy `/community` to `/t/start-here` with HTTP 301
 - Leaves General Live on its durable `/live/community-general-live` identity
 - Embeds a generated navigation runtime manifest asset; does not read the main wiki repo at runtime
+
+## Followed-brand projection contract
+
+This extension presents brand-follow state but does **not** own or persist it. The canonical FlatRate.wiki relationship remains upstream.
+
+For the signed-in actor, the forum bootstrap may expose:
+
+```text
+flatrateFollowedBrandKeys: string[]
+```
+
+Values are durable navigation `boardKey` values such as `toyota`, `ford`, or `bmw`. The extension also accepts JSON-array or comma-separated string forms during rollout, but the target contract is a JSON array.
+
+The star is currently a state indicator only. Follow/Unfollow mutation must remain owned by the canonical relationship implementation rather than creating a duplicate Flarum-local follow store.
 
 ## Hard boundaries
 
@@ -22,6 +39,8 @@ PUBLIC_COMMUNITY_SURFACE=false
 PUSH_TO_START_SLUG=start-here
 LIVE_CHAT_CODE_MUTATION=false
 FLARUM_PARENT_GRAPH_CHANGED=false
+BRAND_FOLLOW_STATE_AUTHORITY=UPSTREAM_CANONICAL
+BRAND_FOLLOW_UI_MUTATION=false
 ```
 
 Disabling this extension restores native Flarum sideNav without mutating tag IDs, slugs, names, or parent graph.

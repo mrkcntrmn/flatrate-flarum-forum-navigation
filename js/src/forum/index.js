@@ -2,6 +2,7 @@ import app from 'flarum/forum/app';
 import { extend, override } from 'flarum/common/extend';
 import IndexPage from 'flarum/forum/components/IndexPage';
 import HeaderSecondary from 'flarum/forum/components/HeaderSecondary';
+import Search from 'flarum/forum/components/Search';
 import LinkButton from 'flarum/common/components/LinkButton';
 import SelectDropdown from 'flarum/common/components/SelectDropdown';
 import icon from 'flarum/common/helpers/icon';
@@ -22,13 +23,27 @@ function hideDrawerAfterLinkClick(event) {
   }
 }
 
-function followingDrawerHref() {
-  const params =
-    app.search && typeof app.search.stickyParams === 'function' ? app.search.stickyParams() : {};
-  if (app.routes && app.routes.following) {
-    return app.route('following', params);
+function setSearchPlaceholder(vdom) {
+  const stack = Array.isArray(vdom) ? [...vdom] : [vdom];
+
+  while (stack.length) {
+    const node = stack.pop();
+    if (!node || typeof node !== 'object') {
+      continue;
+    }
+
+    if (node.tag === 'input' && node.attrs && node.attrs.type === 'search') {
+      node.attrs.placeholder = 'Search';
+      node.attrs['aria-label'] = 'Search';
+      return;
+    }
+
+    if (Array.isArray(node.children)) {
+      stack.push(...node.children);
+    } else if (node.children) {
+      stack.push(node.children);
+    }
   }
-  return '/following';
 }
 
 /**
@@ -42,6 +57,11 @@ function followingDrawerHref() {
 app.initializers.add(
   'flatrate-forum-navigation',
   () => {
+    // Keep the core search behavior, but use FlatRate.wiki's shorter copy.
+    extend(Search.prototype, 'view', function (vdom) {
+      setSearchPlaceholder(vdom);
+    });
+
     extend(IndexPage.prototype, 'navItems', function (items) {
       // Registered after flarum-tags so removals apply after tag injection.
       stripNativeTagPresentation(items);
@@ -67,27 +87,6 @@ app.initializers.add(
     // Phone hamburger is Flarum's App-drawer, which renders HeaderSecondary.
     // Desktop keeps IndexPage sideNav; CSS hides these copies at tablet-up.
     extend(HeaderSecondary.prototype, 'items', function (items) {
-      if (app.session && app.session.user && app.routes && app.routes.following) {
-        if (items.items && items.items.flatrateDrawerFollowing) {
-          items.remove('flatrateDrawerFollowing');
-        }
-
-        items.add(
-          'flatrateDrawerFollowing',
-          <div
-            className="FlatRateDrawerFollowing"
-            oncreate={(vnode) => {
-              vnode.dom.addEventListener('click', hideDrawerAfterLinkClick);
-            }}
-          >
-            <LinkButton className="Button--flat" href={followingDrawerHref()} icon="fas fa-star">
-              {app.translator.trans('flarum-subscriptions.forum.index.following_link')}
-            </LinkButton>
-          </div>,
-          -10
-        );
-      }
-
       const manifest = getNavigationManifest();
       if (!manifest) {
         return;
