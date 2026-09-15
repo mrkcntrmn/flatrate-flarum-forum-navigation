@@ -69,6 +69,16 @@
   flex: 1;
 }
 
+.FlatRatePresentationNav-followingStar {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  min-height: 2rem;
+  color: @primary-color;
+}
+
 @media (max-width: 767px) {
   .FlatRatePresentationNav-link {
     min-height: 2.5rem;
@@ -79,20 +89,29 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Phone drawer stacks HeaderSecondary vertically. Keep Search first,
-     then the session avatar/profile above Notifications. Desktop header
-     order is unchanged because this rule is phone-only. */
-  .App-drawer .Header-controls {
+  /* The drawer header becomes one ordered column so Search can sit above
+     FlatRate.wiki while profile/notification rows remain below the title. */
+  .App-drawer .App-header > .container {
     display: flex;
     flex-direction: column;
   }
 
+  .App-drawer .Header-secondary,
+  .App-drawer .Header-secondary > .Header-controls {
+    display: contents;
+  }
+
+  .App-drawer .Header-title {
+    order: -20;
+  }
+
   .App-drawer .item-search {
-    order: -2;
+    order: -30;
+    width: 100%;
   }
 
   .App-drawer .item-session {
-    order: -1;
+    order: -10;
   }
 
   .App-drawer .item-flatrateDrawerNav {
@@ -123,28 +142,30 @@
     gap: 0.4rem;
   }
 
+  .App-drawer .FlatRatePresentationNav-followingStar {
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+    margin-left: 0.25rem;
+  }
+
   /* Hide Live Chat in the phone hamburger only. Desktop header keeps it.
      Do not mutate the live-chat package. */
   .App-drawer .item-LiveChats {
     display: none !important;
   }
 
-  .App-drawer .item-flatrateDrawerFollowing,
   .App-drawer .item-flatrateDrawerStart {
     width: 100%;
   }
 
-  /* Collapse wrappers so Following/START participate in Header-controls
-     Button layout the same way Notifications does. */
-  .App-drawer .FlatRateDrawerFollowing,
+  /* Collapse wrapper so START participates in Header-controls Button layout
+     the same way Notifications does. */
   .App-drawer .FlatRateDrawerStart {
     display: contents;
   }
 
   /* Match Notifications / Direct Messages: li 10px + Button 13px.
      Beat .Button.hasIcon extra left padding so labels sit at ~49px. */
-  .App-drawer .item-flatrateDrawerFollowing a,
-  .App-drawer .item-flatrateDrawerFollowing .Button,
   .App-drawer .item-flatrateDrawerStart a,
   .App-drawer .item-flatrateDrawerStart .Button {
     display: flex !important;
@@ -156,8 +177,6 @@
     min-height: 36px;
   }
 
-  .App-drawer .item-flatrateDrawerFollowing .Button-icon,
-  .App-drawer .item-flatrateDrawerFollowing .icon,
   .App-drawer .item-flatrateDrawerStart .Button-icon,
   .App-drawer .item-flatrateDrawerStart .icon {
     float: none !important;
@@ -174,13 +193,13 @@
     font-weight: 700;
   }
 
-  /* START is a HeaderSecondary peer under Following in the hamburger.
+  /* START is a HeaderSecondary peer above the brand tree in the hamburger.
      Keep the lime START link in the desktop sidebar and title-sheet list. */
   .App-drawer .FlatRatePresentationNav-item--community {
     display: none !important;
   }
 
-  /* Center popup brand list: text only. Hamburger keeps car icons. */
+  /* Center popup brand list: car icons are hidden, followed-brand stars stay. */
   .App-titleControl .FlatRatePresentationNav-brandLink .icon {
     display: none !important;
   }
@@ -234,6 +253,10 @@
       font-size: 16px;
     }
 
+    .FlatRatePresentationNav-followingStar {
+      margin-left: 0.25rem;
+    }
+
     .FlatRatePresentationNav-brand.depth-1 {
       margin-left: 1.25rem;
     }
@@ -241,11 +264,10 @@
 }
 
 /* HeaderSecondary also renders in the desktop top bar. Do not mount the
-   41-board tree or Following copy there; IndexPage sideNav already owns
+   41-board tree or START copy there; IndexPage sideNav already owns
    desktop presentation. */
 @media (min-width: 768px) {
   .item-flatrateDrawerNav,
-  .item-flatrateDrawerFollowing,
   .item-flatrateDrawerStart {
     display: none !important;
   }
