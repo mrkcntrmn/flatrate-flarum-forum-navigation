@@ -1,3 +1,4 @@
+import app from 'flarum/forum/app';
 import Component from 'flarum/common/Component';
 import Link from 'flarum/common/components/Link';
 import classList from 'flarum/common/utils/classList';
@@ -13,10 +14,45 @@ import {
   isTechnicianTopicsGroup,
 } from '../utils/startNav';
 
+const FOLLOWED_BRAND_KEYS_ATTRIBUTE = 'flatrateFollowedBrandKeys';
+
+function normalizeFollowedBrandKeys(raw) {
+  if (Array.isArray(raw)) {
+    return raw.map((key) => String(key));
+  }
+
+  if (typeof raw !== 'string' || raw.trim() === '') {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      return parsed.map((key) => String(key));
+    }
+  } catch (_error) {
+    // Allow a simple comma-separated fallback while the projection contract settles.
+  }
+
+  return raw
+    .split(',')
+    .map((key) => key.trim())
+    .filter(Boolean);
+}
+
+function followedBrandKeys() {
+  const raw = app.forum && typeof app.forum.attribute === 'function'
+    ? app.forum.attribute(FOLLOWED_BRAND_KEYS_ATTRIBUTE)
+    : null;
+
+  return new Set(normalizeFollowedBrandKeys(raw));
+}
+
 export default class PresentationNav extends Component {
   view() {
     const { manifest } = this.attrs;
     const groups = manifest.groups || [];
+    this.followedBrandKeys = followedBrandKeys();
 
     return (
       <div className="FlatRatePresentationNav" role="navigation" aria-label="Forum presentation navigation">
@@ -68,11 +104,13 @@ export default class PresentationNav extends Component {
   renderBrandNode(board, depth) {
     const children = Array.isArray(board.children) ? board.children : [];
     const hasChildren = children.length > 0;
+    const isFollowed = this.followedBrandKeys && this.followedBrandKeys.has(String(board.boardKey));
 
     return (
       <li
         className={classList('FlatRatePresentationNav-brand', `depth-${depth}`, {
           'has-children': hasChildren,
+          'is-followed': isFollowed,
         })}
         key={board.boardKey}
       >
@@ -84,6 +122,16 @@ export default class PresentationNav extends Component {
             {icon(BRAND_NAV_ICON)}
             {board.name}
           </Link>
+          {isFollowed ? (
+            <span
+              className="FlatRatePresentationNav-followingStar"
+              role="img"
+              aria-label={`Following ${board.name}`}
+              title={`Following ${board.name}`}
+            >
+              {icon('fas fa-star')}
+            </span>
+          ) : null}
         </div>
         {hasChildren ? (
           <ul className="FlatRatePresentationNav-children">
