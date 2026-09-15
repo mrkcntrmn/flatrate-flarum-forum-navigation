@@ -1,0 +1,39 @@
+name: Build dist once
+
+on:
+  push:
+    branches: ['feat/ia011-search-followed-brand-stars']
+
+permissions:
+  contents: write
+
+jobs:
+  build-dist:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/ia011-search-followed-brand-stars
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: js/package-lock.json
+      - name: Install JS dependencies
+        working-directory: js
+        run: npm ci
+      - name: Build forum assets
+        working-directory: js
+        run: npm run build
+      - name: Commit generated bundle
+        run: |
+          git add js/dist/forum.js js/dist/forum.js.map
+          if git diff --cached --quiet; then
+            echo "DIST_CHANGED=false"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "build(js): regenerate forum bundle"
+          git push origin HEAD:feat/ia011-search-followed-brand-stars
