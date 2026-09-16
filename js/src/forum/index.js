@@ -7,6 +7,7 @@ import SelectDropdown from 'flarum/common/components/SelectDropdown';
 import icon from 'flarum/common/helpers/icon';
 
 import PresentationNav from './components/PresentationNav';
+import { withDefaultRootSort, withRootSortOrder } from './utils/defaultRootSort';
 import { getNavigationManifest, pushToStartHref } from './utils/manifest';
 import { resolvePresentationTitle, TECHNICIAN_TOPICS_LABEL } from './utils/presentationTitle';
 import { START_NAV_ICON, START_NAV_LABEL, TECHNICIAN_TOPICS_ICON } from './utils/startNav';
@@ -20,6 +21,10 @@ function hideDrawerAfterLinkClick(event) {
   if (app.drawer && typeof app.drawer.hide === 'function') {
     app.drawer.hide();
   }
+}
+
+function currentPathname() {
+  return window.location && window.location.pathname ? window.location.pathname : '/';
 }
 
 function followingDrawerHref() {
@@ -42,6 +47,19 @@ function followingDrawerHref() {
 app.initializers.add(
   'flatrate-forum-navigation',
   () => {
+    // Flarum 1.8.19 has no root-index default-sort setting. Keep the clean
+    // canonical `/` URL while treating Top as the implicit root-feed sort.
+    // Searches retain relevance-first behavior, non-root pages retain native
+    // behavior, and explicit user-selected sorts remain authoritative.
+    override(app.search, 'params', function (original) {
+      return withDefaultRootSort(original(), currentPathname());
+    });
+
+    override(app.discussions, 'sortMap', function (original) {
+      const params = app.search && typeof app.search.params === 'function' ? app.search.params() : {};
+      return withRootSortOrder(original(), params, currentPathname());
+    });
+
     extend(IndexPage.prototype, 'navItems', function (items) {
       // Registered after flarum-tags so removals apply after tag injection.
       stripNativeTagPresentation(items);
