@@ -49,17 +49,11 @@ jobs:
       - name: Build forum assets
         working-directory: js
         run: npm run build
-      - name: Emit rebuilt dist for tracked asset sync
-        working-directory: js
-        run: |
-          echo 'FORUM_JS_BASE64_BEGIN'
-          base64 -w0 dist/forum.js
-          echo
-          echo 'FORUM_JS_BASE64_END'
-          echo 'FORUM_JS_MAP_BASE64_BEGIN'
-          base64 -w0 dist/forum.js.map
-          echo
-          echo 'FORUM_JS_MAP_BASE64_END'
+      - name: Upload rebuilt dist for tracked asset sync
+        uses: actions/upload-artifact@v4
+        with:
+          name: forum-dist
+          path: js/dist/
       - name: Static navigation contracts
         run: node --test js/tests/*.test.mjs
 
