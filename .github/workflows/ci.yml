@@ -49,8 +49,19 @@ jobs:
       - name: Build forum assets
         working-directory: js
         run: npm run build
-      - name: Static Brands navigation contract
-        run: node --test js/tests/presentation-nav-static.test.mjs js/tests/presentation-nav-picker.test.mjs js/tests/community-live-route.test.mjs
+      - name: Emit rebuilt dist for tracked asset sync
+        working-directory: js
+        run: |
+          echo 'FORUM_JS_BASE64_BEGIN'
+          base64 -w0 dist/forum.js
+          echo
+          echo 'FORUM_JS_BASE64_END'
+          echo 'FORUM_JS_MAP_BASE64_BEGIN'
+          base64 -w0 dist/forum.js.map
+          echo
+          echo 'FORUM_JS_MAP_BASE64_END'
+      - name: Static navigation contracts
+        run: node --test js/tests/*.test.mjs
 
   flarum-install-smoke:
     name: Flarum 1.8.19 install smoke
