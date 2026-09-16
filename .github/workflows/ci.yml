@@ -5,6 +5,9 @@ on:
     branches: [main, 'feat/**']
   pull_request:
 
+permissions:
+  contents: write
+
 jobs:
   php:
     name: PHP validate + unit
@@ -49,11 +52,18 @@ jobs:
       - name: Build forum assets
         working-directory: js
         run: npm run build
-      - name: Upload rebuilt dist for tracked asset sync
-        uses: actions/upload-artifact@v4
-        with:
-          name: forum-dist
-          path: js/dist/
+      - name: Sync rebuilt tracked dist on feature push
+        if: github.event_name == 'push' && github.ref == 'refs/heads/feat/default-top-sort'
+        run: |
+          if git diff --quiet -- js/dist/forum.js js/dist/forum.js.map; then
+            echo 'Tracked dist already matches the production build.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add js/dist/forum.js js/dist/forum.js.map
+          git commit -m 'build: sync forum dist for default Top sort'
+          git push origin HEAD:feat/default-top-sort
       - name: Static navigation contracts
         run: node --test js/tests/*.test.mjs
 
