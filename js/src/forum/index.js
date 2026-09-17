@@ -7,6 +7,7 @@ import SelectDropdown from 'flarum/common/components/SelectDropdown';
 import icon from 'flarum/common/helpers/icon';
 
 import PresentationNav from './components/PresentationNav';
+import './discussionCenterMenu';
 import { withDefaultRootSort, withRootSortOrder } from './utils/defaultRootSort';
 import { getNavigationManifest, pushToStartHref } from './utils/manifest';
 import { resolvePresentationTitle, TECHNICIAN_TOPICS_LABEL } from './utils/presentationTitle';
