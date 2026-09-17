@@ -3,7 +3,7 @@
  *
  * Flarum 1.8.19 SelectDropdown.getButtonContent() uses the first active child
  * label, else defaultLabel. On `/` the active All Discussions child therefore
- * wins over defaultLabel="Pick a Brand". Return a string to override that
+ * wins over the generic center-menu label. Return a string to override that
  * label, or null to leave core SelectDropdown behavior unchanged.
  */
 
@@ -11,7 +11,7 @@ import { START_NAV_LABEL } from './startNav.js';
 
 export const TECHNICIAN_TOPICS_SLUG = 'general-shop-discussion';
 export const START_HERE_SLUG = 'start-here';
-export const PICK_A_BRAND = 'Pick a Brand';
+export const PICK_A_BRAND = 'FlatRate.wiki';
 export const TECHNICIAN_TOPICS_LABEL = 'Technician Topics';
 export const START_HERE_LABEL = START_NAV_LABEL;
 export const PUSH_TO_START_LABEL = START_NAV_LABEL;

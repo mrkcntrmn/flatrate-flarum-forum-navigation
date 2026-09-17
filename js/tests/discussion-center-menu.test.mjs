@@ -41,6 +41,10 @@ function discussion(...slugs) {
   return { tags: () => slugs.map(tag) };
 }
 
+test('generic center-menu label is FlatRate.wiki', () => {
+  assert.equal(PICK_A_BRAND, 'FlatRate.wiki');
+});
+
 test('discussion center title resolves the current brand board', () => {
   assert.equal(resolveDiscussionBrandTitle({ discussion: discussion('gm'), manifest }), 'GM');
   assert.equal(resolveDiscussionBrandTitle({ discussion: discussion('ford'), manifest }), 'Ford');
@@ -50,11 +54,11 @@ test('discussion center title prefers a child marque when parent and child are a
   assert.equal(resolveDiscussionBrandTitle({ discussion: discussion('gm', 'chevrolet'), manifest }), 'Chevrolet');
 });
 
-test('non-brand discussions fall back to Pick a Brand', () => {
+test('non-brand discussions fall back to FlatRate.wiki', () => {
   assert.equal(resolveDiscussionBrandTitle({ discussion: discussion('general-shop-discussion'), manifest }), PICK_A_BRAND);
 });
 
-test('GM board index retains the Pick a Brand title contract', () => {
+test('GM board index retains the FlatRate.wiki title contract', () => {
   assert.equal(resolvePresentationTitle({ currentTag: tag('gm') }), PICK_A_BRAND);
 });
 

@@ -16,7 +16,8 @@ return [
         ->js(__DIR__ . '/js/dist/forum.js')
         ->css(__DIR__ . '/resources/less/forum.less')
         ->css(__DIR__ . '/resources/less/discussion-center-menu.less')
-        ->css(__DIR__ . '/resources/less/brand-board-toolbar.less'),
+        ->css(__DIR__ . '/resources/less/brand-board-toolbar.less')
+        ->css(__DIR__ . '/resources/less/drawer-home.less'),
 
     (new Extend\Middleware('forum'))
         ->add(DefaultRootSort::class),
