@@ -62,7 +62,7 @@ test('DiscussionPage mounts a HOME + PresentationNav center picker', () => {
   assert.match(discussionSrc, /DiscussionPage\.prototype, 'sidebarItems'/);
   assert.match(discussionSrc, /flatrateDiscussionBrandPicker/);
   assert.match(discussionSrc, /resolveDiscussionBrandTitle/);
-  assert.match(discussionSrc, /item[s]?\.add\(\s*'allDiscussions'/);
+  assert.match(discussionSrc, /pickerItems\.add\(\s*'allDiscussions'/);
   assert.match(discussionSrc, /<PresentationNav manifest=\{manifest\}/);
   assert.match(discussionSrc, /className="App-titleControl FlatRateDiscussionBrandPicker"/);
 });
