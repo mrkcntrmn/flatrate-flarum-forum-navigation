@@ -28,7 +28,6 @@ test('presentation nav has no collapse state or expander controls', () => {
     'FlatRatePresentationNav-expanderIcon',
     'aria-expanded',
     'aria-controls',
-    'onclick',
     'hidden={!',
     'is-collapsed',
     'is-expanded',
@@ -36,6 +35,10 @@ test('presentation nav has no collapse state or expander controls', () => {
     assert.equal(src.includes(needle), false, `source still contains ${needle}`);
     assert.equal(dist.includes(needle), false, `dist still contains ${needle}`);
   }
+
+  // Other forum controls legitimately use onclick. Keep this assertion scoped
+  // to PresentationNav source so toolbar actions do not create a false failure.
+  assert.equal(src.includes('onclick'), false, 'presentation nav source still contains onclick');
 });
 
 test('obsolete expander LESS is gone after becoming unused', () => {
