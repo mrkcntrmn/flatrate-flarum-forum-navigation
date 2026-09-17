@@ -1,6 +1,8 @@
 import app from 'flarum/forum/app';
 import { extend } from 'flarum/common/extend';
+import Button from 'flarum/common/components/Button';
 import DiscussionPage from 'flarum/forum/components/DiscussionPage';
+import IndexPage from 'flarum/forum/components/IndexPage';
 import LinkButton from 'flarum/common/components/LinkButton';
 import SelectDropdown from 'flarum/common/components/SelectDropdown';
 import ItemList from 'flarum/common/utils/ItemList';
@@ -47,6 +49,46 @@ app.initializers.add(
           {pickerItems.toArray()}
         </SelectDropdown>,
         -90
+      );
+    });
+
+    // Keep the phone header's right-hand primary slot available for the board
+    // follow control. New Discussion moves into the list toolbar instead.
+    extend(IndexPage.prototype, 'sidebarItems', function (items) {
+      if (items.items && items.items.newDiscussion) {
+        items.remove('newDiscussion');
+      }
+    });
+
+    // Replace the refresh / mark-all-read pair with one explicit compose action.
+    // This keeps the sort control on the left and a single + action on the right.
+    extend(IndexPage.prototype, 'actionItems', function (items) {
+      if (items.items && items.items.refresh) {
+        items.remove('refresh');
+      }
+      if (items.items && items.items.markAllAsRead) {
+        items.remove('markAllAsRead');
+      }
+      if (items.items && items.items.newDiscussion) {
+        items.remove('newDiscussion');
+      }
+
+      const canStartDiscussion = app.forum.attribute('canStartDiscussion') || !app.session.user;
+      const label = app.translator.trans(
+        `core.forum.index.${canStartDiscussion ? 'start_discussion_button' : 'cannot_start_discussion_button'}`
+      );
+
+      items.add(
+        'newDiscussion',
+        <Button
+          icon="fas fa-plus"
+          className="Button Button--icon FlatRateInlineNewDiscussion"
+          title={label}
+          aria-label={label}
+          onclick={() => this.newDiscussionAction().catch(() => {})}
+          disabled={!canStartDiscussion}
+        />,
+        100
       );
     });
   },
