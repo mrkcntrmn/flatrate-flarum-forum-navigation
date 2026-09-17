@@ -175,7 +175,7 @@
   }
 
   /* START is a HeaderSecondary peer under Following in the hamburger.
-     Keep the lime START link in the desktop sidebar and title-sheet list. */
+     Hide the duplicate START entry in the hamburger presentation tree. */
   .App-drawer .FlatRatePresentationNav-item--community {
     display: none !important;
   }
@@ -190,8 +190,58 @@
     display: none !important;
   }
 
-  /* Phone title-control is a full-width bottom sheet. START must use the
-     same hasIcon gutter as All Discussions / Following. */
+  /* Center popup is a focused HOME + brand picker. Following and START remain
+     available in their other navigation surfaces but do not appear here. */
+  .App-titleControl .item-following,
+  .App-titleControl .FlatRatePresentationNav-item--community {
+    display: none !important;
+  }
+
+  /* Recast the native All Discussions option as the centered HOME action.
+     Flarum supplies `far fa-comments`; overriding its glyph with the Font
+     Awesome 5 Free solid warehouse codepoint is visually equivalent to
+     `fas fa-warehouse` without changing the shared desktop/hamburger vnode. */
+  .App-titleControl .Dropdown-menu .item-allDiscussions > a {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 0;
+    padding: 15px 20px !important;
+    text-align: center;
+    font-size: 16px;
+  }
+
+  .App-titleControl .Dropdown-menu .item-allDiscussions > a .Button-icon,
+  .App-titleControl .Dropdown-menu .item-allDiscussions > a .icon {
+    position: static !important;
+    float: none !important;
+    margin: 0 !important;
+    width: 16px;
+    font-size: 16px;
+    text-align: center;
+  }
+
+  .App-titleControl .Dropdown-menu .item-allDiscussions > a .Button-icon::before,
+  .App-titleControl .Dropdown-menu .item-allDiscussions > a .icon::before {
+    content: "\f494";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+  }
+
+  .App-titleControl .Dropdown-menu .item-allDiscussions > a .Button-label {
+    font-size: 0;
+  }
+
+  .App-titleControl .Dropdown-menu .item-allDiscussions > a .Button-label::after {
+    content: "HOME";
+    font-size: 16px;
+  }
+
+  /* Phone title-control is a full-width bottom sheet. Presentation links use
+     the native hasIcon gutter; HOME above is intentionally centered. */
   .App-titleControl .Dropdown-menu .FlatRatePresentationNav-item--link {
     margin: 0;
   }
