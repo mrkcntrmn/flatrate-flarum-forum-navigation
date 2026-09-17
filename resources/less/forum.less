@@ -94,8 +94,7 @@
   }
 
   /* All secondary controls remain after the title/header controls. Search is
-     the one exception: it is promoted to the top edge. Keep the signed-in
-     session/avatar ahead of Notifications, matching the existing drawer UX. */
+     the one exception: it is promoted to the top edge. */
   .App-drawer .Header-secondary > .Header-controls > li {
     order: 30;
   }
@@ -107,7 +106,14 @@
     padding-top: 10px;
   }
 
+  /* Preserve the established drawer contract for the session item. Once
+     HeaderSecondary is flattened above, the scoped override below places the
+     avatar after the FlatRate.wiki/header block and before Notifications. */
   .App-drawer .item-session {
+    order: -1;
+  }
+
+  .App-drawer .Header-secondary > .Header-controls > .item-session {
     order: 10;
     margin-top: 10px;
   }
