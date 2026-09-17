@@ -135,6 +135,32 @@ app.initializers.add(
         -15
       );
 
+      // HOME is a phone-drawer affordance that sits immediately above the
+      // brand tree. The brand tree keeps its top border, so HOME and Acura are
+      // intentionally separated by the existing menu divider.
+      if (items.items && items.items.flatrateDrawerHome) {
+        items.remove('flatrateDrawerHome');
+      }
+
+      items.add(
+        'flatrateDrawerHome',
+        <div
+          className="FlatRateDrawerHome"
+          oncreate={(vnode) => {
+            vnode.dom.addEventListener('click', hideDrawerAfterLinkClick);
+          }}
+        >
+          <LinkButton
+            className="Button--flat FlatRateDrawerHome-link"
+            href={app.route('index')}
+            icon="fas fa-warehouse"
+          >
+            HOME
+          </LinkButton>
+        </div>,
+        -19
+      );
+
       if (items.items && items.items.flatrateDrawerNav) {
         items.remove('flatrateDrawerNav');
       }
