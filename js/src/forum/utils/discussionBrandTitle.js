@@ -29,8 +29,8 @@ export function flattenBrandBoards(manifest) {
 /**
  * Resolve the board label used by the mobile center control on a discussion.
  * If both a parent brand and child marque are attached, prefer the deepest
- * matching board (for example Chevrolet over GM). Non-brand discussions keep
- * the generic Pick a Brand title.
+ * matching board (for example Chevrolet over GM). Non-brand discussions use
+ * the generic FlatRate.wiki center-menu label.
  */
 export function resolveDiscussionBrandTitle({ discussion = null, manifest = null } = {}) {
   const slugs = new Set(discussionTags(discussion).map(tagSlug).filter(Boolean));
