@@ -1,0 +1,18 @@
+/* Discussion routes use the board name as the mobile center control and open
+   the same HOME + brand picker as the index. Preserve the native post scrubber
+   on tablet/desktop; only replace its phone-header role. */
+@media (max-width: 767px) {
+  .DiscussionPage-nav .item-scrubber {
+    display: none !important;
+  }
+
+  .DiscussionPage-nav .item-flatrateDiscussionBrandPicker {
+    display: block !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .DiscussionPage-nav .item-flatrateDiscussionBrandPicker {
+    display: none !important;
+  }
+}
