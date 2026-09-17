@@ -79,20 +79,69 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Phone drawer stacks HeaderSecondary vertically. Keep Search first,
-     then the session avatar/profile above Notifications. Desktop header
-     order is unchanged because this rule is phone-only. */
-  .App-drawer .Header-controls {
+  /* Flarum renders the forum title, HeaderPrimary, and HeaderSecondary as
+     siblings inside the drawer header container. Flatten HeaderSecondary only
+     on phones so its Search row can become the first flex item above
+     FlatRate.wiki while the desktop header remains untouched. */
+  .App-drawer .App-header .container {
     display: flex;
     flex-direction: column;
   }
 
-  .App-drawer .item-search {
-    order: -2;
+  .App-drawer .Header-secondary,
+  .App-drawer .Header-secondary > .Header-controls {
+    display: contents;
   }
 
-  .App-drawer .item-session {
-    order: -1;
+  /* All secondary controls remain after the title/header controls. Search is
+     the one exception: it is promoted to the top edge. Keep the signed-in
+     session/avatar ahead of Notifications, matching the existing drawer UX. */
+  .App-drawer .Header-secondary > .Header-controls > li {
+    order: 30;
+  }
+
+  .App-drawer .Header-secondary > .Header-controls > .item-search {
+    order: -30;
+    box-sizing: border-box;
+    width: 100%;
+    padding-top: 10px;
+  }
+
+  .App-drawer .Header-secondary > .Header-controls > .item-session {
+    order: 10;
+    margin-top: 10px;
+  }
+
+  .App-drawer .Header-secondary > .Header-controls > .item-notifications {
+    order: 20;
+  }
+
+  /* Core Flarum owns the search component and its actual query state. For the
+     phone drawer, visually replace the verbose core placeholder with the
+     concise requested label without changing input behavior or desktop copy. */
+  .App-drawer .item-search .Search-input {
+    position: relative;
+  }
+
+  .App-drawer .item-search .Search-input::before {
+    content: "Search";
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    left: 13px;
+    transform: translateY(-50%);
+    color: var(--muted-color, currentColor);
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .App-drawer .item-search .Search-input:has(.FormControl:not(:placeholder-shown))::before {
+    display: none;
+  }
+
+  .App-drawer .item-search .FormControl::placeholder {
+    color: transparent !important;
+    opacity: 0 !important;
   }
 
   .App-drawer .item-flatrateDrawerNav {
