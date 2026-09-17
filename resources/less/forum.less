@@ -184,20 +184,27 @@
     display: none !important;
   }
 
+  /* These shortcuts are intentionally omitted from the phone hamburger.
+     Their routes/features remain available elsewhere, and desktop header
+     presentation is unchanged because every selector is drawer-scoped. */
+  .App-drawer .item-FlatRateMessages,
+  .App-drawer .item-flatrateDrawerFollowing,
+  .App-drawer .item-flatrateDrawerStart {
+    display: none !important;
+  }
+
   .App-drawer .item-flatrateDrawerFollowing,
   .App-drawer .item-flatrateDrawerStart {
     width: 100%;
   }
 
-  /* Collapse wrappers so Following/START participate in Header-controls
-     Button layout the same way Notifications does. */
+  /* Preserve the underlying Following/START presentation contract even though
+     those shortcuts are currently hidden from the phone hamburger. */
   .App-drawer .FlatRateDrawerFollowing,
   .App-drawer .FlatRateDrawerStart {
     display: contents;
   }
 
-  /* Match Notifications / Direct Messages: li 10px + Button 13px.
-     Beat .Button.hasIcon extra left padding so labels sit at ~49px. */
   .App-drawer .item-flatrateDrawerFollowing a,
   .App-drawer .item-flatrateDrawerFollowing .Button,
   .App-drawer .item-flatrateDrawerStart a,
@@ -229,8 +236,8 @@
     font-weight: 700;
   }
 
-  /* START is a HeaderSecondary peer under Following in the hamburger.
-     Hide the duplicate START entry in the hamburger presentation tree. */
+  /* START also exists in the presentation tree. Keep that copy hidden in the
+     hamburger so there is no fallback duplicate. */
   .App-drawer .FlatRatePresentationNav-item--community {
     display: none !important;
   }
