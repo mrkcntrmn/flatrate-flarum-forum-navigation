@@ -12,7 +12,7 @@ FlatRate.wiki presentation navigation for Flarum 1.8.x.
 - Retires the public Community landing page
 - Redirects legacy `/community` to `/t/start-here` with HTTP 301
 - Leaves General Live on its durable `/live/community-general-live` identity
-- Embeds a generated navigation runtime manifest asset; does not read the main wiki repo at runtime
+- Embeds a generated navigation runtime manifest asset; does not read the main wiki repo at runtime\n- Keeps Flarum's built-in loader/error fallback UX, while marking non-content fallback chrome `data-nosnippet` so it cannot displace technician discussion text in Google snippets
 
 ## Hard boundaries
 

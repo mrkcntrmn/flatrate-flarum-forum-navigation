@@ -18,6 +18,9 @@ return [
         ->css(__DIR__ . '/resources/less/discussion-center-menu.less')
         ->css(__DIR__ . '/resources/less/brand-board-toolbar.less'),
 
+    (new Extend\View())
+        ->extendNamespace('flarum', __DIR__ . '/resources/views'),
+
     (new Extend\Middleware('forum'))
         ->add(DefaultRootSort::class),
 
