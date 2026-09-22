@@ -9,8 +9,11 @@ import SelectDropdown from 'flarum/common/components/SelectDropdown';
 import ItemList from 'flarum/common/utils/ItemList';
 
 import PresentationNav from './components/PresentationNav';
-import { resolveDiscussionBrandBoard, resolveDiscussionBrandTitle } from './utils/discussionBrandTitle';
-import { brandHref, getNavigationManifest } from './utils/manifest';
+import {
+  resolveDiscussionBoardTarget,
+  resolveDiscussionBrandTitle,
+} from './utils/discussionBrandTitle';
+import { getNavigationManifest, tagHref } from './utils/manifest';
 import { PICK_A_BRAND } from './utils/presentationTitle';
 
 app.initializers.add(
@@ -53,9 +56,9 @@ app.initializers.add(
       );
     });
 
-    // A discussion is a child of its most specific Brand board. Replace the
-    // history-driven arrow with that stable parent destination, including when
-    // the discussion was opened directly and Flarum has no history to pop.
+    // A discussion is a child of its owning board/context. Replace Flarum's
+    // history-driven arrow with that stable destination, including direct-entry
+    // URLs where there is no app history to pop.
     extend(Navigation.prototype, 'items', function (items) {
       if (!app.current || typeof app.current.matches !== 'function' || !app.current.matches(DiscussionPage)) {
         return;
@@ -64,10 +67,10 @@ app.initializers.add(
       const discussion =
         typeof app.current.get === 'function' ? app.current.get('discussion') : null;
       const manifest = getNavigationManifest();
-      const board = resolveDiscussionBrandBoard({ discussion, manifest });
+      const target = resolveDiscussionBoardTarget({ discussion, manifest });
 
-      // Non-brand discussions keep native Flarum history behavior.
-      if (!board) {
+      // If no reliable board can be identified, preserve native Flarum behavior.
+      if (!target) {
         return;
       }
 
@@ -78,10 +81,10 @@ app.initializers.add(
       items.add(
         'back',
         <LinkButton
-          className="Button Navigation-back Button--icon FlatRateDiscussionBackToBrand"
-          href={brandHref(board)}
+          className="Button Navigation-back Button--icon FlatRateDiscussionBackToBoard"
+          href={tagHref(target.slug)}
           icon="fas fa-chevron-left"
-          aria-label={`Back to ${board.name}`}
+          aria-label={`Back to ${target.name}`}
         />,
         90
       );

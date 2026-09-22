@@ -16,13 +16,17 @@ export function isGeneralLiveAvailable() {
   return Boolean(manifest?.community?.generalLiveAvailable);
 }
 
+export function tagHref(slug) {
+  return app.route('tag', { tags: slug });
+}
+
 export function pushToStartHref(manifest) {
   const slug =
     manifest?.groups?.find((group) => group.destination?.type === 'tag' && group.destination?.slug === 'start-here')
       ?.destination?.slug ||
     manifest?.pushToStart?.slug ||
     'start-here';
-  return app.route('tag', { tags: slug });
+  return tagHref(slug);
 }
 
 export function startHereHref(manifest) {
@@ -33,16 +37,16 @@ export function technicianTopicsHref(manifest) {
   const slug =
     manifest?.groups?.find((group) => group.id === 'technician-topics')?.destination?.slug ||
     'general-shop-discussion';
-  return app.route('tag', { tags: slug });
+  return tagHref(slug);
 }
 
 export function groupLinkHref(group, manifest) {
   if (group?.destination?.type === 'tag' && group.destination.slug) {
-    return app.route('tag', { tags: group.destination.slug });
+    return tagHref(group.destination.slug);
   }
   return pushToStartHref(manifest);
 }
 
 export function brandHref(board) {
-  return app.route('tag', { tags: board.slug });
+  return tagHref(board.slug);
 }
