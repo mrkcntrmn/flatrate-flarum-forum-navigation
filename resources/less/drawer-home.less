@@ -1,0 +1,40 @@
+@media (max-width: 767px) {
+  /* HOME is intentionally outside the brand-navigation block. The existing
+     top border on .item-flatrateDrawerNav remains the divider between HOME
+     and the first visible brand (Acura). */
+  .App-drawer .item-flatrateDrawerHome {
+    width: 100%;
+  }
+
+  .App-drawer .FlatRateDrawerHome {
+    display: contents;
+  }
+
+  .App-drawer .item-flatrateDrawerHome a,
+  .App-drawer .item-flatrateDrawerHome .Button {
+    display: flex !important;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 13px !important;
+    text-align: left;
+    min-height: 36px;
+  }
+
+  .App-drawer .item-flatrateDrawerHome .Button-icon,
+  .App-drawer .item-flatrateDrawerHome .icon {
+    float: none !important;
+    margin: 0 7px 0 0 !important;
+    font-size: 14px;
+    width: 16px;
+    text-align: center;
+  }
+}
+
+/* HeaderSecondary also renders in the desktop top bar. HOME is a phone-drawer
+   control only; desktop keeps the existing forum navigation surfaces. */
+@media (min-width: 768px) {
+  .item-flatrateDrawerHome {
+    display: none !important;
+  }
+}
