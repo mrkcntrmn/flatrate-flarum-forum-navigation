@@ -8,12 +8,12 @@ import LinkButton from 'flarum/common/components/LinkButton';
 import SelectDropdown from 'flarum/common/components/SelectDropdown';
 import ItemList from 'flarum/common/utils/ItemList';
 
-import PresentationNav from './components/PresentationNav';
 import {
+  flattenBrandBoards,
   resolveDiscussionBoardTarget,
   resolveDiscussionBrandTitle,
 } from './utils/discussionBrandTitle';
-import { getNavigationManifest, tagHref } from './utils/manifest';
+import { brandHref, getNavigationManifest, tagHref } from './utils/manifest';
 import { PICK_A_BRAND } from './utils/presentationTitle';
 
 function currentDiscussionBoardTarget() {
@@ -45,8 +45,50 @@ function discussionBoardBackButton(target) {
       href={tagHref(target.slug)}
       icon="fas fa-chevron-left"
       aria-label={`Back to ${target.name}`}
+      force
     />
   );
+}
+
+/**
+ * Flarum 1.8.19 SelectDropdown treats each direct child as one menu item via
+ * Dropdown.view -> listItems(vnode.children). Nested PresentationNav collapses
+ * into a single empty/incorrect <li>; emit native LinkButton children instead.
+ */
+function discussionPickerItems(manifest) {
+  const items = new ItemList();
+
+  items.add(
+    'allDiscussions',
+    <LinkButton
+      className="Button--flat FlatRateDiscussionPicker-link FlatRateDiscussionPicker-home"
+      href={app.route('index')}
+      icon="fas fa-warehouse"
+      force
+    >
+      HOME
+    </LinkButton>,
+    1000
+  );
+
+  flattenBrandBoards(manifest).forEach(({ board, depth }, index) => {
+    const key = board.boardKey || board.slug;
+
+    items.add(
+      `flatrateDiscussionBrand-${key}`,
+      <LinkButton
+        className="Button--flat FlatRateDiscussionPicker-link FlatRateDiscussionPicker-brandLink"
+        itemClassName={`FlatRateDiscussionPicker-brand depth-${depth}`}
+        href={brandHref(board)}
+        force
+      >
+        {board.name}
+      </LinkButton>,
+      900 - index
+    );
+  });
+
+  return items;
 }
 
 app.initializers.add(
@@ -61,16 +103,6 @@ app.initializers.add(
         return;
       }
 
-      const pickerItems = new ItemList();
-      pickerItems.add(
-        'allDiscussions',
-        <LinkButton className="Button--flat" href={app.route('index')} icon="fas fa-warehouse">
-          HOME
-        </LinkButton>,
-        100
-      );
-      pickerItems.add('flatratePresentationNav', <PresentationNav manifest={manifest} hideStart />, -14);
-
       if (items.items && items.items.flatrateDiscussionBrandPicker) {
         items.remove('flatrateDiscussionBrandPicker');
       }
@@ -83,7 +115,7 @@ app.initializers.add(
           accessibleToggleLabel={PICK_A_BRAND}
           defaultLabel={resolveDiscussionBrandTitle({ discussion: this.discussion, manifest })}
         >
-          {pickerItems.toArray()}
+          {discussionPickerItems(manifest).toArray()}
         </SelectDropdown>,
         -90
       );
@@ -93,6 +125,7 @@ app.initializers.add(
     // app history can go back, and getDrawerButton() on direct-entry/no-history.
     // Override both live seams with a stable owning-board LinkButton. Do not
     // invoke Flarum app-history back helpers — the board route is the destination.
+    // Explicit force documents the required Mithril route remount contract.
     override(Navigation.prototype, 'getBackButton', function (original) {
       const target = currentDiscussionBoardTarget();
 

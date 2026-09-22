@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 
 import {
+  flattenBrandBoards,
   resolveDiscussionBoardTarget,
   resolveDiscussionBrandBoard,
   resolveDiscussionBrandTitle,
@@ -14,7 +15,6 @@ import { PICK_A_BRAND, resolvePresentationTitle } from '../src/forum/utils/prese
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const discussionSrc = readFileSync(join(root, 'js/src/forum/discussionCenterMenu.js'), 'utf8');
-const presentationNavSrc = readFileSync(join(root, 'js/src/forum/components/PresentationNav.js'), 'utf8');
 const less = readFileSync(join(root, 'resources/less/discussion-center-menu.less'), 'utf8');
 const extendPhp = readFileSync(join(root, 'extend.php'), 'utf8');
 
@@ -134,16 +134,35 @@ test('GM board index retains the FlatRate.wiki title contract', () => {
   assert.equal(resolvePresentationTitle({ currentTag: tag('gm') }), PICK_A_BRAND);
 });
 
-test('DiscussionPage center popup is HOME + Brand presentation without START or Following', () => {
+test('flattenBrandBoards preserves manifest order and GM→Chevrolet depth', () => {
+  const flattened = flattenBrandBoards(manifest);
+  assert.deepEqual(
+    flattened.map(({ board, depth }) => [board.slug, depth]),
+    [
+      ['gm', 0],
+      ['chevrolet', 1],
+      ['ford', 0],
+    ]
+  );
+});
+
+test('DiscussionPage center popup uses direct LinkButton Brand entries without nested PresentationNav', () => {
   assert.match(discussionSrc, /DiscussionPage\.prototype, 'sidebarItems'/);
   assert.match(discussionSrc, /flatrateDiscussionBrandPicker/);
   assert.match(discussionSrc, /resolveDiscussionBrandTitle/);
-  assert.match(discussionSrc, /pickerItems\.add\(\s*'allDiscussions'/);
+  assert.match(discussionSrc, /discussionPickerItems\(manifest\)/);
+  assert.match(discussionSrc, /flattenBrandBoards\(manifest\)/);
   assert.match(discussionSrc, /icon="fas fa-warehouse"/);
   assert.match(discussionSrc, />\s*HOME\s*<\/LinkButton>/);
-  assert.match(discussionSrc, /<PresentationNav manifest=\{manifest\} hideStart \/>/);
+  assert.match(discussionSrc, /FlatRateDiscussionPicker-brandLink/);
+  assert.match(discussionSrc, /FlatRateDiscussionPicker-home/);
+  assert.match(discussionSrc, /itemClassName=\{`FlatRateDiscussionPicker-brand depth-\$\{depth\}`\}/);
+  assert.doesNotMatch(
+    discussionSrc,
+    /<PresentationNav manifest=\{manifest\} hideStart/
+  );
+  assert.doesNotMatch(discussionSrc, /import PresentationNav/);
   assert.doesNotMatch(discussionSrc, /following/i);
-  assert.match(presentationNavSrc, /start && this\.attrs\.hideStart === true/);
   assert.match(discussionSrc, /className="App-titleControl FlatRateDiscussionBrandPicker"/);
 });
 
@@ -156,6 +175,7 @@ test('discussion back arrow overrides the Flarum 1.8.19 live back-button seam', 
   assert.match(discussionSrc, /currentDiscussionBoardTarget\(\)/);
   assert.match(discussionSrc, /href=\{tagHref\(target\.slug\)\}/);
   assert.match(discussionSrc, /FlatRateDiscussionBackToBoard/);
+  assert.match(discussionSrc, /aria-label=\{`Back to \$\{target\.name\}`\}\s*\n\s*force/);
 
   assert.doesNotMatch(
     discussionSrc,
@@ -163,6 +183,8 @@ test('discussion back arrow overrides the Flarum 1.8.19 live back-button seam', 
   );
   assert.doesNotMatch(discussionSrc, /history\.back/);
   assert.doesNotMatch(discussionSrc, /history\.backUrl/);
+  assert.doesNotMatch(discussionSrc, /m\.route\.set/);
+  assert.doesNotMatch(discussionSrc, /window\.history/);
 });
 
 test('discussion direct entry overrides the no-history drawer branch', () => {
@@ -180,5 +202,7 @@ test('phone swaps the scrubber for the brand picker while desktop keeps scrubber
   assert.match(less, /display: none !important/);
   assert.match(less, /\.DiscussionPage-nav \.item-flatrateDiscussionBrandPicker/);
   assert.match(less, /@media \(min-width: 768px\)/);
+  assert.match(less, /\.FlatRateDiscussionBrandPicker \.Dropdown-menu\s+\.FlatRateDiscussionPicker-link/);
+  assert.match(less, /\.FlatRateDiscussionPicker-brand\.depth-1/);
   assert.match(extendPhp, /discussion-center-menu\.less/);
 });

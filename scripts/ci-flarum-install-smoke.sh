@@ -110,4 +110,49 @@ if grep -Fq "Navigation.prototype, 'items'" "${EXTENSION_NAVIGATION_SOURCE}"; th
 fi
 
 echo "FLARUM_NAVIGATION_RENDER_SEAM=PASS"
+
+# Prove SelectDropdown treats each direct child as one menu item, and LinkButton
+# defaults force=true so Link creates a Mithril route-state remount key.
+CORE_DROPDOWN_SOURCE="${SMOKE_ROOT}/vendor/flarum/core/js/src/common/components/Dropdown.tsx"
+CORE_LINKBUTTON_SOURCE="${SMOKE_ROOT}/vendor/flarum/core/js/src/common/components/LinkButton.js"
+CORE_LINK_SOURCE="${SMOKE_ROOT}/vendor/flarum/core/js/src/common/components/Link.js"
+
+if [[ ! -f "${CORE_DROPDOWN_SOURCE}" ]]; then
+  echo "FLARUM_DROPDOWN_DIRECT_ITEM_SEAM=FAIL source_missing path=${CORE_DROPDOWN_SOURCE}" >&2
+  exit 1
+fi
+
+if ! grep -Fq 'listItems(vnode.children' "${CORE_DROPDOWN_SOURCE}"; then
+  echo "FLARUM_DROPDOWN_DIRECT_ITEM_SEAM=FAIL upstream_missing_listItems_children" >&2
+  exit 1
+fi
+
+echo "FLARUM_DROPDOWN_DIRECT_ITEM_SEAM=PASS"
+
+if [[ ! -f "${CORE_LINKBUTTON_SOURCE}" ]]; then
+  echo "FLARUM_LINKBUTTON_FORCE_RERENDER_SEAM=FAIL source_missing path=${CORE_LINKBUTTON_SOURCE}" >&2
+  exit 1
+fi
+
+if ! grep -Fq 'if (attrs.force === undefined) attrs.force = true;' "${CORE_LINKBUTTON_SOURCE}"; then
+  echo "FLARUM_LINKBUTTON_FORCE_RERENDER_SEAM=FAIL upstream_missing_force_default" >&2
+  exit 1
+fi
+
+if [[ ! -f "${CORE_LINK_SOURCE}" ]]; then
+  echo "FLARUM_LINKBUTTON_FORCE_RERENDER_SEAM=FAIL link_source_missing path=${CORE_LINK_SOURCE}" >&2
+  exit 1
+fi
+
+if ! grep -Fq "extract(attrs, 'force')" "${CORE_LINK_SOURCE}"; then
+  echo "FLARUM_LINKBUTTON_FORCE_RERENDER_SEAM=FAIL upstream_missing_force_extract" >&2
+  exit 1
+fi
+
+if ! grep -Fq 'options.state.key' "${CORE_LINK_SOURCE}"; then
+  echo "FLARUM_LINKBUTTON_FORCE_RERENDER_SEAM=FAIL upstream_missing_force_route_key" >&2
+  exit 1
+fi
+
+echo "FLARUM_LINKBUTTON_FORCE_RERENDER_SEAM=PASS"
 echo "PRODUCTION_INSTALL=false"
