@@ -242,8 +242,8 @@
     display: none !important;
   }
 
-  /* Center popup brand list: text only. Hamburger keeps car icons. */
-  .App-titleControl .FlatRatePresentationNav-brandLink .icon {
+  /* Center popup brand list: text only (LinkButton brands have no car icons). */
+  .App-titleControl .FlatRateDiscussionBrandLink .icon {
     display: none !important;
   }
 
@@ -302,53 +302,28 @@
     font-size: 16px;
   }
 
-  /* Phone title-control is a full-width bottom sheet. Presentation links use
-     the native hasIcon gutter; HOME above is intentionally centered. */
-  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-item--link {
-    margin: 0;
-  }
-
-  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-item--link .FlatRatePresentationNav-link {
-    width: 100%;
+  /* Phone title-control Brand links: SelectDropdown-compatible li > a rows.
+     Child marques indent under their parent. */
+  .App-titleControl .Dropdown-menu .FlatRateDiscussionBrandLink {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
     box-sizing: border-box;
-    justify-content: flex-start;
-    gap: 0;
-    font-size: 16px;
+    width: 100%;
     min-height: 0;
-    padding: 15px 20px 15px 50px;
-  }
-
-  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-item--link .icon {
-    width: 16px;
-    margin-left: -30px;
-    margin-right: 14px;
+    padding: 15px 20px !important;
+    text-align: center;
     font-size: 16px;
-    text-align: center;
   }
 
-  /* Phone title-control brand column is centered; GM/CDJR children indent
-     inside it. Sidebar/hamburger stay start-aligned. */
-  .App-titleControl .FlatRatePresentationNav-item--brands {
-    text-align: center;
+  .App-titleControl .Dropdown-menu .FlatRateDiscussionBrandLink.depth-1 {
+    padding-left: 2.5rem !important;
+    justify-content: flex-start;
+    text-align: left;
+  }
 
-    .FlatRatePresentationNav-tree {
-      display: inline-block;
-      text-align: left;
-    }
-
-    .FlatRatePresentationNav-row {
-      justify-content: flex-start;
-    }
-
-    .FlatRatePresentationNav-link {
-      justify-content: flex-start;
-      width: auto;
-      font-size: 16px;
-    }
-
-    .FlatRatePresentationNav-brand.depth-1 {
-      margin-left: 1.25rem;
-    }
+  .App-titleControl .Dropdown-menu .FlatRateDiscussionBrandLink .Button-label {
+    font-size: 16px;
   }
 }
 

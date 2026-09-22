@@ -54,15 +54,12 @@ test('obsolete expander LESS is gone after becoming unused', () => {
   assert.match(less, /\.item-flatrateDrawerNav/);
   assert.match(less, /min-width: 768px/);
   assert.match(less, /\.App-drawer \.item-flatrateDrawerNav/);
-  assert.match(less, /\.App-titleControl \.FlatRatePresentationNav-item--brands/);
-  assert.match(less, /text-align:\s*center/);
-  assert.match(less, /display:\s*inline-block/);
-  assert.match(less, /margin-left:\s*1\.25rem/);
+  assert.match(less, /\.App-titleControl \.Dropdown-menu \.FlatRateDiscussionBrandLink/);
+  assert.match(less, /\.App-titleControl \.Dropdown-menu \.FlatRateDiscussionBrandLink\.depth-1/);
   assert.match(less, /\.App-drawer \.item-session/);
   assert.match(less, /order:\s*-1/);
   assert.match(less, /padding:\s*0\.75rem 10px 1rem/);
   assert.match(less, /padding-left:\s*13px/);
-  assert.match(less, /padding:\s*15px 20px 15px 50px/);
   assert.match(less, /FlatRatePresentationNav-link--technician/);
   assert.match(less, /\.App-drawer \.item-LiveChats/);
   assert.match(less, /display:\s*none !important/);
@@ -71,7 +68,7 @@ test('obsolete expander LESS is gone after becoming unused', () => {
   assert.match(less, /\.item-flatrateDrawerStart/);
   assert.match(less, /display:\s*contents/);
   assert.match(less, /FlatRatePresentationNav-item--community/);
-  assert.match(less, /\.App-titleControl \.FlatRatePresentationNav-brandLink \.icon/);
+  assert.match(less, /\.App-titleControl \.FlatRateDiscussionBrandLink \.icon/);
   assert.match(less, /FlatRatePresentationNav-item--technician-topics/);
   assert.doesNotMatch(less, /padding-left:\s*70px/);
 });

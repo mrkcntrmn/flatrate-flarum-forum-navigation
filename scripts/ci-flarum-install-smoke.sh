@@ -109,5 +109,28 @@ if grep -Fq "Navigation.prototype, 'items'" "${EXTENSION_NAVIGATION_SOURCE}"; th
   exit 1
 fi
 
+# Discussion-center Brand picker must emit SelectDropdown-compatible LinkButtons
+# from the canonical Brand manifest — not a nested PresentationNav div slot.
+if ! grep -Fq 'listDiscussionBrandBoards' "${EXTENSION_NAVIGATION_SOURCE}"; then
+  echo "CENTER_BRANDS_RENDER_SOURCE=FAIL missing_listDiscussionBrandBoards" >&2
+  exit 1
+fi
+
+if ! grep -Fq 'FlatRateDiscussionBrandLink' "${EXTENSION_NAVIGATION_SOURCE}"; then
+  echo "CENTER_BRANDS_RENDER_SOURCE=FAIL missing_FlatRateDiscussionBrandLink" >&2
+  exit 1
+fi
+
+if ! grep -Fq 'brandHref(board)' "${EXTENSION_NAVIGATION_SOURCE}"; then
+  echo "CENTER_BRANDS_RENDER_SOURCE=FAIL missing_brandHref" >&2
+  exit 1
+fi
+
+if grep -Fq "pickerItems.add('flatratePresentationNav'" "${EXTENSION_NAVIGATION_SOURCE}"; then
+  echo "CENTER_BRANDS_RENDER_SOURCE=FAIL nested_PresentationNav_slot" >&2
+  exit 1
+fi
+
+echo "CENTER_BRANDS_RENDER_SOURCE=PASS"
 echo "FLARUM_NAVIGATION_RENDER_SEAM=PASS"
 echo "PRODUCTION_INSTALL=false"
