@@ -5,7 +5,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 
-import { resolveDiscussionBrandTitle } from '../src/forum/utils/discussionBrandTitle.js';
+import { resolveDiscussionBrandBoard, resolveDiscussionBrandTitle } from '../src/forum/utils/discussionBrandTitle.js';
 import { PICK_A_BRAND, resolvePresentationTitle } from '../src/forum/utils/presentationTitle.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -54,6 +54,12 @@ test('discussion center title prefers a child marque when parent and child are a
   assert.equal(resolveDiscussionBrandTitle({ discussion: discussion('gm', 'chevrolet'), manifest }), 'Chevrolet');
 });
 
+test('discussion brand board resolver returns the same deepest board used by navigation', () => {
+  assert.equal(resolveDiscussionBrandBoard({ discussion: discussion('gm'), manifest })?.slug, 'gm');
+  assert.equal(resolveDiscussionBrandBoard({ discussion: discussion('gm', 'chevrolet'), manifest })?.slug, 'chevrolet');
+  assert.equal(resolveDiscussionBrandBoard({ discussion: discussion('general-shop-discussion'), manifest }), null);
+});
+
 test('non-brand discussions fall back to FlatRate.wiki', () => {
   assert.equal(resolveDiscussionBrandTitle({ discussion: discussion('general-shop-discussion'), manifest }), PICK_A_BRAND);
 });
@@ -69,6 +75,16 @@ test('DiscussionPage mounts a HOME + PresentationNav center picker', () => {
   assert.match(discussionSrc, /pickerItems\.add\(\s*'allDiscussions'/);
   assert.match(discussionSrc, /<PresentationNav manifest=\{manifest\}/);
   assert.match(discussionSrc, /className="App-titleControl FlatRateDiscussionBrandPicker"/);
+});
+
+test('discussion back arrow targets the deepest Brand board instead of browser history', () => {
+  assert.match(discussionSrc, /Navigation\.prototype, 'items'/);
+  assert.match(discussionSrc, /app\.current\.matches\(DiscussionPage\)/);
+  assert.match(discussionSrc, /resolveDiscussionBrandBoard\(\{ discussion, manifest \}\)/);
+  assert.match(discussionSrc, /items\.remove\('back'\)/);
+  assert.match(discussionSrc, /href=\{brandHref\(board\)\}/);
+  assert.match(discussionSrc, /FlatRateDiscussionBackToBrand/);
+  assert.doesNotMatch(discussionSrc, /history\.back\(\)/);
 });
 
 test('phone swaps the scrubber for the brand picker while desktop keeps scrubber behavior', () => {
