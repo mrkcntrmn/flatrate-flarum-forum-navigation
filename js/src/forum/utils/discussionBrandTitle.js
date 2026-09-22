@@ -6,6 +6,27 @@ function tagSlug(tag) {
   return String(tag.slug || '');
 }
 
+function tagName(tag) {
+  if (!tag) return '';
+  if (typeof tag.name === 'function') return String(tag.name() || '');
+  return String(tag.name || '');
+}
+
+function tagIsPrimary(tag) {
+  if (!tag) return false;
+
+  if (typeof tag.isPrimary === 'function') {
+    return tag.isPrimary() === true;
+  }
+  if (typeof tag.isPrimary === 'boolean') {
+    return tag.isPrimary === true;
+  }
+
+  const position = typeof tag.position === 'function' ? tag.position() : tag.position;
+  const isChild = typeof tag.isChild === 'function' ? tag.isChild() : tag.isChild;
+  return position != null && isChild !== true;
+}
+
 function discussionTags(discussion) {
   if (!discussion) return [];
   if (typeof discussion.tags === 'function') return discussion.tags() || [];
@@ -40,6 +61,60 @@ export function resolveDiscussionBrandBoard({ discussion = null, manifest = null
 
   matches.sort((left, right) => right.depth - left.depth);
   return matches[0].board || null;
+}
+
+/**
+ * Resolve the stable board/context that owns a discussion.
+ *
+ * Priority:
+ * 1. deepest matching Brand board;
+ * 2. an explicit manifest link-board such as START or Technician Topics;
+ * 3. any remaining Flarum primary tag.
+ *
+ * Secondary metadata tags (for example Job Breakdown) are never used as the
+ * generic fallback destination.
+ */
+export function resolveDiscussionBoardTarget({ discussion = null, manifest = null } = {}) {
+  const tags = discussionTags(discussion);
+  if (!tags.length) return null;
+
+  const brand = resolveDiscussionBrandBoard({ discussion, manifest });
+  if (brand?.slug) {
+    return {
+      slug: String(brand.slug),
+      name: String(brand.name || brand.slug),
+      kind: 'brand',
+    };
+  }
+
+  const slugs = new Set(tags.map(tagSlug).filter(Boolean));
+  const linkGroup = (manifest?.groups || []).find(
+    (group) =>
+      group?.mode === 'link' &&
+      group?.destination?.type === 'tag' &&
+      group.destination.slug &&
+      slugs.has(String(group.destination.slug))
+  );
+
+  if (linkGroup) {
+    return {
+      slug: String(linkGroup.destination.slug),
+      name: String(linkGroup.label || linkGroup.destination.slug),
+      kind: 'manifest',
+    };
+  }
+
+  const primaryTag = tags.find((tag) => tagIsPrimary(tag) && tagSlug(tag));
+  if (primaryTag) {
+    const slug = tagSlug(primaryTag);
+    return {
+      slug,
+      name: tagName(primaryTag) || slug,
+      kind: 'primary-tag',
+    };
+  }
+
+  return null;
 }
 
 /**
