@@ -10,6 +10,7 @@ import { PICK_A_BRAND, resolvePresentationTitle } from '../src/forum/utils/prese
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const discussionSrc = readFileSync(join(root, 'js/src/forum/discussionCenterMenu.js'), 'utf8');
+const presentationNavSrc = readFileSync(join(root, 'js/src/forum/components/PresentationNav.js'), 'utf8');
 const less = readFileSync(join(root, 'resources/less/discussion-center-menu.less'), 'utf8');
 const extendPhp = readFileSync(join(root, 'extend.php'), 'utf8');
 
@@ -68,12 +69,16 @@ test('GM board index retains the FlatRate.wiki title contract', () => {
   assert.equal(resolvePresentationTitle({ currentTag: tag('gm') }), PICK_A_BRAND);
 });
 
-test('DiscussionPage mounts a HOME + PresentationNav center picker', () => {
+test('DiscussionPage center popup is HOME + Brand presentation without START or Following', () => {
   assert.match(discussionSrc, /DiscussionPage\.prototype, 'sidebarItems'/);
   assert.match(discussionSrc, /flatrateDiscussionBrandPicker/);
   assert.match(discussionSrc, /resolveDiscussionBrandTitle/);
   assert.match(discussionSrc, /pickerItems\.add\(\s*'allDiscussions'/);
-  assert.match(discussionSrc, /<PresentationNav manifest=\{manifest\}/);
+  assert.match(discussionSrc, /icon="fas fa-warehouse"/);
+  assert.match(discussionSrc, />\s*HOME\s*<\/LinkButton>/);
+  assert.match(discussionSrc, /<PresentationNav manifest=\{manifest\} hideStart \/>/);
+  assert.doesNotMatch(discussionSrc, /following/i);
+  assert.match(presentationNavSrc, /start && this\.attrs\.hideStart === true/);
   assert.match(discussionSrc, /className="App-titleControl FlatRateDiscussionBrandPicker"/);
 });
 
