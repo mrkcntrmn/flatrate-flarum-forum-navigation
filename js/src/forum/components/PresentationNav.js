@@ -31,6 +31,11 @@ export default class PresentationNav extends Component {
     if (group.mode === 'link') {
       const start = isStartNavGroup(group);
       const technician = isTechnicianTopicsGroup(group);
+
+      if (start && this.attrs.hideStart === true) {
+        return null;
+      }
+
       const linkIcon = start ? START_NAV_ICON : technician ? TECHNICIAN_TOPICS_ICON : null;
       return (
         <li

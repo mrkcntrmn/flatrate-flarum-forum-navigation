@@ -27,18 +27,26 @@ export function flattenBrandBoards(manifest) {
 }
 
 /**
- * Resolve the board label used by the mobile center control on a discussion.
+ * Resolve the most specific Brand board attached to a discussion.
  * If both a parent brand and child marque are attached, prefer the deepest
- * matching board (for example Chevrolet over GM). Non-brand discussions use
- * the generic FlatRate.wiki center-menu label.
+ * matching board (for example Chevrolet over GM).
  */
-export function resolveDiscussionBrandTitle({ discussion = null, manifest = null } = {}) {
+export function resolveDiscussionBrandBoard({ discussion = null, manifest = null } = {}) {
   const slugs = new Set(discussionTags(discussion).map(tagSlug).filter(Boolean));
-  if (!slugs.size) return PICK_A_BRAND;
+  if (!slugs.size) return null;
 
   const matches = flattenBrandBoards(manifest).filter(({ board }) => slugs.has(String(board?.slug || '')));
-  if (!matches.length) return PICK_A_BRAND;
+  if (!matches.length) return null;
 
   matches.sort((left, right) => right.depth - left.depth);
-  return String(matches[0].board?.name || PICK_A_BRAND);
+  return matches[0].board || null;
+}
+
+/**
+ * Resolve the board label used by the mobile center control on a discussion.
+ * Non-brand discussions use the generic FlatRate.wiki center-menu label.
+ */
+export function resolveDiscussionBrandTitle({ discussion = null, manifest = null } = {}) {
+  const board = resolveDiscussionBrandBoard({ discussion, manifest });
+  return String(board?.name || PICK_A_BRAND);
 }
