@@ -1,6 +1,7 @@
 import app from 'flarum/forum/app';
 import { extend } from 'flarum/common/extend';
 import Button from 'flarum/common/components/Button';
+import Navigation from 'flarum/common/components/Navigation';
 import DiscussionPage from 'flarum/forum/components/DiscussionPage';
 import IndexPage from 'flarum/forum/components/IndexPage';
 import LinkButton from 'flarum/common/components/LinkButton';
@@ -8,8 +9,8 @@ import SelectDropdown from 'flarum/common/components/SelectDropdown';
 import ItemList from 'flarum/common/utils/ItemList';
 
 import PresentationNav from './components/PresentationNav';
-import { resolveDiscussionBrandTitle } from './utils/discussionBrandTitle';
-import { getNavigationManifest } from './utils/manifest';
+import { resolveDiscussionBrandBoard, resolveDiscussionBrandTitle } from './utils/discussionBrandTitle';
+import { brandHref, getNavigationManifest } from './utils/manifest';
 import { PICK_A_BRAND } from './utils/presentationTitle';
 
 app.initializers.add(
@@ -49,6 +50,40 @@ app.initializers.add(
           {pickerItems.toArray()}
         </SelectDropdown>,
         -90
+      );
+    });
+
+    // A discussion is a child of its most specific Brand board. Replace the
+    // history-driven arrow with that stable parent destination, including when
+    // the discussion was opened directly and Flarum has no history to pop.
+    extend(Navigation.prototype, 'items', function (items) {
+      if (!app.current || typeof app.current.matches !== 'function' || !app.current.matches(DiscussionPage)) {
+        return;
+      }
+
+      const discussion =
+        typeof app.current.get === 'function' ? app.current.get('discussion') : null;
+      const manifest = getNavigationManifest();
+      const board = resolveDiscussionBrandBoard({ discussion, manifest });
+
+      // Non-brand discussions keep native Flarum history behavior.
+      if (!board) {
+        return;
+      }
+
+      if (items.items && items.items.back) {
+        items.remove('back');
+      }
+
+      items.add(
+        'back',
+        <LinkButton
+          className="Button Navigation-back Button--icon FlatRateDiscussionBackToBrand"
+          href={brandHref(board)}
+          icon="fas fa-chevron-left"
+          aria-label={`Back to ${board.name}`}
+        />,
+        90
       );
     });
 
