@@ -143,6 +143,7 @@ test('DiscussionPage center popup is HOME + Brand presentation without START or 
   assert.match(discussionSrc, />\s*HOME\s*<\/LinkButton>/);
   assert.match(discussionSrc, /listDiscussionBrandBoards\(manifest\)/);
   assert.match(discussionSrc, /FlatRateDiscussionBrandLink/);
+  assert.match(discussionSrc, /FlatRateDiscussionPicker-home/);
   assert.doesNotMatch(
     discussionSrc,
     /pickerItems\.add\(\s*'flatratePresentationNav',\s*<PresentationNav/
@@ -161,6 +162,7 @@ test('discussion back arrow overrides the Flarum 1.8.19 live back-button seam', 
   assert.match(discussionSrc, /currentDiscussionBoardTarget\(\)/);
   assert.match(discussionSrc, /href=\{tagHref\(target\.slug\)\}/);
   assert.match(discussionSrc, /FlatRateDiscussionBackToBoard/);
+  assert.match(discussionSrc, /aria-label=\{`Back to \$\{target\.name\}`\}\s*\n\s*force/);
 
   assert.doesNotMatch(
     discussionSrc,
@@ -168,6 +170,8 @@ test('discussion back arrow overrides the Flarum 1.8.19 live back-button seam', 
   );
   assert.doesNotMatch(discussionSrc, /history\.back/);
   assert.doesNotMatch(discussionSrc, /history\.backUrl/);
+  assert.doesNotMatch(discussionSrc, /m\.route\.set/);
+  assert.doesNotMatch(discussionSrc, /window\.history/);
 });
 
 test('discussion direct entry overrides the no-history drawer branch', () => {
@@ -185,5 +189,7 @@ test('phone swaps the scrubber for the brand picker while desktop keeps scrubber
   assert.match(less, /display: none !important/);
   assert.match(less, /\.DiscussionPage-nav \.item-flatrateDiscussionBrandPicker/);
   assert.match(less, /@media \(min-width: 768px\)/);
+  assert.match(less, /\.FlatRateDiscussionBrandPicker \.Dropdown-menu\s+\.FlatRateDiscussionPicker-link/);
+  assert.match(less, /\.FlatRateDiscussionBrandLink\.depth-1/);
   assert.match(extendPhp, /discussion-center-menu\.less/);
 });
