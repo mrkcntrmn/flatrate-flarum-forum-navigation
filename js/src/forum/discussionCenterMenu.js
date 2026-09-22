@@ -8,12 +8,12 @@ import LinkButton from 'flarum/common/components/LinkButton';
 import SelectDropdown from 'flarum/common/components/SelectDropdown';
 import ItemList from 'flarum/common/utils/ItemList';
 
-import PresentationNav from './components/PresentationNav';
 import {
   resolveDiscussionBoardTarget,
   resolveDiscussionBrandTitle,
 } from './utils/discussionBrandTitle';
-import { getNavigationManifest, tagHref } from './utils/manifest';
+import { listDiscussionBrandBoards } from './utils/discussionBrandDropdownItems';
+import { brandHref, getNavigationManifest, tagHref } from './utils/manifest';
 import { PICK_A_BRAND } from './utils/presentationTitle';
 
 function currentDiscussionBoardTarget() {
@@ -69,7 +69,22 @@ app.initializers.add(
         </LinkButton>,
         100
       );
-      pickerItems.add('flatratePresentationNav', <PresentationNav manifest={manifest} hideStart />, -14);
+
+      // SelectDropdown styles only li > a|button. Do not nest PresentationNav
+      // (a <div> tree) here — production left item-flatratePresentationNav empty.
+      // Reuse the canonical Brand manifest via LinkButton children instead.
+      listDiscussionBrandBoards(manifest).forEach((board, index) => {
+        pickerItems.add(
+          `brand-${board.boardKey}`,
+          <LinkButton
+            className={`Button--flat FlatRateDiscussionBrandLink depth-${board.depth}`}
+            href={brandHref(board)}
+          >
+            {board.name}
+          </LinkButton>,
+          -14 - index
+        );
+      });
 
       if (items.items && items.items.flatrateDiscussionBrandPicker) {
         items.remove('flatrateDiscussionBrandPicker');
