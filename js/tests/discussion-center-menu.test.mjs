@@ -5,7 +5,11 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 
-import { resolveDiscussionBrandBoard, resolveDiscussionBrandTitle } from '../src/forum/utils/discussionBrandTitle.js';
+import {
+  resolveDiscussionBoardTarget,
+  resolveDiscussionBrandBoard,
+  resolveDiscussionBrandTitle,
+} from '../src/forum/utils/discussionBrandTitle.js';
 import { PICK_A_BRAND, resolvePresentationTitle } from '../src/forum/utils/presentationTitle.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -16,6 +20,18 @@ const extendPhp = readFileSync(join(root, 'extend.php'), 'utf8');
 
 const manifest = {
   groups: [
+    {
+      id: 'community',
+      label: 'Push to Start',
+      mode: 'link',
+      destination: { type: 'tag', boardKey: 'start-here', slug: 'start-here' },
+    },
+    {
+      id: 'technician-topics',
+      label: 'Technician Topics',
+      mode: 'link',
+      destination: { type: 'tag', boardKey: 'general-shop-discussion', slug: 'general-shop-discussion' },
+    },
     {
       id: 'brands',
       mode: 'tree',
@@ -34,12 +50,21 @@ const manifest = {
   ],
 };
 
-function tag(slug) {
-  return { slug: () => slug };
+function tag(slug, { name = slug, primary = null, position = undefined, child = false } = {}) {
+  return {
+    slug: () => slug,
+    name: () => name,
+    ...(primary === null ? {} : { isPrimary: () => primary }),
+    ...(position === undefined ? {} : { position: () => position }),
+    isChild: () => child,
+  };
 }
 
-function discussion(...slugs) {
-  return { tags: () => slugs.map(tag) };
+function discussion(...tags) {
+  return {
+    tags: () =>
+      tags.map((entry) => (typeof entry === 'string' ? tag(entry) : entry)),
+  };
 }
 
 test('generic center-menu label is FlatRate.wiki', () => {
@@ -55,13 +80,53 @@ test('discussion center title prefers a child marque when parent and child are a
   assert.equal(resolveDiscussionBrandTitle({ discussion: discussion('gm', 'chevrolet'), manifest }), 'Chevrolet');
 });
 
-test('discussion brand board resolver returns the same deepest board used by navigation', () => {
+test('discussion Brand resolver returns the deepest matching board', () => {
   assert.equal(resolveDiscussionBrandBoard({ discussion: discussion('gm'), manifest })?.slug, 'gm');
   assert.equal(resolveDiscussionBrandBoard({ discussion: discussion('gm', 'chevrolet'), manifest })?.slug, 'chevrolet');
   assert.equal(resolveDiscussionBrandBoard({ discussion: discussion('general-shop-discussion'), manifest }), null);
 });
 
-test('non-brand discussions fall back to FlatRate.wiki', () => {
+test('owning-board resolver covers Brand and non-Brand manifest boards', () => {
+  assert.deepEqual(resolveDiscussionBoardTarget({ discussion: discussion('gm', 'chevrolet'), manifest }), {
+    slug: 'chevrolet',
+    name: 'Chevrolet',
+    kind: 'brand',
+  });
+  assert.deepEqual(resolveDiscussionBoardTarget({ discussion: discussion('general-shop-discussion'), manifest }), {
+    slug: 'general-shop-discussion',
+    name: 'Technician Topics',
+    kind: 'manifest',
+  });
+  assert.deepEqual(resolveDiscussionBoardTarget({ discussion: discussion('start-here'), manifest }), {
+    slug: 'start-here',
+    name: 'Push to Start',
+    kind: 'manifest',
+  });
+});
+
+test('unknown non-Brand primary board is used while secondary metadata is ignored', () => {
+  const laborLaw = tag('labor-law-texas', { name: 'Texas Labor Law', primary: true });
+  const breakdown = tag('job-breakdown', { name: 'Job Breakdown', primary: false });
+
+  assert.deepEqual(resolveDiscussionBoardTarget({ discussion: discussion(breakdown, laborLaw), manifest }), {
+    slug: 'labor-law-texas',
+    name: 'Texas Labor Law',
+    kind: 'primary-tag',
+  });
+  assert.equal(resolveDiscussionBoardTarget({ discussion: discussion(breakdown), manifest }), null);
+});
+
+test('position metadata is accepted as the Flarum 1.x primary-tag fallback', () => {
+  const primary = tag('diagnostics', { name: 'Diagnostics', position: 3 });
+  const secondary = tag('job-breakdown', { name: 'Job Breakdown', position: null });
+  assert.deepEqual(resolveDiscussionBoardTarget({ discussion: discussion(secondary, primary), manifest }), {
+    slug: 'diagnostics',
+    name: 'Diagnostics',
+    kind: 'primary-tag',
+  });
+});
+
+test('non-brand discussions still use FlatRate.wiki as the center title', () => {
   assert.equal(resolveDiscussionBrandTitle({ discussion: discussion('general-shop-discussion'), manifest }), PICK_A_BRAND);
 });
 
@@ -82,13 +147,13 @@ test('DiscussionPage center popup is HOME + Brand presentation without START or 
   assert.match(discussionSrc, /className="App-titleControl FlatRateDiscussionBrandPicker"/);
 });
 
-test('discussion back arrow targets the deepest Brand board instead of browser history', () => {
+test('discussion back arrow targets the owning board instead of browser history', () => {
   assert.match(discussionSrc, /Navigation\.prototype, 'items'/);
   assert.match(discussionSrc, /app\.current\.matches\(DiscussionPage\)/);
-  assert.match(discussionSrc, /resolveDiscussionBrandBoard\(\{ discussion, manifest \}\)/);
+  assert.match(discussionSrc, /resolveDiscussionBoardTarget\(\{ discussion, manifest \}\)/);
   assert.match(discussionSrc, /items\.remove\('back'\)/);
-  assert.match(discussionSrc, /href=\{brandHref\(board\)\}/);
-  assert.match(discussionSrc, /FlatRateDiscussionBackToBrand/);
+  assert.match(discussionSrc, /href=\{tagHref\(target\.slug\)\}/);
+  assert.match(discussionSrc, /FlatRateDiscussionBackToBoard/);
   assert.doesNotMatch(discussionSrc, /history\.back\(\)/);
 });
 
