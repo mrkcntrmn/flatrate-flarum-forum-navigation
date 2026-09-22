@@ -23,3 +23,8 @@ test('center popup presents All Discussions as centered HOME with warehouse glyp
   assert.match(less, /font-family: "Font Awesome 5 Free"/);
   assert.match(less, /font-weight: 900/);
 });
+
+test('center popup presents Brand boards as SelectDropdown LinkButton rows', () => {
+  assert.match(less, /\.App-titleControl \.Dropdown-menu \.FlatRateDiscussionBrandLink/);
+  assert.match(less, /\.App-titleControl \.Dropdown-menu \.FlatRateDiscussionBrandLink\.depth-1/);
+});
