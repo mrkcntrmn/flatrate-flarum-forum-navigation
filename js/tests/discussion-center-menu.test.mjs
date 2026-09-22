@@ -147,14 +147,31 @@ test('DiscussionPage center popup is HOME + Brand presentation without START or 
   assert.match(discussionSrc, /className="App-titleControl FlatRateDiscussionBrandPicker"/);
 });
 
-test('discussion back arrow targets the owning board instead of browser history', () => {
-  assert.match(discussionSrc, /Navigation\.prototype, 'items'/);
-  assert.match(discussionSrc, /app\.current\.matches\(DiscussionPage\)/);
-  assert.match(discussionSrc, /resolveDiscussionBoardTarget\(\{ discussion, manifest \}\)/);
-  assert.match(discussionSrc, /items\.remove\('back'\)/);
+test('discussion back arrow overrides the Flarum 1.8.19 live back-button seam', () => {
+  assert.match(
+    discussionSrc,
+    /override\(\s*Navigation\.prototype,\s*'getBackButton'/
+  );
+
+  assert.match(discussionSrc, /currentDiscussionBoardTarget\(\)/);
   assert.match(discussionSrc, /href=\{tagHref\(target\.slug\)\}/);
   assert.match(discussionSrc, /FlatRateDiscussionBackToBoard/);
-  assert.doesNotMatch(discussionSrc, /history\.back\(\)/);
+
+  assert.doesNotMatch(
+    discussionSrc,
+    /extend\(\s*Navigation\.prototype,\s*'items'/
+  );
+  assert.doesNotMatch(discussionSrc, /history\.back/);
+  assert.doesNotMatch(discussionSrc, /history\.backUrl/);
+});
+
+test('discussion direct entry overrides the no-history drawer branch', () => {
+  assert.match(
+    discussionSrc,
+    /override\(\s*Navigation\.prototype,\s*'getDrawerButton'/
+  );
+
+  assert.match(discussionSrc, /discussionBoardBackButton\(target\)/);
 });
 
 test('phone swaps the scrubber for the brand picker while desktop keeps scrubber behavior', () => {
