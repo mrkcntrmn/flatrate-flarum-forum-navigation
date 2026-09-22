@@ -141,7 +141,12 @@ test('DiscussionPage center popup is HOME + Brand presentation without START or 
   assert.match(discussionSrc, /pickerItems\.add\(\s*'allDiscussions'/);
   assert.match(discussionSrc, /icon="fas fa-warehouse"/);
   assert.match(discussionSrc, />\s*HOME\s*<\/LinkButton>/);
-  assert.match(discussionSrc, /<PresentationNav manifest=\{manifest\} hideStart \/>/);
+  assert.match(discussionSrc, /listDiscussionBrandBoards\(manifest\)/);
+  assert.match(discussionSrc, /FlatRateDiscussionBrandLink/);
+  assert.doesNotMatch(
+    discussionSrc,
+    /pickerItems\.add\(\s*'flatratePresentationNav',\s*<PresentationNav/
+  );
   assert.doesNotMatch(discussionSrc, /following/i);
   assert.match(presentationNavSrc, /start && this\.attrs\.hideStart === true/);
   assert.match(discussionSrc, /className="App-titleControl FlatRateDiscussionBrandPicker"/);
