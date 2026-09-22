@@ -62,4 +62,25 @@ class FrontendContentViewTest extends TestCase
             $extend
         );
     }
+    public function testMaintenanceBannerIsDismissibleAndVersioned(): void
+    {
+        $root = dirname(__DIR__);
+        $view = (string) file_get_contents($root . '/resources/views/frontend/content.blade.php');
+        $less = (string) file_get_contents($root . '/resources/less/forum.less');
+
+        $this->assertStringContainsString('id="flatrate-maintenance-banner"', $view);
+        $this->assertStringContainsString('FLATRATE.WIKI is undergoing maintenance.', $view);
+        $this->assertStringContainsString('6:00 PM, 9/22/26', $view);
+        $this->assertStringContainsString('flatrate:maintenance-banner:2026-09-22-1800', $view);
+        $this->assertStringContainsString("window.localStorage.setItem(storageKey, 'dismissed')", $view);
+        $this->assertStringContainsString("drawer.parentNode.insertBefore(banner, drawer.nextSibling)", $view);
+        $this->assertStringContainsString('aria-label="Dismiss maintenance announcement"', $view);
+        $this->assertStringContainsString('data-nosnippet', $view);
+
+        $this->assertStringContainsString('.FlatRateMaintenanceBanner {', $less);
+        $this->assertStringContainsString('background: #c62828;', $less);
+        $this->assertStringContainsString('color: #fff;', $less);
+        $this->assertStringContainsString('.FlatRateMaintenanceBanner-dismiss', $less);
+    }
+
 }
