@@ -28,12 +28,12 @@ app.initializers.add(
       const pickerItems = new ItemList();
       pickerItems.add(
         'allDiscussions',
-        <LinkButton className="Button--flat" href={app.route('index')} icon="far fa-comments">
-          {app.translator.trans('core.forum.index.all_discussions_link')}
+        <LinkButton className="Button--flat" href={app.route('index')} icon="fas fa-warehouse">
+          HOME
         </LinkButton>,
         100
       );
-      pickerItems.add('flatratePresentationNav', <PresentationNav manifest={manifest} />, -14);
+      pickerItems.add('flatratePresentationNav', <PresentationNav manifest={manifest} hideStart />, -14);
 
       if (items.items && items.items.flatrateDiscussionBrandPicker) {
         items.remove('flatrateDiscussionBrandPicker');
