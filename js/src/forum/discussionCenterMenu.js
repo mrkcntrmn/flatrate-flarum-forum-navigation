@@ -39,12 +39,15 @@ function currentDiscussionBoardTarget() {
 }
 
 function discussionBoardBackButton(target) {
+  // Explicit force documents the Mithril route-remount contract required for
+  // board transitions (URL change alone is not acceptance).
   return (
     <LinkButton
       className="Button Navigation-back Button--icon FlatRateDiscussionBackToBoard"
       href={tagHref(target.slug)}
       icon="fas fa-chevron-left"
       aria-label={`Back to ${target.name}`}
+      force
     />
   );
 }
@@ -64,7 +67,12 @@ app.initializers.add(
       const pickerItems = new ItemList();
       pickerItems.add(
         'allDiscussions',
-        <LinkButton className="Button--flat" href={app.route('index')} icon="fas fa-warehouse">
+        <LinkButton
+          className="Button--flat FlatRateDiscussionPicker-link FlatRateDiscussionPicker-home"
+          href={app.route('index')}
+          icon="fas fa-warehouse"
+          force
+        >
           HOME
         </LinkButton>,
         100
@@ -77,8 +85,9 @@ app.initializers.add(
         pickerItems.add(
           `brand-${board.boardKey}`,
           <LinkButton
-            className={`Button--flat FlatRateDiscussionBrandLink depth-${board.depth}`}
+            className={`Button--flat FlatRateDiscussionPicker-link FlatRateDiscussionBrandLink depth-${board.depth}`}
             href={brandHref(board)}
+            force
           >
             {board.name}
           </LinkButton>,
