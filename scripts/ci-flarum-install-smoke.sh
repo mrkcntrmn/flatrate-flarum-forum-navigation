@@ -62,4 +62,52 @@ echo "FLARUM_SKELETON_VERSION=${FLARUM_SKELETON_VERSION}"
 echo "FLARUM_CORE_VERSION=${INSTALLED_CORE}"
 echo "EXTENSION_PACKAGE=flatrate/flarum-forum-navigation"
 echo "FLARUM_CORE_INSTALL_SMOKE=PASS"
+
+# Prove the extension hooks the live Flarum 1.8.19 Navigation render seam, not a
+# dead items() path. Missing upstream Navigation.tsx is a hard compatibility
+# failure — never skip the seam assertion.
+CORE_NAVIGATION_SOURCE="${SMOKE_ROOT}/vendor/flarum/core/js/src/common/components/Navigation.tsx"
+EXTENSION_NAVIGATION_SOURCE="${ROOT}/js/src/forum/discussionCenterMenu.js"
+
+if [[ ! -f "${CORE_NAVIGATION_SOURCE}" ]]; then
+  echo "FLARUM_NAVIGATION_RENDER_SEAM=FAIL source_missing path=${CORE_NAVIGATION_SOURCE}" >&2
+  exit 1
+fi
+
+if ! grep -Fq 'this.getBackButton()' "${CORE_NAVIGATION_SOURCE}"; then
+  echo "FLARUM_NAVIGATION_RENDER_SEAM=FAIL upstream_missing_getBackButton" >&2
+  exit 1
+fi
+
+if ! grep -Fq 'this.getDrawerButton()' "${CORE_NAVIGATION_SOURCE}"; then
+  echo "FLARUM_NAVIGATION_RENDER_SEAM=FAIL upstream_missing_getDrawerButton" >&2
+  exit 1
+fi
+
+if [[ ! -f "${EXTENSION_NAVIGATION_SOURCE}" ]]; then
+  echo "FLARUM_NAVIGATION_RENDER_SEAM=FAIL extension_source_missing" >&2
+  exit 1
+fi
+
+if ! grep -Fq "override(" "${EXTENSION_NAVIGATION_SOURCE}"; then
+  echo "FLARUM_NAVIGATION_RENDER_SEAM=FAIL extension_missing_override" >&2
+  exit 1
+fi
+
+if ! grep -Fq "'getBackButton'" "${EXTENSION_NAVIGATION_SOURCE}"; then
+  echo "FLARUM_NAVIGATION_RENDER_SEAM=FAIL extension_missing_getBackButton" >&2
+  exit 1
+fi
+
+if ! grep -Fq "'getDrawerButton'" "${EXTENSION_NAVIGATION_SOURCE}"; then
+  echo "FLARUM_NAVIGATION_RENDER_SEAM=FAIL extension_missing_getDrawerButton" >&2
+  exit 1
+fi
+
+if grep -Fq "Navigation.prototype, 'items'" "${EXTENSION_NAVIGATION_SOURCE}"; then
+  echo "FLARUM_NAVIGATION_RENDER_SEAM=FAIL obsolete_items_hook" >&2
+  exit 1
+fi
+
+echo "FLARUM_NAVIGATION_RENDER_SEAM=PASS"
 echo "PRODUCTION_INSTALL=false"

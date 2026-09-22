@@ -1,5 +1,5 @@
 import app from 'flarum/forum/app';
-import { extend } from 'flarum/common/extend';
+import { extend, override } from 'flarum/common/extend';
 import Button from 'flarum/common/components/Button';
 import Navigation from 'flarum/common/components/Navigation';
 import DiscussionPage from 'flarum/forum/components/DiscussionPage';
@@ -15,6 +15,39 @@ import {
 } from './utils/discussionBrandTitle';
 import { getNavigationManifest, tagHref } from './utils/manifest';
 import { PICK_A_BRAND } from './utils/presentationTitle';
+
+function currentDiscussionBoardTarget() {
+  const current = app.current;
+
+  if (
+    !current ||
+    typeof current.matches !== 'function' ||
+    !current.matches(DiscussionPage)
+  ) {
+    return null;
+  }
+
+  const discussion =
+    typeof current.get === 'function'
+      ? current.get('discussion')
+      : null;
+
+  return resolveDiscussionBoardTarget({
+    discussion,
+    manifest: getNavigationManifest(),
+  });
+}
+
+function discussionBoardBackButton(target) {
+  return (
+    <LinkButton
+      className="Button Navigation-back Button--icon FlatRateDiscussionBackToBoard"
+      href={tagHref(target.slug)}
+      icon="fas fa-chevron-left"
+      aria-label={`Back to ${target.name}`}
+    />
+  );
+}
 
 app.initializers.add(
   'flatrate-discussion-center-menu',
@@ -56,38 +89,28 @@ app.initializers.add(
       );
     });
 
-    // A discussion is a child of its owning board/context. Replace Flarum's
-    // history-driven arrow with that stable destination, including direct-entry
-    // URLs where there is no app history to pop.
-    extend(Navigation.prototype, 'items', function (items) {
-      if (!app.current || typeof app.current.matches !== 'function' || !app.current.matches(DiscussionPage)) {
-        return;
-      }
+    // Flarum 1.8.19 Navigation.view() renders through getBackButton() when
+    // app history can go back, and getDrawerButton() on direct-entry/no-history.
+    // Override both live seams with a stable owning-board LinkButton. Do not
+    // invoke Flarum app-history back helpers — the board route is the destination.
+    override(Navigation.prototype, 'getBackButton', function (original) {
+      const target = currentDiscussionBoardTarget();
 
-      const discussion =
-        typeof app.current.get === 'function' ? app.current.get('discussion') : null;
-      const manifest = getNavigationManifest();
-      const target = resolveDiscussionBoardTarget({ discussion, manifest });
-
-      // If no reliable board can be identified, preserve native Flarum behavior.
       if (!target) {
-        return;
+        return original();
       }
 
-      if (items.items && items.items.back) {
-        items.remove('back');
+      return discussionBoardBackButton(target);
+    });
+
+    override(Navigation.prototype, 'getDrawerButton', function (original) {
+      const target = currentDiscussionBoardTarget();
+
+      if (!target) {
+        return original();
       }
 
-      items.add(
-        'back',
-        <LinkButton
-          className="Button Navigation-back Button--icon FlatRateDiscussionBackToBoard"
-          href={tagHref(target.slug)}
-          icon="fas fa-chevron-left"
-          aria-label={`Back to ${target.name}`}
-        />,
-        90
-      );
+      return discussionBoardBackButton(target);
     });
 
     // Keep the phone header's right-hand primary slot available for the board
