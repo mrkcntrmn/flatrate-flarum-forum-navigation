@@ -10,11 +10,13 @@ import ItemList from 'flarum/common/utils/ItemList';
 
 import {
   resolveDiscussionBoardTarget,
+  resolveDiscussionBrandAccessibleLabel,
   resolveDiscussionBrandTitle,
 } from './utils/discussionBrandTitle';
 import { listDiscussionBrandBoards } from './utils/discussionBrandDropdownItems';
 import { brandHref, getNavigationManifest, tagHref } from './utils/manifest';
 import { PICK_A_BRAND } from './utils/presentationTitle';
+import { recordOpenBoardAtTopIntent, consumeOpenBoardAtTopIntent } from './utils/boardBackIntent';
 
 function currentDiscussionBoardTarget() {
   const current = app.current;
@@ -48,6 +50,9 @@ function discussionBoardBackButton(target) {
       icon="fas fa-chevron-left"
       aria-label={`Back to ${target.name}`}
       force
+      onclick={() => {
+        recordOpenBoardAtTopIntent();
+      }}
     />
   );
 }
@@ -64,6 +69,12 @@ app.initializers.add(
         return;
       }
 
+      const visibleTitle = resolveDiscussionBrandTitle({ discussion: this.discussion, manifest });
+      const accessibleLabel = resolveDiscussionBrandAccessibleLabel({
+        discussion: this.discussion,
+        manifest,
+      });
+
       const pickerItems = new ItemList();
       pickerItems.add(
         'allDiscussions',
@@ -73,7 +84,7 @@ app.initializers.add(
           icon="fas fa-warehouse"
           force
         >
-          HOME
+          MAIN
         </LinkButton>,
         100
       );
@@ -104,8 +115,8 @@ app.initializers.add(
         <SelectDropdown
           buttonClassName="Button"
           className="App-titleControl FlatRateDiscussionBrandPicker"
-          accessibleToggleLabel={PICK_A_BRAND}
-          defaultLabel={resolveDiscussionBrandTitle({ discussion: this.discussion, manifest })}
+          accessibleToggleLabel={accessibleLabel}
+          defaultLabel={visibleTitle}
         >
           {pickerItems.toArray()}
         </SelectDropdown>,
@@ -135,6 +146,29 @@ app.initializers.add(
       }
 
       return discussionBoardBackButton(target);
+    });
+
+    // Custom board-arrow: one-shot open-board-at-top intent. Native Back keeps
+    // lastDiscussion restoration.
+    extend(IndexPage.prototype, 'oninit', function () {
+      if (consumeOpenBoardAtTopIntent()) {
+        this.lastDiscussion = undefined;
+        this.flatrateOpenBoardAtTop = true;
+      }
+    });
+
+    extend(IndexPage.prototype, 'oncreate', function () {
+      if (!this.flatrateOpenBoardAtTop) {
+        return;
+      }
+
+      this.flatrateOpenBoardAtTop = false;
+
+      if (typeof window !== 'undefined' && window.jQuery) {
+        window.jQuery(window).scrollTop(0);
+      } else if (typeof window !== 'undefined') {
+        window.scrollTo(0, 0);
+      }
     });
 
     // Keep the phone header's right-hand primary slot available for the board

@@ -33,7 +33,7 @@ test('center trigger is FLATRATE.WIKI with a down chevron only and true header c
   assert.match(less, /margin: 0 !important/);
 });
 
-test('center-menu HOME is transparent and shares the centered Brand column', () => {
+test('center-menu MAIN is transparent and shares the centered Brand column', () => {
   assert.match(less, /\.App-titleControl \.Dropdown-menu \.item-allDiscussions > a/);
   assert.match(less, /background: transparent !important/);
   assert.match(less, /width: 15rem/);
@@ -47,7 +47,7 @@ test('center-menu brands use a centered left-aligned column with consistent chil
   assert.match(less, /\.App-titleControl \.Dropdown-menu \.FlatRatePresentationNav-brandLink/);
   assert.match(less, /width: 15rem/);
   assert.match(less, /max-width: calc\(100% - 40px\)/);
-  assert.match(less, /margin-left: auto/);
+  assert.match(less, /flatrate-mobile-nav-rail-offset/);
   assert.match(less, /margin-right: auto/);
   assert.match(less, /justify-content: flex-start/);
   assert.match(less, /text-align: left/);

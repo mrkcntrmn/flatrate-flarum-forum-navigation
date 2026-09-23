@@ -9,6 +9,7 @@ import {
   resolveDiscussionBoardTarget,
   resolveDiscussionBrandBoard,
   resolveDiscussionBrandTitle,
+  resolveDiscussionBrandAccessibleLabel,
 } from '../src/forum/utils/discussionBrandTitle.js';
 import { PICK_A_BRAND, resolvePresentationTitle } from '../src/forum/utils/presentationTitle.js';
 
@@ -126,21 +127,22 @@ test('position metadata is accepted as the Flarum 1.x primary-tag fallback', () 
   });
 });
 
-test('non-brand discussions still use FlatRate.wiki as the center title', () => {
-  assert.equal(resolveDiscussionBrandTitle({ discussion: discussion('general-shop-discussion'), manifest }), PICK_A_BRAND);
+test('Technician Topics discussion uses wrench emoji; unknown non-primary falls back', () => {
+  assert.equal(resolveDiscussionBrandTitle({ discussion: discussion('general-shop-discussion'), manifest }), '🔧');
+  assert.equal(resolveDiscussionBrandTitle({ discussion: discussion('job-breakdown'), manifest }), PICK_A_BRAND);
 });
 
 test('GM board index retains the FlatRate.wiki title contract', () => {
   assert.equal(resolvePresentationTitle({ currentTag: tag('gm') }), PICK_A_BRAND);
 });
 
-test('DiscussionPage center popup is HOME + Brand presentation without START or Following', () => {
+test('DiscussionPage center popup is MAIN + Brand presentation without START or Following', () => {
   assert.match(discussionSrc, /DiscussionPage\.prototype, 'sidebarItems'/);
   assert.match(discussionSrc, /flatrateDiscussionBrandPicker/);
   assert.match(discussionSrc, /resolveDiscussionBrandTitle/);
   assert.match(discussionSrc, /pickerItems\.add\(\s*'allDiscussions'/);
   assert.match(discussionSrc, /icon="fas fa-warehouse"/);
-  assert.match(discussionSrc, />\s*HOME\s*<\/LinkButton>/);
+  assert.match(discussionSrc, />\s*MAIN\s*<\/LinkButton>/);
   assert.match(discussionSrc, /listDiscussionBrandBoards\(manifest\)/);
   assert.match(discussionSrc, /FlatRateDiscussionBrandLink/);
   assert.match(discussionSrc, /FlatRateDiscussionPicker-home/);
@@ -194,10 +196,35 @@ test('phone swaps the scrubber for the brand picker while desktop keeps scrubber
   assert.match(less, /\.FlatRateDiscussionBrandLink/);
   assert.match(less, /width: 15rem/);
   assert.match(less, /justify-content: flex-start/);
-  assert.match(less, /margin-left: auto/);
+  assert.match(less, /flatrate-mobile-nav-rail-offset/);
   assert.match(less, /\.FlatRateDiscussionBrandLink\.depth-1/);
   assert.match(less, /padding-left: 1\.5rem/);
   assert.match(less, /\.FlatRateDiscussionBrandLink\.depth-2/);
   assert.match(less, /padding-left: 3rem/);
   assert.match(extendPhp, /discussion-center-menu\.less/);
+});
+
+
+test('discussion center title uses owning board including Technician Topics emoji', () => {
+  assert.equal(
+    resolveDiscussionBrandTitle({ discussion: discussion('general-shop-discussion'), manifest }),
+    '🔧'
+  );
+  assert.equal(
+    resolveDiscussionBrandAccessibleLabel({ discussion: discussion('general-shop-discussion'), manifest }),
+    'Technician Topics'
+  );
+  assert.equal(
+    resolveDiscussionBrandTitle({ discussion: discussion('labor-law-texas'), manifest }),
+    'FlatRate.wiki'
+  );
+  const laborLaw = tag('labor-law-texas', { name: 'Texas Labor Law', primary: true });
+  assert.equal(resolveDiscussionBrandTitle({ discussion: discussion(laborLaw), manifest }), 'Texas Labor Law');
+});
+
+test('discussion CSS mask does not force FLATRATE.WIKI on FlatRateDiscussionBrandPicker', () => {
+  const forumLess = readFileSync(join(root, 'resources/less/forum.less'), 'utf8');
+  assert.match(forumLess, /App-titleControl:not\(\.FlatRateDiscussionBrandPicker\)/);
+  assert.match(forumLess, /FlatRateDiscussionBrandPicker > \.Dropdown-toggle \.Button-label::after/);
+  assert.match(forumLess, /content: none !important/);
 });

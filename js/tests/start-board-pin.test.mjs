@@ -142,9 +142,9 @@ test('presentation keeps pin left, START centered, and close control right', () 
   assert.doesNotMatch(pinSrc, /FlatRateStartBoardPin-toggle/);
 });
 
-test('center popup contract tests remain authoritative (HOME + Brands, no START)', () => {
+test('center popup contract tests remain authoritative (MAIN + Brands, no START)', () => {
   assert.match(centerPopupLessTests, /center popup hides Following and START/);
-  assert.match(centerPopupLessTests, /presents HOME on the same left-aligned column/);
+  assert.match(centerPopupLessTests, /presents MAIN on the same left-aligned column/);
   assert.match(less, /\.App-titleControl \.FlatRatePresentationNav-item--community/);
   assert.match(less, /\.App-titleControl \.Dropdown-menu \.item-allDiscussions > a/);
   assert.match(less, /\.App-drawer \.item-flatrateDrawerStart/);
