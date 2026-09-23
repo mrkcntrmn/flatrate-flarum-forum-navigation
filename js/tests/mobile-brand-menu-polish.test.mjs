@@ -18,17 +18,28 @@ test('mobile follow control is pinned to the right edge', () => {
   assert.match(less, /\.IndexPage-nav \.SubscriptionButton\s*\{\s*right: 0 !important;/);
 });
 
-test('center trigger is FLATRATE.WIKI with a down chevron only', () => {
+test('center trigger is FLATRATE.WIKI with a down chevron only and true header centering', () => {
   assert.match(less, /content: "FLATRATE\.WIKI"/);
   assert.match(less, /\.Button-caret\.fa-sort::before/);
   assert.match(less, /content: "\\f078"/);
   assert.doesNotMatch(less, /content: "\\\\f078"/);
   assert.match(less, /> \.icon:not\(\.Button-caret\)/);
+  assert.match(less, /\.App-header \.App-titleControl/);
+  assert.match(less, /top: 50% !important/);
+  assert.match(less, /left: 50% !important/);
+  assert.match(less, /transform: translate\(-50%, -50%\) !important/);
+  assert.match(less, /width: max-content !important/);
+  assert.match(less, /\.Dropdown-toggle \.Button-caret/);
+  assert.match(less, /margin: 0 !important/);
 });
 
-test('center-menu HOME is transparent with primary-color text and icon', () => {
+test('center-menu HOME is transparent and shares the centered Brand column', () => {
   assert.match(less, /\.App-titleControl \.Dropdown-menu \.item-allDiscussions > a/);
   assert.match(less, /background: transparent !important/);
+  assert.match(less, /width: 15rem/);
+  assert.match(less, /max-width: calc\(100% - 40px\)/);
+  assert.match(less, /justify-content: flex-start/);
+  assert.match(less, /text-align: left/);
   assert.match(less, /\.FlatRateDiscussionPicker-home/);
 });
 
