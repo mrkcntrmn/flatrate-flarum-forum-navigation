@@ -36,7 +36,8 @@ function writeCollapsedPreference(collapsed) {
  * Presentation navigation only — not a Discussion model.
  */
 export default class StartBoardPin extends Component {
-  oninit() {
+  oninit(vnode) {
+    super.oninit(vnode);
     this.collapsed = readCollapsedPreference();
   }
 
