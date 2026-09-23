@@ -13,7 +13,7 @@
 >
     <div class="container FlatRateMaintenanceBanner-inner">
         <div class="FlatRateMaintenanceBanner-message">
-            FLATRATE.WIKI is undergoing maintenance. Some forum features may behave differently while we make improvements. — 6:00 PM, 9/22/26
+            FLATRATE.WIKI is undergoing maintenance.  — 3:00 AM, 9/23/26
         </div>
         <button
             type="button"
@@ -31,7 +31,7 @@
             return;
         }
 
-        var storageKey = 'flatrate:maintenance-banner:2026-09-22-1800';
+        var storageKey = 'flatrate:maintenance-banner:2026-09-23-0300';
         var dismissed = false;
 
         try {
