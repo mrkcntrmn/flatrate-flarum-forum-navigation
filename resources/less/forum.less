@@ -404,6 +404,111 @@
   .App-titleControl .Dropdown-menu .FlatRateDiscussionBrandLink .Button-label {
     font-size: 16px;
   }
+
+  /* FORUM-NAV-MOBILE-POLISH-001
+   * Keep the mobile header brand-led and visually consistent without changing
+   * route semantics or the underlying accessible/current-context labels.
+   */
+  .IndexPage .FlatRateInlineNewDiscussion,
+  .IndexPage .FlatRateInlineNewDiscussion .Button-icon,
+  .IndexPage .FlatRateInlineNewDiscussion .icon {
+    color: var(--primary-color) !important;
+  }
+
+  /* Follow/favorite controls keep the phone header's far-right slot. */
+  .IndexPage .App-primaryControl {
+    right: 8px !important;
+  }
+
+  /* The visible center trigger is always the FLATRATE.WIKI brand. Preserve
+     the underlying SelectDropdown label for state/accessibility, but replace
+     only the phone-visible text and sort glyph. */
+  .App-titleControl > .Dropdown-toggle {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+  }
+
+  .App-titleControl > .Dropdown-toggle .Button-label {
+    font-size: 0 !important;
+  }
+
+  .App-titleControl > .Dropdown-toggle .Button-label::after {
+    content: "FLATRATE.WIKI";
+    font-size: 16px;
+    color: var(--primary-color);
+  }
+
+  .App-titleControl > .Dropdown-toggle > .icon:not(.Button-caret),
+  .App-titleControl > .Dropdown-toggle > .Button-icon:not(.Button-caret) {
+    display: none !important;
+  }
+
+  .App-titleControl > .Dropdown-toggle .Button-caret {
+    color: var(--primary-color) !important;
+  }
+
+  .App-titleControl > .Dropdown-toggle .Button-caret.fa-sort::before {
+    content: "\\f078";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+  }
+
+  /* HOME is a text/icon accent, not a filled active-state tile. */
+  .App-titleControl .Dropdown-menu .item-allDiscussions > a,
+  .App-titleControl .Dropdown-menu .FlatRateDiscussionPicker-home {
+    background: transparent !important;
+    color: var(--primary-color) !important;
+  }
+
+  .App-titleControl .Dropdown-menu .item-allDiscussions > a .Button-label,
+  .App-titleControl .Dropdown-menu .item-allDiscussions > a .Button-icon,
+  .App-titleControl .Dropdown-menu .item-allDiscussions > a .icon,
+  .App-titleControl .Dropdown-menu .FlatRateDiscussionPicker-home .Button-label,
+  .App-titleControl .Dropdown-menu .FlatRateDiscussionPicker-home .Button-icon,
+  .App-titleControl .Dropdown-menu .FlatRateDiscussionPicker-home .icon {
+    color: var(--primary-color) !important;
+  }
+
+  /* Index-page center picker: top-level makes are centered. Child marques
+     stay left-aligned and indented beneath their umbrella make. */
+  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-row {
+    width: 100%;
+  }
+
+  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-brandLink {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 0;
+    padding: 15px 20px !important;
+    text-align: center;
+  }
+
+  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-brandLink .Button-icon,
+  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-brandLink .icon {
+    display: none !important;
+  }
+
+  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-brand.depth-1,
+  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-brand.depth-2 {
+    margin-left: 0;
+  }
+
+  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-brand.depth-1 > .FlatRatePresentationNav-row .FlatRatePresentationNav-brandLink {
+    justify-content: flex-start;
+    padding-left: 2.5rem !important;
+    text-align: left;
+  }
+
+  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-brand.depth-2 > .FlatRatePresentationNav-row .FlatRatePresentationNav-brandLink {
+    justify-content: flex-start;
+    padding-left: 4rem !important;
+    text-align: left;
+  }
 }
 
 /* HeaderSecondary also renders in the desktop top bar. Do not mount the
