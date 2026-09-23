@@ -69,9 +69,11 @@ class FrontendContentViewTest extends TestCase
         $less = (string) file_get_contents($root . '/resources/less/forum.less');
 
         $this->assertStringContainsString('id="flatrate-maintenance-banner"', $view);
+        $this->assertStringContainsString('FlatRateMaintenanceBanner-copy', $view);
         $this->assertStringContainsString('FLATRATE.WIKI is undergoing maintenance.', $view);
-        $this->assertStringContainsString('3:00 AM, 9/23/26', $view);
-        $this->assertStringContainsString('flatrate:maintenance-banner:2026-09-23-0300', $view);
+        $this->assertStringContainsString('FlatRateMaintenanceBanner-schedule', $view);
+        $this->assertStringContainsString('9/23/26 4:00 PM', $view);
+        $this->assertStringContainsString('flatrate:maintenance-banner:2026-09-23-1600', $view);
         $this->assertStringContainsString("window.localStorage.setItem(storageKey, 'dismissed')", $view);
         $this->assertStringContainsString("drawer.parentNode.insertBefore(banner, drawer.nextSibling)", $view);
         $this->assertStringContainsString('aria-label="Dismiss maintenance announcement"', $view);
