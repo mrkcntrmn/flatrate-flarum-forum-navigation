@@ -70,8 +70,8 @@ class FrontendContentViewTest extends TestCase
 
         $this->assertStringContainsString('id="flatrate-maintenance-banner"', $view);
         $this->assertStringContainsString('FLATRATE.WIKI is undergoing maintenance.', $view);
-        $this->assertStringContainsString('6:00 PM, 9/22/26', $view);
-        $this->assertStringContainsString('flatrate:maintenance-banner:2026-09-22-1800', $view);
+        $this->assertStringContainsString('3:00 AM, 9/23/26', $view);
+        $this->assertStringContainsString('flatrate:maintenance-banner:2026-09-23-0300', $view);
         $this->assertStringContainsString("window.localStorage.setItem(storageKey, 'dismissed')", $view);
         $this->assertStringContainsString("drawer.parentNode.insertBefore(banner, drawer.nextSibling)", $view);
         $this->assertStringContainsString('aria-label="Dismiss maintenance announcement"', $view);
