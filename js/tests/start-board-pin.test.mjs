@@ -76,6 +76,14 @@ test('route authority: StartBoardPin uses pushToStartHref and START identity', (
   assert.match(indexSrc, /addStartBoardPinItem/);
 });
 
+test('Component attrs lifecycle: oninit must call super.oninit(vnode)', () => {
+  // Production v1.3.5 crash: overriding oninit without super left this.attrs undefined,
+  // so view() threw on this.attrs.manifest and broke IndexPage redraw.
+  assert.match(pinSrc, /oninit\(vnode\)\s*\{[\s\S]*?super\.oninit\(vnode\);/);
+  assert.match(pinSrc, /this\.attrs\.manifest/);
+  assert.doesNotMatch(pinSrc, /oninit\(\)\s*\{/);
+});
+
 test('no Discussion model mutation in board-pin sources', () => {
   for (const src of [pinSrc, pinUtil, indexSrc]) {
     assert.doesNotMatch(src, /createRecord\(\s*['"]discussions['"]\s*\)/);
