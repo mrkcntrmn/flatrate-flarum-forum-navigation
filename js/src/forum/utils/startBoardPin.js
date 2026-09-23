@@ -4,9 +4,9 @@ import { hasSearchQuery, isRootDiscussionPath } from './defaultRootSort.js';
 export const START_BOARD_PIN_ITEM = 'flatrateStartBoardPin';
 
 /**
- * Between IndexPage toolbar (100) and discussionList (90) on Flarum 1.8.19.
+ * Above IndexPage toolbar (100) and discussionList (90) on Flarum 1.8.19.
  */
-export const START_BOARD_PIN_PRIORITY = 95;
+export const START_BOARD_PIN_PRIORITY = 110;
 
 const BLOCKED_ROUTE_NAMES = new Set([
   'following',
