@@ -84,35 +84,70 @@
   margin: 0 0 12px;
 }
 
-.FlatRateStartBoardPin-link {
-  display: flex;
+.FlatRateStartBoardPin-bar {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
   align-items: center;
-  gap: 0.55rem;
   width: 100%;
   min-height: 44px;
   box-sizing: border-box;
-  padding: 10px 12px;
-  text-decoration: none;
-  color: inherit;
   background: var(--control-bg);
   border: 1px solid var(--control-bg);
   border-radius: var(--border-radius);
+  transition: min-height 120ms ease;
+}
+
+.FlatRateStartBoardPin-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-width: 0;
+  min-height: 42px;
+  padding: 0 8px;
+  box-sizing: border-box;
+  text-decoration: none;
+  color: inherit;
 }
 
 .FlatRateStartBoardPin-link:hover {
-  box-shadow: inset 0 0 0 1px var(--primary-color);
+  color: inherit;
 }
 
-.FlatRateStartBoardPin-link:focus-visible {
+.FlatRateStartBoardPin-link:focus-visible,
+.FlatRateStartBoardPin-toggle:focus-visible {
   outline: 2px solid var(--primary-color);
-  outline-offset: 2px;
+  outline-offset: -3px;
+}
+
+.FlatRateStartBoardPin-pin,
+.FlatRateStartBoardPin-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  min-width: 44px;
+  height: 42px;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .FlatRateStartBoardPin-pin {
-  display: inline-flex;
-  flex-shrink: 0;
+  justify-self: start;
   color: var(--primary-color);
   opacity: 0.9;
+}
+
+.FlatRateStartBoardPin-toggle {
+  justify-self: end;
+  border: 0;
+  background: transparent;
+  color: var(--muted-color, currentColor);
+  cursor: pointer;
+}
+
+.FlatRateStartBoardPin-toggle:hover {
+  color: var(--primary-color);
 }
 
 .FlatRateStartBoardPin-icon {
@@ -129,6 +164,21 @@
 
 .FlatRateStartBoardPin-label {
   letter-spacing: 0.02em;
+}
+
+.FlatRateStartBoardPin.is-collapsed .FlatRateStartBoardPin-bar {
+  min-height: 32px;
+}
+
+.FlatRateStartBoardPin.is-collapsed .FlatRateStartBoardPin-link,
+.FlatRateStartBoardPin.is-collapsed .FlatRateStartBoardPin-pin,
+.FlatRateStartBoardPin.is-collapsed .FlatRateStartBoardPin-toggle {
+  min-height: 30px;
+  height: 30px;
+}
+
+.FlatRateStartBoardPin.is-collapsed .FlatRateStartBoardPin-icon {
+  display: none;
 }
 
 .FlatRatePresentationNav {
@@ -399,13 +449,16 @@
   .App-titleControl .Dropdown-menu .item-allDiscussions > a {
     display: flex !important;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 0.5rem;
     box-sizing: border-box;
-    width: 100%;
+    width: 15rem;
+    max-width: calc(100% - 40px);
     min-height: 0;
-    padding: 15px 20px !important;
-    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 15px 0 !important;
+    text-align: left;
     font-size: 16px;
   }
 
@@ -489,14 +542,36 @@
   /* The visible center trigger is always the FLATRATE.WIKI brand. Preserve
      the underlying SelectDropdown label for state/accessibility, but replace
      only the phone-visible text and sort glyph. */
+  /* Keep the mobile center control geometrically centered in the header, not
+     merely centered in whatever width remains between left/right controls. */
+  .App-header .App-titleControl {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    right: auto !important;
+    width: max-content !important;
+    max-width: calc(100% - 120px);
+    margin: 0 !important;
+    transform: translate(-50%, -50%) !important;
+  }
+
   .App-titleControl > .Dropdown-toggle {
-    display: flex !important;
+    display: inline-flex !important;
     align-items: center;
     justify-content: center;
     gap: 0.45rem;
+    width: auto !important;
+    min-height: 44px;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    line-height: 1 !important;
+    vertical-align: middle;
   }
 
   .App-titleControl > .Dropdown-toggle .Button-label {
+    display: inline-flex;
+    align-items: center;
+    line-height: 1 !important;
     font-size: 0 !important;
   }
 
@@ -512,7 +587,16 @@
   }
 
   .App-titleControl > .Dropdown-toggle .Button-caret {
+    position: static !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    margin: 0 !important;
+    line-height: 1 !important;
     color: var(--primary-color) !important;
+    vertical-align: middle;
   }
 
   .App-titleControl > .Dropdown-toggle .Button-caret.fa-sort::before {
