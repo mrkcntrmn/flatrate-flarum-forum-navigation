@@ -21,7 +21,8 @@ test('mobile follow control is pinned to the right edge', () => {
 test('center trigger is FLATRATE.WIKI with a down chevron only', () => {
   assert.match(less, /content: "FLATRATE\.WIKI"/);
   assert.match(less, /\.Button-caret\.fa-sort::before/);
-  assert.match(less, /content: "\\\\f078"/);
+  assert.match(less, /content: "\\f078"/);
+  assert.doesNotMatch(less, /content: "\\\\f078"/);
   assert.match(less, /> \.icon:not\(\.Button-caret\)/);
 });
 
@@ -31,11 +32,18 @@ test('center-menu HOME is transparent with primary-color text and icon', () => {
   assert.match(less, /\.FlatRateDiscussionPicker-home/);
 });
 
-test('center-menu brands are centered, child marques indented, and car icons hidden', () => {
+test('center-menu brands use a centered left-aligned column with consistent child indentation', () => {
   assert.match(less, /\.App-titleControl \.Dropdown-menu \.FlatRatePresentationNav-brandLink/);
-  assert.match(less, /justify-content: center/);
+  assert.match(less, /width: 15rem/);
+  assert.match(less, /max-width: calc\(100% - 40px\)/);
+  assert.match(less, /margin-left: auto/);
+  assert.match(less, /margin-right: auto/);
+  assert.match(less, /justify-content: flex-start/);
+  assert.match(less, /text-align: left/);
   assert.match(less, /\.FlatRatePresentationNav-brand\.depth-1/);
-  assert.match(less, /padding-left: 2\.5rem !important/);
+  assert.match(less, /padding-left: 1\.5rem !important/);
+  assert.match(less, /\.FlatRatePresentationNav-brand\.depth-2/);
+  assert.match(less, /padding-left: 3rem !important/);
   assert.match(less, /\.FlatRatePresentationNav-brandLink \.icon/);
   assert.match(less, /display: none !important/);
 });
