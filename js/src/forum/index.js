@@ -90,7 +90,7 @@ app.initializers.add(
     });
 
     // Flarum 1.8.19 IndexPage.contentItems: toolbar(100), discussionList(90).
-    // Insert the START board pin between them without touching app.discussions.
+    // Insert the START board pin above the toolbar without touching app.discussions.
     extend(IndexPage.prototype, 'contentItems', function (items) {
       const current = app.current;
       const routeName =
