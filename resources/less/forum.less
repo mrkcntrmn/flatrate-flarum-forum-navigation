@@ -382,23 +382,29 @@
   }
 
   /* Phone title-control Brand links: SelectDropdown-compatible li > a rows.
-     Child marques indent under their parent. */
+     Keep one centered Brand column, left-align every make, and indent child
+     marques from the same column edge so umbrella groups read as a tree. */
   .App-titleControl .Dropdown-menu .FlatRateDiscussionBrandLink {
     display: flex !important;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     box-sizing: border-box;
-    width: 100%;
+    width: 15rem;
+    max-width: calc(100% - 40px);
     min-height: 0;
-    padding: 15px 20px !important;
-    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 15px 0 !important;
+    text-align: left;
     font-size: 16px;
   }
 
   .App-titleControl .Dropdown-menu .FlatRateDiscussionBrandLink.depth-1 {
-    padding-left: 2.5rem !important;
-    justify-content: flex-start;
-    text-align: left;
+    padding-left: 1.5rem !important;
+  }
+
+  .App-titleControl .Dropdown-menu .FlatRateDiscussionBrandLink.depth-2 {
+    padding-left: 3rem !important;
   }
 
   .App-titleControl .Dropdown-menu .FlatRateDiscussionBrandLink .Button-label {
@@ -456,7 +462,7 @@
   }
 
   .App-titleControl > .Dropdown-toggle .Button-caret.fa-sort::before {
-    content: "\\f078";
+    content: "\f078";
     font-family: "Font Awesome 5 Free";
     font-weight: 900;
   }
@@ -477,8 +483,9 @@
     color: var(--primary-color) !important;
   }
 
-  /* Index-page center picker: top-level makes are centered. Child marques
-     stay left-aligned and indented beneath their umbrella make. */
+  /* Index-page center picker: use one centered Brand column. Every top-level
+     make is left-aligned to the same edge; child marques are consistently
+     indented from that edge instead of drifting toward the menu boundary. */
   .App-titleControl .Dropdown-menu .FlatRatePresentationNav-row {
     width: 100%;
   }
@@ -486,12 +493,15 @@
   .App-titleControl .Dropdown-menu .FlatRatePresentationNav-brandLink {
     display: flex !important;
     align-items: center;
-    justify-content: center;
-    width: 100%;
+    justify-content: flex-start;
+    width: 15rem;
+    max-width: calc(100% - 40px);
     box-sizing: border-box;
     min-height: 0;
-    padding: 15px 20px !important;
-    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 15px 0 !important;
+    text-align: left;
   }
 
   .App-titleControl .Dropdown-menu .FlatRatePresentationNav-brandLink .Button-icon,
@@ -505,15 +515,11 @@
   }
 
   .App-titleControl .Dropdown-menu .FlatRatePresentationNav-brand.depth-1 > .FlatRatePresentationNav-row .FlatRatePresentationNav-brandLink {
-    justify-content: flex-start;
-    padding-left: 2.5rem !important;
-    text-align: left;
+    padding-left: 1.5rem !important;
   }
 
   .App-titleControl .Dropdown-menu .FlatRatePresentationNav-brand.depth-2 > .FlatRatePresentationNav-row .FlatRatePresentationNav-brandLink {
-    justify-content: flex-start;
-    padding-left: 4rem !important;
-    text-align: left;
+    padding-left: 3rem !important;
   }
 }
 

@@ -190,6 +190,13 @@ test('phone swaps the scrubber for the brand picker while desktop keeps scrubber
   assert.match(less, /\.DiscussionPage-nav \.item-flatrateDiscussionBrandPicker/);
   assert.match(less, /@media \(min-width: 768px\)/);
   assert.match(less, /\.FlatRateDiscussionBrandPicker \.Dropdown-menu\s+\.FlatRateDiscussionPicker-link/);
+  assert.match(less, /\.FlatRateDiscussionBrandLink/);
+  assert.match(less, /width: 15rem/);
+  assert.match(less, /justify-content: flex-start/);
+  assert.match(less, /margin-left: auto/);
   assert.match(less, /\.FlatRateDiscussionBrandLink\.depth-1/);
+  assert.match(less, /padding-left: 1\.5rem/);
+  assert.match(less, /\.FlatRateDiscussionBrandLink\.depth-2/);
+  assert.match(less, /padding-left: 3rem/);
   assert.match(extendPhp, /discussion-center-menu\.less/);
 });
