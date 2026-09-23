@@ -7,10 +7,16 @@ import SelectDropdown from 'flarum/common/components/SelectDropdown';
 import icon from 'flarum/common/helpers/icon';
 
 import PresentationNav from './components/PresentationNav';
+import StartBoardPin from './components/StartBoardPin';
 import './discussionCenterMenu';
 import { withDefaultRootSort, withRootSortOrder } from './utils/defaultRootSort';
 import { getNavigationManifest, pushToStartHref } from './utils/manifest';
 import { resolvePresentationTitle, TECHNICIAN_TOPICS_LABEL } from './utils/presentationTitle';
+import {
+  addStartBoardPinItem,
+  removeStartBoardPinItem,
+  shouldShowStartBoardPin,
+} from './utils/startBoardPin';
 import { START_NAV_ICON, START_NAV_LABEL, TECHNICIAN_TOPICS_ICON } from './utils/startNav';
 import { stripNativeTagPresentation } from './utils/stripNativeTagPresentation';
 
@@ -81,6 +87,37 @@ app.initializers.add(
       );
 
       stripNativeTagPresentation(items);
+    });
+
+    // Flarum 1.8.19 IndexPage.contentItems: toolbar(100), discussionList(90).
+    // Insert the START board pin between them without touching app.discussions.
+    extend(IndexPage.prototype, 'contentItems', function (items) {
+      const current = app.current;
+      const routeName =
+        (current && typeof current.get === 'function' && current.get('routeName')) ||
+        (current && current.data && current.data.routeName) ||
+        '';
+      const searchParams =
+        (app.search && typeof app.search.params === 'function' && app.search.params()) || {};
+      const stickyParams =
+        (app.search && typeof app.search.stickyParams === 'function' && app.search.stickyParams()) ||
+        {};
+      const currentTag = typeof this.currentTag === 'function' ? this.currentTag() : null;
+
+      if (
+        !shouldShowStartBoardPin({
+          pathname: currentPathname(),
+          routeName,
+          searchParams,
+          stickyParams,
+          currentTag,
+        })
+      ) {
+        removeStartBoardPinItem(items);
+        return;
+      }
+
+      addStartBoardPinItem(items, <StartBoardPin manifest={getNavigationManifest()} />);
     });
 
     // Phone hamburger is Flarum's App-drawer, which renders HeaderSecondary.
