@@ -112,7 +112,7 @@ test('single injection: repeated addStartBoardPinItem keeps exactly one pin', ()
   assert.equal(list.items[START_BOARD_PIN_ITEM], undefined);
 });
 
-test('presentation keeps pin left, START centered, and collapse control right', () => {
+test('presentation keeps pin left, START centered, and close control right', () => {
   assert.match(less, /\.FlatRateStartBoardPin\b/);
   assert.match(less, /\.FlatRateStartBoardPin-bar\b/);
   assert.match(less, /grid-template-columns: 44px minmax\(0, 1fr\) 44px/);
@@ -120,20 +120,26 @@ test('presentation keeps pin left, START centered, and collapse control right', 
   assert.match(less, /justify-content: center/);
   assert.match(less, /\.FlatRateStartBoardPin-pin\b/);
   assert.match(less, /justify-self: start/);
-  assert.match(less, /\.FlatRateStartBoardPin-toggle\b/);
+  assert.match(less, /\.FlatRateStartBoardPin-close\b/);
   assert.match(less, /justify-self: end/);
   assert.match(less, /\.FlatRateStartBoardPin-icon\b/);
   assert.match(less, /\.FlatRateStartBoardPin-label\b/);
-  assert.match(less, /\.FlatRateStartBoardPin\.is-collapsed/);
-  assert.match(less, /min-height: 32px/);
+  assert.doesNotMatch(less, /\.FlatRateStartBoardPin\.is-collapsed/);
+  assert.doesNotMatch(less, /\.FlatRateStartBoardPin-toggle\b/);
   assert.match(less, /#66ff00/);
   assert.match(pinSrc, /fas fa-thumbtack/);
-  assert.match(pinSrc, /START_BOARD_PIN_COLLAPSED_KEY/);
+  assert.match(pinSrc, /START_BOARD_PIN_DISMISSED_KEY/);
+  assert.match(pinSrc, /flatrate:start-board-pin:dismissed:v1/);
   assert.match(pinSrc, /localStorage\.getItem/);
   assert.match(pinSrc, /localStorage\.setItem/);
-  assert.match(pinSrc, /aria-expanded/);
-  assert.match(pinSrc, /fa-chevron-down/);
-  assert.match(pinSrc, /fa-chevron-up/);
+  assert.match(pinSrc, /aria-label=\{`Close \$\{START_NAV_LABEL\} pinned board`\}/);
+  assert.match(pinSrc, /fas fa-times/);
+  assert.match(pinSrc, /return null;/);
+  assert.doesNotMatch(pinSrc, /aria-expanded/);
+  assert.doesNotMatch(pinSrc, /fa-chevron-down/);
+  assert.doesNotMatch(pinSrc, /fa-chevron-up/);
+  assert.doesNotMatch(pinSrc, /collapsed/);
+  assert.doesNotMatch(pinSrc, /FlatRateStartBoardPin-toggle/);
 });
 
 test('center popup contract tests remain authoritative (HOME + Brands, no START)', () => {

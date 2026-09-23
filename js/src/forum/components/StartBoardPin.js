@@ -5,27 +5,27 @@ import icon from 'flarum/common/helpers/icon';
 import { getNavigationManifest, pushToStartHref } from '../utils/manifest';
 import { START_NAV_ICON, START_NAV_LABEL } from '../utils/startNav';
 
-const START_BOARD_PIN_COLLAPSED_KEY = 'flatrate:start-board-pin:collapsed:v1';
+const START_BOARD_PIN_DISMISSED_KEY = 'flatrate:start-board-pin:dismissed:v1';
 
-function readCollapsedPreference() {
+function readDismissedPreference() {
   if (typeof window === 'undefined' || !window.localStorage) {
     return false;
   }
 
   try {
-    return window.localStorage.getItem(START_BOARD_PIN_COLLAPSED_KEY) === '1';
+    return window.localStorage.getItem(START_BOARD_PIN_DISMISSED_KEY) === '1';
   } catch (error) {
     return false;
   }
 }
 
-function writeCollapsedPreference(collapsed) {
+function writeDismissedPreference(dismissed) {
   if (typeof window === 'undefined' || !window.localStorage) {
     return;
   }
 
   try {
-    window.localStorage.setItem(START_BOARD_PIN_COLLAPSED_KEY, collapsed ? '1' : '0');
+    window.localStorage.setItem(START_BOARD_PIN_DISMISSED_KEY, dismissed ? '1' : '0');
   } catch (error) {
     // Storage can be unavailable in privacy-restricted browsing contexts.
   }
@@ -38,30 +38,29 @@ function writeCollapsedPreference(collapsed) {
 export default class StartBoardPin extends Component {
   oninit(vnode) {
     super.oninit(vnode);
-    this.collapsed = readCollapsedPreference();
+    this.dismissed = readDismissedPreference();
   }
 
-  toggleCollapsed(event) {
+  dismiss(event) {
     if (event) {
       event.preventDefault();
       event.stopPropagation();
     }
 
-    this.collapsed = !this.collapsed;
-    writeCollapsedPreference(this.collapsed);
+    this.dismissed = true;
+    writeDismissedPreference(true);
   }
 
   view() {
+    if (this.dismissed === true) {
+      return null;
+    }
+
     const manifest = this.attrs.manifest || getNavigationManifest();
     const href = pushToStartHref(manifest);
-    const collapsed = this.collapsed === true;
 
     return (
-      <div
-        className={`FlatRateStartBoardPin${collapsed ? ' is-collapsed' : ''}`}
-        data-flatrate-start-board-pin="true"
-        data-flatrate-start-board-pin-collapsed={collapsed ? 'true' : 'false'}
-      >
+      <div className="FlatRateStartBoardPin" data-flatrate-start-board-pin="true">
         <div className="FlatRateStartBoardPin-bar">
           <span className="FlatRateStartBoardPin-pin" aria-hidden="true">
             {icon('fas fa-thumbtack')}
@@ -80,12 +79,11 @@ export default class StartBoardPin extends Component {
 
           <button
             type="button"
-            className="FlatRateStartBoardPin-toggle"
-            aria-label={collapsed ? `Expand ${START_NAV_LABEL} pinned board` : `Collapse ${START_NAV_LABEL} pinned board`}
-            aria-expanded={collapsed ? 'false' : 'true'}
-            onclick={(event) => this.toggleCollapsed(event)}
+            className="FlatRateStartBoardPin-close"
+            aria-label={`Close ${START_NAV_LABEL} pinned board`}
+            onclick={(event) => this.dismiss(event)}
           >
-            {icon(collapsed ? 'fas fa-chevron-down' : 'fas fa-chevron-up')}
+            {icon('fas fa-times')}
           </button>
         </div>
       </div>

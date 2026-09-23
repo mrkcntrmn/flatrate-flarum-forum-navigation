@@ -115,13 +115,13 @@
 }
 
 .FlatRateStartBoardPin-link:focus-visible,
-.FlatRateStartBoardPin-toggle:focus-visible {
+.FlatRateStartBoardPin-close:focus-visible {
   outline: 2px solid var(--primary-color);
   outline-offset: -3px;
 }
 
 .FlatRateStartBoardPin-pin,
-.FlatRateStartBoardPin-toggle {
+.FlatRateStartBoardPin-close {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -138,7 +138,7 @@
   opacity: 0.9;
 }
 
-.FlatRateStartBoardPin-toggle {
+.FlatRateStartBoardPin-close {
   justify-self: end;
   border: 0;
   background: transparent;
@@ -146,7 +146,7 @@
   cursor: pointer;
 }
 
-.FlatRateStartBoardPin-toggle:hover {
+.FlatRateStartBoardPin-close:hover {
   color: var(--primary-color);
 }
 
@@ -164,21 +164,6 @@
 
 .FlatRateStartBoardPin-label {
   letter-spacing: 0.02em;
-}
-
-.FlatRateStartBoardPin.is-collapsed .FlatRateStartBoardPin-bar {
-  min-height: 32px;
-}
-
-.FlatRateStartBoardPin.is-collapsed .FlatRateStartBoardPin-link,
-.FlatRateStartBoardPin.is-collapsed .FlatRateStartBoardPin-pin,
-.FlatRateStartBoardPin.is-collapsed .FlatRateStartBoardPin-toggle {
-  min-height: 30px;
-  height: 30px;
-}
-
-.FlatRateStartBoardPin.is-collapsed .FlatRateStartBoardPin-icon {
-  display: none;
 }
 
 .FlatRatePresentationNav {
