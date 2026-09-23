@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 class PresentationNavStaticTest extends TestCase
 {
-    public function testSourceAndDistHaveNoCollapseControls(): void
+    public function testBrandTreeHasNoCollapseControls(): void
     {
         $root = dirname(__DIR__);
         $src = (string) file_get_contents($root . '/js/src/forum/components/PresentationNav.js');
@@ -21,6 +21,13 @@ class PresentationNavStaticTest extends TestCase
             'aria-controls',
         ] as $needle) {
             $this->assertStringNotContainsString($needle, $src, $needle . ' remains in PresentationNav source');
+        }
+
+        foreach ([
+            'brandsExpanded',
+            'expandedParents',
+            'FlatRatePresentationNav-expander',
+        ] as $needle) {
             $this->assertStringNotContainsString($needle, $dist, $needle . ' remains in compiled forum.js');
         }
 

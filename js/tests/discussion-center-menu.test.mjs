@@ -190,6 +190,7 @@ test('phone swaps the scrubber for the brand picker while desktop keeps scrubber
   assert.match(less, /\.DiscussionPage-nav \.item-flatrateDiscussionBrandPicker/);
   assert.match(less, /@media \(min-width: 768px\)/);
   assert.match(less, /\.FlatRateDiscussionBrandPicker \.Dropdown-menu\s+\.FlatRateDiscussionPicker-link/);
+  assert.match(less, /\.FlatRateDiscussionPicker-home/);
   assert.match(less, /\.FlatRateDiscussionBrandLink/);
   assert.match(less, /width: 15rem/);
   assert.match(less, /justify-content: flex-start/);

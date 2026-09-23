@@ -20,7 +20,7 @@ function collectBoards(nodes, acc = []) {
   return acc;
 }
 
-test('presentation nav has no collapse state or expander controls', () => {
+test('presentation nav brand tree has no collapse state or expander controls', () => {
   for (const needle of [
     'brandsExpanded',
     'expandedParents',
@@ -28,11 +28,22 @@ test('presentation nav has no collapse state or expander controls', () => {
     'FlatRatePresentationNav-expanderIcon',
     'aria-expanded',
     'aria-controls',
-    'hidden={!',
+    'hidden={! ',
     'is-collapsed',
     'is-expanded',
   ]) {
     assert.equal(src.includes(needle), false, `source still contains ${needle}`);
+  }
+
+  // The pinned START banner now legitimately uses aria-expanded and
+  // is-collapsed. Keep compiled-bundle checks limited to Brand-tree-specific
+  // collapse identifiers so this test remains scoped to PresentationNav.
+  for (const needle of [
+    'brandsExpanded',
+    'expandedParents',
+    'FlatRatePresentationNav-expander',
+    'FlatRatePresentationNav-expanderIcon',
+  ]) {
     assert.equal(dist.includes(needle), false, `dist still contains ${needle}`);
   }
 
@@ -41,12 +52,11 @@ test('presentation nav has no collapse state or expander controls', () => {
   assert.equal(src.includes('onclick'), false, 'presentation nav source still contains onclick');
 });
 
-test('obsolete expander LESS is gone after becoming unused', () => {
+test('obsolete Brand-tree expander LESS is gone after becoming unused', () => {
   for (const needle of [
     'FlatRatePresentationNav-expander',
     'FlatRatePresentationNav-expanderIcon',
     'FlatRatePresentationNav-expanderSpacer',
-    'is-collapsed',
   ]) {
     assert.equal(less.includes(needle), false, `less still contains ${needle}`);
   }

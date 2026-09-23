@@ -94,31 +94,43 @@ test('single injection: repeated addStartBoardPinItem keeps exactly one pin', ()
   addStartBoardPinItem(list, { marker: 'pin-c' });
 
   assert.equal(START_BOARD_PIN_ITEM, 'flatrateStartBoardPin');
-  assert.equal(START_BOARD_PIN_PRIORITY, 95);
+  assert.equal(START_BOARD_PIN_PRIORITY, 110);
   assert.equal(Object.keys(list.items).length, 1);
   assert.ok(list.items[START_BOARD_PIN_ITEM]);
   assert.equal(list.items[START_BOARD_PIN_ITEM].content.marker, 'pin-c');
-  assert.equal(list.items[START_BOARD_PIN_ITEM].priority, 95);
+  assert.equal(list.items[START_BOARD_PIN_ITEM].priority, 110);
 
   removeStartBoardPinItem(list);
   assert.equal(list.items[START_BOARD_PIN_ITEM], undefined);
 });
 
-test('presentation classes and lime START identity are present', () => {
+test('presentation keeps pin left, START centered, and collapse control right', () => {
   assert.match(less, /\.FlatRateStartBoardPin\b/);
+  assert.match(less, /\.FlatRateStartBoardPin-bar\b/);
+  assert.match(less, /grid-template-columns: 44px minmax\(0, 1fr\) 44px/);
   assert.match(less, /\.FlatRateStartBoardPin-link\b/);
+  assert.match(less, /justify-content: center/);
   assert.match(less, /\.FlatRateStartBoardPin-pin\b/);
+  assert.match(less, /justify-self: start/);
+  assert.match(less, /\.FlatRateStartBoardPin-toggle\b/);
+  assert.match(less, /justify-self: end/);
   assert.match(less, /\.FlatRateStartBoardPin-icon\b/);
   assert.match(less, /\.FlatRateStartBoardPin-label\b/);
-  assert.match(less, /min-height: 44px/);
+  assert.match(less, /\.FlatRateStartBoardPin\.is-collapsed/);
+  assert.match(less, /min-height: 32px/);
   assert.match(less, /#66ff00/);
   assert.match(pinSrc, /fas fa-thumbtack/);
-  assert.match(pinSrc, /aria-hidden="true"/);
+  assert.match(pinSrc, /START_BOARD_PIN_COLLAPSED_KEY/);
+  assert.match(pinSrc, /localStorage\.getItem/);
+  assert.match(pinSrc, /localStorage\.setItem/);
+  assert.match(pinSrc, /aria-expanded/);
+  assert.match(pinSrc, /fa-chevron-down/);
+  assert.match(pinSrc, /fa-chevron-up/);
 });
 
 test('center popup contract tests remain authoritative (HOME + Brands, no START)', () => {
   assert.match(centerPopupLessTests, /center popup hides Following and START/);
-  assert.match(centerPopupLessTests, /presents All Discussions as centered HOME/);
+  assert.match(centerPopupLessTests, /presents HOME on the same left-aligned column/);
   assert.match(less, /\.App-titleControl \.FlatRatePresentationNav-item--community/);
   assert.match(less, /\.App-titleControl \.Dropdown-menu \.item-allDiscussions > a/);
   assert.match(less, /\.App-drawer \.item-flatrateDrawerStart/);

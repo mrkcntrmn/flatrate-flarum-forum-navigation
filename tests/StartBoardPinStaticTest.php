@@ -20,12 +20,18 @@ class StartBoardPinStaticTest extends TestCase
         $this->assertStringContainsString('START_NAV_ICON', $component);
         $this->assertStringContainsString('FlatRateStartBoardPin', $component);
         $this->assertStringContainsString('data-flatrate-start-board-pin', $component);
+        $this->assertStringContainsString('START_BOARD_PIN_COLLAPSED_KEY', $component);
+        $this->assertStringContainsString('localStorage.setItem', $component);
+        $this->assertStringContainsString('aria-expanded', $component);
         $this->assertStringContainsString('shouldShowStartBoardPin', $util);
         $this->assertStringContainsString('flatrateStartBoardPin', $util);
+        $this->assertStringContainsString('START_BOARD_PIN_PRIORITY = 110', $util);
         $this->assertStringContainsString("contentItems", $index);
         $this->assertStringContainsString('StartBoardPin', $index);
         $this->assertStringContainsString('addStartBoardPinItem', $index);
         $this->assertStringContainsString('.FlatRateStartBoardPin', $less);
+        $this->assertStringContainsString('.FlatRateStartBoardPin-toggle', $less);
+        $this->assertStringContainsString('grid-template-columns: 44px minmax(0, 1fr) 44px', $less);
         $this->assertStringContainsString('#66ff00', $less);
         $this->assertStringContainsString('FlatRateStartBoardPin', $dist);
         $this->assertStringContainsString('flatrateStartBoardPin', $dist);
