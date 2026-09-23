@@ -77,6 +77,60 @@
   }
 }
 
+/* HOME-only pinned START board shortcut (not a Discussion model row). */
+.FlatRateStartBoardPin {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0 0 12px;
+}
+
+.FlatRateStartBoardPin-link {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  text-decoration: none;
+  color: inherit;
+  background: var(--control-bg);
+  border: 1px solid var(--control-bg);
+  border-radius: var(--border-radius);
+}
+
+.FlatRateStartBoardPin-link:hover {
+  box-shadow: inset 0 0 0 1px var(--primary-color);
+}
+
+.FlatRateStartBoardPin-link:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.FlatRateStartBoardPin-pin {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--primary-color);
+  opacity: 0.9;
+}
+
+.FlatRateStartBoardPin-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: #66ff00;
+}
+
+.FlatRateStartBoardPin-label,
+.FlatRateStartBoardPin-icon .icon {
+  color: #66ff00;
+  font-weight: 700;
+}
+
+.FlatRateStartBoardPin-label {
+  letter-spacing: 0.02em;
+}
+
 .FlatRatePresentationNav {
   margin: 0;
   padding: 0;
