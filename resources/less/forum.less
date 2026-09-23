@@ -415,9 +415,15 @@
     color: var(--primary-color) !important;
   }
 
-  /* Follow/favorite controls keep the phone header's far-right slot. */
+  /* Follow/favorite controls keep the phone header's far-right slot.
+     FoF Follow Tags ships a phone-only right: 50px offset on the button;
+     explicitly neutralize that offset here. */
   .IndexPage .App-primaryControl {
     right: 8px !important;
+  }
+
+  .IndexPage-nav .SubscriptionButton {
+    right: 0 !important;
   }
 
   /* The visible center trigger is always the FLATRATE.WIKI brand. Preserve
