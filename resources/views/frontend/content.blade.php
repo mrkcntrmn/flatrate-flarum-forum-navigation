@@ -13,7 +13,12 @@
 >
     <div class="container FlatRateMaintenanceBanner-inner">
         <div class="FlatRateMaintenanceBanner-message">
-            FLATRATE.WIKI is undergoing maintenance.  — 4:00 PM, 9/24/26
+            <div class="FlatRateMaintenanceBanner-copy">
+                FLATRATE.WIKI is undergoing maintenance.
+            </div>
+            <div class="FlatRateMaintenanceBanner-schedule">
+                9/24/26 4:00 PM
+            </div>
         </div>
         <button
             type="button"
