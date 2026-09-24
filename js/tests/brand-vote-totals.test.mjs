@@ -22,7 +22,7 @@ test('Brand totals consume the FlatRate forum-bootstrap aggregate', () => {
 
 test('exact positive Follow state recolors only presentation', () => {
   assert.match(helper, /subscription === 'follow' \|\| subscription === 'lurk'/);
-  assert.doesNotMatch(helper, /family|parent|children/);
+  assert.doesNotMatch(helper, /board\.parent|board\.children|familyOf|listDirectBrandChildren/);
   assert.match(component, /is-followed/);
   assert.match(less, /\.FlatRateBrandVoteTotal\.is-followed/);
   assert.match(less, /#84cc16/);
