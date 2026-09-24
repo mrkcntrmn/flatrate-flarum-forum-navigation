@@ -17,7 +17,7 @@
                 FLATRATE.WIKI is undergoing maintenance.
             </div>
             <div class="FlatRateMaintenanceBanner-schedule">
-                9/23/26 4:00 PM
+                9/24/26 4:00 PM
             </div>
         </div>
         <button
@@ -36,7 +36,7 @@
             return;
         }
 
-        var storageKey = 'flatrate:maintenance-banner:2026-09-23-1600';
+        var storageKey = 'flatrate:maintenance-banner:2026-09-24-1600';
         var dismissed = false;
 
         try {
