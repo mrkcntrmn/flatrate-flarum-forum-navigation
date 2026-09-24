@@ -55,7 +55,7 @@ class NavigationManifestTest extends TestCase
         $this->assertSame('general-shop-discussion', $destination['slug']);
     }
 
-    public function testBrandTreeCountsAndGmCdjrChildren(): void
+    public function testBrandTreeCountsAndGmCdjrJlrChildren(): void
     {
         $manifest = NavigationManifest::load();
         $boards = $manifest['groups'][2]['boards'];
@@ -68,7 +68,7 @@ class NavigationManifestTest extends TestCase
         };
         $walk($boards);
 
-        $this->assertCount(41, $keys);
+        $this->assertCount(45, $keys);
         $this->assertCount(41, array_unique($keys));
         $this->assertCount(33, $boards);
 
