@@ -138,12 +138,12 @@ try {
     fail($e->getMessage());
 }
 
-if (count($keys) !== 41 || count(array_unique($keys)) !== 41) {
-    fail('BRAND_BOARD_COUNT must be 41 without duplicates (got ' . count($keys) . ')');
+if (count($keys) !== 45 || count(array_unique($keys)) !== 45) {
+    fail('BRAND_BOARD_COUNT must be 45 without duplicates (got ' . count($keys) . ')');
 }
 
-if (count($brands) !== 33) {
-    fail('TOP_LEVEL brand count must be 33');
+if (count($brands) !== 34) {
+    fail('TOP_LEVEL brand count must be 34');
 }
 
 $byKey = [];
@@ -157,11 +157,15 @@ $index($brands);
 
 $gmNames = array_map(static fn ($child) => $child['name'] ?? null, $byKey['gm']['children'] ?? []);
 $cdjrNames = array_map(static fn ($child) => $child['name'] ?? null, $byKey['cdjr']['children'] ?? []);
+$jlrNames = array_map(static fn ($child) => $child['name'] ?? null, $byKey['jlr']['children'] ?? []);
 if ($gmNames !== ['Buick', 'Cadillac', 'Chevrolet', 'GMC']) {
     fail('GM children mismatch');
 }
 if ($cdjrNames !== ['Chrysler', 'Dodge', 'Jeep', 'Ram']) {
     fail('CDJR children mismatch');
+}
+if ($jlrNames !== ['Jaguar', 'Land Rover', 'Range Rover']) {
+    fail('JLR children mismatch');
 }
 
 if (($manifest['pushToStart']['boardKey'] ?? null) !== 'start-here'
@@ -198,7 +202,7 @@ fwrite(STDOUT, "SOURCE_MANIFEST_SHA256={$sha256}\n");
 fwrite(STDOUT, "CONTROL_REPO={$provenance['CONTROL_REPO']}\n");
 fwrite(STDOUT, "CONTROL_SOURCE_SHA={$provenance['CONTROL_SOURCE_SHA']}\n");
 fwrite(STDOUT, "MANIFEST_SOURCE_PATH={$provenance['MANIFEST_SOURCE_PATH']}\n");
-fwrite(STDOUT, "BRAND_BOARD_COUNT=41\n");
+fwrite(STDOUT, "BRAND_BOARD_COUNT=45\n");
 fwrite(STDOUT, "PUSH_TO_START_PATH=/t/start-here\n");
 fwrite(STDOUT, "LEGACY_COMMUNITY_ROUTE=/community\n");
 fwrite(STDOUT, "GENERAL_LIVE_AVAILABLE=true\n");
