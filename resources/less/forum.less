@@ -748,3 +748,60 @@
     display: none;
   }
 }
+
+
+/* FORUM-BRAND-VOTE-TOTALS-001
+ * One exact-Brand total is reused in sidebar, center picker, and Brand hero.
+ * Lime is the default/read state; pink is a secondary accent for the exact
+ * Brand's positive Follow state. The number itself is never a Follow control.
+ */
+.FlatRateBrandVoteTotal {
+  display: inline-block;
+  margin-left: 0.5rem;
+  color: #84cc16;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.FlatRateBrandVoteTotal.is-followed {
+  color: #c72d5d;
+}
+
+.FlatRatePresentationNav-brandLink {
+  display: flex !important;
+  align-items: center;
+  width: 100%;
+}
+
+.FlatRatePresentationNav-brandName {
+  min-width: 0;
+}
+
+.FlatRatePresentationNav-brandLink .FlatRateBrandVoteTotal {
+  margin-left: auto;
+  padding-left: 0.75rem;
+}
+
+.FlatRateDiscussionBrandLink .Button-label {
+  display: flex !important;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.FlatRateDiscussionBrandName {
+  min-width: 0;
+}
+
+.FlatRateDiscussionBrandLink .FlatRateBrandVoteTotal {
+  margin-left: auto;
+  padding-left: 0.75rem;
+}
+
+.TagHero .Hero-title .FlatRateBrandVoteTotal {
+  margin-left: 0.5rem;
+  font-size: 0.72em;
+  vertical-align: baseline;
+}
