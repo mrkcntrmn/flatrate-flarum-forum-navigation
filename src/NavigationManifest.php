@@ -131,8 +131,8 @@ final class NavigationManifest
         };
         $walk($brands);
 
-        if (count($keys) !== 41 || count(array_unique($keys)) !== 41) {
-            throw new InvalidArgumentException('BRAND_BOARD_COUNT must be 41 without duplicates');
+        if (count($keys) !== 45 || count(array_unique($keys)) !== 45) {
+            throw new InvalidArgumentException('BRAND_BOARD_COUNT must be 45 without duplicates');
         }
 
         $byKey = [];
@@ -146,11 +146,15 @@ final class NavigationManifest
 
         $gmNames = array_map(static fn ($child) => $child['name'] ?? null, $byKey['gm']['children'] ?? []);
         $cdjrNames = array_map(static fn ($child) => $child['name'] ?? null, $byKey['cdjr']['children'] ?? []);
+        $jlrNames = array_map(static fn ($child) => $child['name'] ?? null, $byKey['jlr']['children'] ?? []);
         if ($gmNames !== ['Buick', 'Cadillac', 'Chevrolet', 'GMC']) {
             throw new InvalidArgumentException('GM children mismatch');
         }
         if ($cdjrNames !== ['Chrysler', 'Dodge', 'Jeep', 'Ram']) {
             throw new InvalidArgumentException('CDJR children mismatch');
+        }
+        if ($jlrNames !== ['Jaguar', 'Land Rover', 'Range Rover']) {
+            throw new InvalidArgumentException('JLR children mismatch');
         }
 
         if (($manifest['pushToStart']['boardKey'] ?? null) !== 'start-here'
