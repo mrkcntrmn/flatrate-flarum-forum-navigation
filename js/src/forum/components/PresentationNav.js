@@ -3,6 +3,7 @@ import Link from 'flarum/common/components/Link';
 import classList from 'flarum/common/utils/classList';
 import icon from 'flarum/common/helpers/icon';
 
+import BrandVoteTotal from './BrandVoteTotal';
 import { brandHref, groupLinkHref } from '../utils/manifest';
 import {
   START_NAV_ICON,
@@ -87,7 +88,8 @@ export default class PresentationNav extends Component {
             href={brandHref(board)}
           >
             {icon(BRAND_NAV_ICON)}
-            {board.name}
+            <span className="FlatRatePresentationNav-brandName">{board.name}</span>
+            <BrandVoteTotal board={board} />
           </Link>
         </div>
         {hasChildren ? (
