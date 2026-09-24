@@ -1,5 +1,9 @@
 import { PICK_A_BRAND } from './presentationTitle.js';
 
+export const TECHNICIAN_TOPICS_SLUG = 'general-shop-discussion';
+export const TECHNICIAN_TOPICS_DISPLAY = '🔧';
+export const TECHNICIAN_TOPICS_A11Y_LABEL = 'Technician Topics';
+
 function tagSlug(tag) {
   if (!tag) return '';
   if (typeof tag.slug === 'function') return String(tag.slug() || '');
@@ -117,11 +121,45 @@ export function resolveDiscussionBoardTarget({ discussion = null, manifest = nul
   return null;
 }
 
+function isTechnicianTopicsTarget(target) {
+  if (!target) return false;
+  return (
+    target.slug === TECHNICIAN_TOPICS_SLUG ||
+    target.name === TECHNICIAN_TOPICS_A11Y_LABEL ||
+    target.name === 'Technician Topics'
+  );
+}
+
 /**
- * Resolve the board label used by the mobile center control on a discussion.
- * Non-brand discussions use the generic FlatRate.wiki center-menu label.
+ * Visible center-control label for a discussion.
+ * Uses owning-board semantics (not Brand-only). Technician Topics renders as 🔧.
+ * Fallback when no valid owning board exists: FlatRate.wiki / FLATRATE.WIKI.
  */
 export function resolveDiscussionBrandTitle({ discussion = null, manifest = null } = {}) {
-  const board = resolveDiscussionBrandBoard({ discussion, manifest });
-  return String(board?.name || PICK_A_BRAND);
+  const target = resolveDiscussionBoardTarget({ discussion, manifest });
+  if (!target) {
+    return PICK_A_BRAND;
+  }
+
+  if (isTechnicianTopicsTarget(target)) {
+    return TECHNICIAN_TOPICS_DISPLAY;
+  }
+
+  return String(target.name || PICK_A_BRAND);
+}
+
+/**
+ * Accessible name for the discussion center control.
+ */
+export function resolveDiscussionBrandAccessibleLabel({ discussion = null, manifest = null } = {}) {
+  const target = resolveDiscussionBoardTarget({ discussion, manifest });
+  if (!target) {
+    return PICK_A_BRAND;
+  }
+
+  if (isTechnicianTopicsTarget(target)) {
+    return TECHNICIAN_TOPICS_A11Y_LABEL;
+  }
+
+  return String(target.name || PICK_A_BRAND);
 }

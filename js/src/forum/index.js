@@ -8,8 +8,10 @@ import icon from 'flarum/common/helpers/icon';
 
 import PresentationNav from './components/PresentationNav';
 import StartBoardPin from './components/StartBoardPin';
+import MainLandingPins from './components/MainLandingPins';
+import BrandFamilyLinks from './components/BrandFamilyLinks';
+import BrandVoteTotal from './components/BrandVoteTotal';
 import './discussionCenterMenu';
-import { withDefaultRootSort, withRootSortOrder } from './utils/defaultRootSort';
 import { getNavigationManifest, pushToStartHref } from './utils/manifest';
 import { resolvePresentationTitle, TECHNICIAN_TOPICS_LABEL } from './utils/presentationTitle';
 import {
@@ -19,6 +21,16 @@ import {
 } from './utils/startBoardPin';
 import { START_NAV_ICON, START_NAV_LABEL, TECHNICIAN_TOPICS_ICON } from './utils/startNav';
 import { stripNativeTagPresentation } from './utils/stripNativeTagPresentation';
+import { resolveBrandTagline } from './utils/brandTagline';
+import { findBrandNodeBySlug } from './utils/brandNode';
+import { isCleanRootIndex, mainPinIdsFromForum } from './utils/mainLandingPins';
+
+let TagHero;
+try {
+  TagHero = require('flarum/tags/components/TagHero').default;
+} catch (error) {
+  TagHero = null;
+}
 
 function hideDrawerAfterLinkClick(event) {
   const target = event && event.target;
@@ -34,6 +46,15 @@ function currentPathname() {
   return window.location && window.location.pathname ? window.location.pathname : '/';
 }
 
+function currentPageNumber() {
+  try {
+    const page = m.route.param('page');
+    return (page && Number(page)) || 1;
+  } catch (error) {
+    return 1;
+  }
+}
+
 function followingDrawerHref() {
   const params =
     app.search && typeof app.search.stickyParams === 'function' ? app.search.stickyParams() : {};
@@ -41,6 +62,22 @@ function followingDrawerHref() {
     return app.route('following', params);
   }
   return '/following';
+}
+
+function rootContext() {
+  const current = app.current;
+  const routeName =
+    (current && typeof current.get === 'function' && current.get('routeName')) ||
+    (current && current.data && current.data.routeName) ||
+    '';
+  const searchParams =
+    (app.search && typeof app.search.params === 'function' && app.search.params()) || {};
+  const stickyParams =
+    (app.search && typeof app.search.stickyParams === 'function' && app.search.stickyParams()) || {};
+  const currentTag =
+    current && typeof current.currentTag === 'function' ? current.currentTag() : null;
+
+  return { routeName, searchParams, stickyParams, currentTag };
 }
 
 /**
@@ -54,18 +91,8 @@ function followingDrawerHref() {
 app.initializers.add(
   'flatrate-forum-navigation',
   () => {
-    // Flarum 1.8.19 has no root-index default-sort setting. Keep the clean
-    // canonical `/` URL while treating Top as the implicit root-feed sort.
-    // Searches retain relevance-first behavior, non-root pages retain native
-    // behavior, and explicit user-selected sorts remain authoritative.
-    override(app.search, 'params', function (original) {
-      return withDefaultRootSort(original(), currentPathname());
-    });
-
-    override(app.discussions, 'sortMap', function (original) {
-      const params = app.search && typeof app.search.params === 'function' ? app.search.params() : {};
-      return withRootSortOrder(original(), params, currentPathname());
-    });
+    // Native Latest is the authenticated MAIN default. Do not force sort=top
+    // or rewrite `/` to `/?sort=latest`.
 
     extend(IndexPage.prototype, 'navItems', function (items) {
       // Registered after flarum-tags so removals apply after tag injection.
@@ -89,35 +116,101 @@ app.initializers.add(
       stripNativeTagPresentation(items);
     });
 
-    // Flarum 1.8.19 IndexPage.contentItems: toolbar(100), discussionList(90).
-    // Insert the START board pin above the toolbar without touching app.discussions.
+    // Content composition for MAIN landing pins + START board pin.
     extend(IndexPage.prototype, 'contentItems', function (items) {
-      const current = app.current;
-      const routeName =
-        (current && typeof current.get === 'function' && current.get('routeName')) ||
-        (current && current.data && current.data.routeName) ||
-        '';
-      const searchParams =
-        (app.search && typeof app.search.params === 'function' && app.search.params()) || {};
-      const stickyParams =
-        (app.search && typeof app.search.stickyParams === 'function' && app.search.stickyParams()) ||
-        {};
-      const currentTag = typeof this.currentTag === 'function' ? this.currentTag() : null;
+      const { routeName, searchParams, stickyParams, currentTag } = rootContext();
+      const pathname = currentPathname();
+      const page = currentPageNumber();
+      const signedIn = !!(app.session && app.session.user);
+      const cleanRoot = isCleanRootIndex({
+        pathname,
+        routeName,
+        searchParams,
+        stickyParams,
+        currentTag,
+        page: 1,
+      });
+      const pageOneCleanRoot = isCleanRootIndex({
+        pathname,
+        routeName,
+        searchParams,
+        stickyParams,
+        currentTag,
+        page,
+      });
 
+      // Public MAIN: curated pins only — hide ordinary feed/sort/pagination/START.
+      if (!signedIn && cleanRoot) {
+        removeStartBoardPinItem(items);
+        if (items.items && items.items.toolbar) {
+          items.remove('toolbar');
+        }
+        if (items.items && items.items.discussionList) {
+          items.remove('discussionList');
+        }
+        if (items.items && items.items.flatrateMainLandingPins) {
+          items.remove('flatrateMainLandingPins');
+        }
+        items.add(
+          'flatrateMainLandingPins',
+          <MainLandingPins audience="public" />,
+          105
+        );
+        return;
+      }
+
+      // Signed-in START pin (independent of discussion MAIN pins).
       if (
-        !shouldShowStartBoardPin({
-          pathname: currentPathname(),
+        signedIn &&
+        shouldShowStartBoardPin({
+          pathname,
           routeName,
           searchParams,
           stickyParams,
           currentTag,
         })
       ) {
+        addStartBoardPinItem(items, <StartBoardPin manifest={getNavigationManifest()} />);
+      } else {
         removeStartBoardPinItem(items);
-        return;
       }
 
-      addStartBoardPinItem(items, <StartBoardPin manifest={getNavigationManifest()} />);
+      // Member MAIN pins on clean root page 1 only.
+      if (items.items && items.items.flatrateMainLandingPins) {
+        items.remove('flatrateMainLandingPins');
+      }
+
+      if (signedIn && pageOneCleanRoot) {
+        const memberIds = mainPinIdsFromForum(app.forum, 'member');
+        if (memberIds.length) {
+          items.add('flatrateMainLandingPins', <MainLandingPins audience="member" />, 105);
+        }
+      }
+    });
+
+    // Member ordinary root feed: exclude configured member pin IDs before pagination.
+    override(app.discussions, 'requestParams', function (original) {
+      const params = original();
+      const { routeName, searchParams, stickyParams, currentTag } = rootContext();
+      const signedIn = !!(app.session && app.session.user);
+
+      if (
+        signedIn &&
+        isCleanRootIndex({
+          pathname: currentPathname(),
+          routeName,
+          searchParams,
+          stickyParams,
+          currentTag,
+          page: 1,
+        }) &&
+        !searchParams.q &&
+        mainPinIdsFromForum(app.forum, 'member').length
+      ) {
+        params.filter = { ...(params.filter || {}), flatrateExcludeMainPins: 'member' };
+      }
+
+      return params;
     });
 
     // Phone hamburger is Flarum's App-drawer, which renders HeaderSecondary.
@@ -172,9 +265,8 @@ app.initializers.add(
         -15
       );
 
-      // HOME is a phone-drawer affordance that sits immediately above the
-      // brand tree. The brand tree keeps its top border, so HOME and Acura are
-      // intentionally separated by the existing menu divider.
+      // MAIN is a phone-drawer affordance that sits immediately above the
+      // brand tree. Internal class names may still say Home.
       if (items.items && items.items.flatrateDrawerHome) {
         items.remove('flatrateDrawerHome');
       }
@@ -191,8 +283,9 @@ app.initializers.add(
             className="Button--flat FlatRateDrawerHome-link"
             href={app.route('index')}
             icon="fas fa-warehouse"
+            aria-label="MAIN"
           >
-            HOME
+            MAIN
           </LinkButton>
         </div>,
         -19
@@ -298,6 +391,75 @@ app.initializers.add(
       }
       return next;
     });
+
+    // Brand hero: tagline + parent family links via TagHero when flarum-tags is present.
+    if (TagHero) {
+      extend(TagHero.prototype, 'view', function (vnode) {
+        const tag = this.attrs.model || this.attrs.tag;
+        if (!tag || !vnode || !vnode.children) {
+          return;
+        }
+
+        const slug = typeof tag.slug === 'function' ? tag.slug() : tag.slug;
+        const manifest = getNavigationManifest();
+        const board = findBrandNodeBySlug(manifest, slug);
+        if (!board) {
+          return;
+        }
+
+        const tagline = resolveBrandTagline({ currentTag: tag, manifest });
+        const extras = [];
+
+        if (tagline) {
+          extras.push(
+            <p className="FlatRateBrandTagline Hero-subtitle" key="flatrate-brand-tagline">
+              {tagline}
+            </p>
+          );
+        }
+
+        extras.push(<BrandFamilyLinks board={board} key="flatrate-brand-family" />);
+
+        const content = Array.isArray(vnode.children) ? vnode.children : [vnode.children];
+        let inserted = false;
+        for (let i = 0; i < content.length; i++) {
+          const child = content[i];
+          const className = child && child.attrs && String(child.attrs.className || '');
+          if (className.includes('container')) {
+            const containerChildren = Array.isArray(child.children)
+              ? child.children.slice()
+              : [child.children];
+
+            // Keep the exact Brand total visually associated with the native
+            // Hero title rather than rendering it as a separate badge row.
+            const titleNode = containerChildren.find((node) => {
+              const titleClass =
+                node && node.attrs && String(node.attrs.className || '');
+              return titleClass.includes('Hero-title');
+            });
+            if (titleNode) {
+              const titleChildren = Array.isArray(titleNode.children)
+                ? titleNode.children.slice()
+                : [titleNode.children];
+              titleChildren.push(
+                <BrandVoteTotal board={board} key="flatrate-brand-vote-total" />
+              );
+              titleNode.children = titleChildren;
+            }
+
+            containerChildren.push(...extras.filter(Boolean));
+            child.children = containerChildren;
+            inserted = true;
+            break;
+          }
+        }
+
+        if (!inserted) {
+          content.push(...extras.filter(Boolean));
+          vnode.children = content;
+        }
+      });
+    }
   },
   -50
 );

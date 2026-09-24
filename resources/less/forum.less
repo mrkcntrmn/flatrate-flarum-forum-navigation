@@ -29,6 +29,17 @@
   text-align: center;
 }
 
+.FlatRateMaintenanceBanner-copy,
+.FlatRateMaintenanceBanner-schedule {
+  display: block;
+}
+
+.FlatRateMaintenanceBanner-schedule {
+  margin-top: 0.15rem;
+  font-weight: 500;
+  opacity: 0.95;
+}
+
 .FlatRateMaintenanceBanner-dismiss {
   position: absolute;
   top: 50%;
@@ -237,6 +248,67 @@
   flex: 1;
 }
 
+/* Brand hero tagline + parent family links */
+.FlatRateBrandTagline {
+  margin: 0.35rem 0 0;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 500;
+  opacity: 0.85;
+  color: inherit;
+}
+
+.FlatRateBrandFamilyLinks {
+  margin: 0.55rem 0 0;
+  text-align: center;
+}
+
+.FlatRateBrandFamilyLinks-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.15rem 0.35rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.FlatRateBrandFamilyLinks-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.FlatRateBrandFamilyLinks-sep {
+  opacity: 0.55;
+}
+
+.FlatRateBrandFamilyLinks-link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.2rem;
+}
+
+.FlatRateBrandFamilyLinks-link:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.FlatRateMainLandingPins {
+  margin: 0 0 12px;
+}
+
+.FlatRateMainLandingPins-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 @media (max-width: 767px) {
   .FlatRatePresentationNav-link {
     min-height: 2.5rem;
@@ -427,10 +499,15 @@
     display: none !important;
   }
 
-  /* Recast the native All Discussions option as the centered HOME action.
+  /* Recast the native All Discussions option as the centered MAIN action.
      Flarum supplies `far fa-comments`; overriding its glyph with the Font
      Awesome 5 Free solid warehouse codepoint is visually equivalent to
      `fas fa-warehouse` without changing the shared desktop/hamburger vnode. */
+  /* Shift the common MAIN + Brand rail right as ONE unit (not per-row offsets). */
+  .App-titleControl .Dropdown-menu {
+    --flatrate-mobile-nav-rail-offset: 0.75rem;
+  }
+
   .App-titleControl .Dropdown-menu .item-allDiscussions > a {
     display: flex !important;
     align-items: center;
@@ -440,7 +517,7 @@
     width: 15rem;
     max-width: calc(100% - 40px);
     min-height: 0;
-    margin-left: auto;
+    margin-left: calc(50% - 7.5rem + var(--flatrate-mobile-nav-rail-offset, 0rem));
     margin-right: auto;
     padding: 15px 0 !important;
     text-align: left;
@@ -469,7 +546,7 @@
   }
 
   .App-titleControl .Dropdown-menu .item-allDiscussions > a .Button-label::after {
-    content: "HOME";
+    content: "MAIN";
     font-size: 16px;
   }
 
@@ -484,7 +561,7 @@
     width: 15rem;
     max-width: calc(100% - 40px);
     min-height: 0;
-    margin-left: auto;
+    margin-left: calc(50% - 7.5rem + var(--flatrate-mobile-nav-rail-offset, 0rem));
     margin-right: auto;
     padding: 15px 0 !important;
     text-align: left;
@@ -524,9 +601,8 @@
     right: 0 !important;
   }
 
-  /* The visible center trigger is always the FLATRATE.WIKI brand. Preserve
-     the underlying SelectDropdown label for state/accessibility, but replace
-     only the phone-visible text and sort glyph. */
+  /* Board/index center trigger shows FLATRATE.WIKI. Discussion routes use
+     FlatRateDiscussionBrandPicker and must keep the JS contextual label. */
   /* Keep the mobile center control geometrically centered in the header, not
      merely centered in whatever width remains between left/right controls. */
   .App-header .App-titleControl {
@@ -553,17 +629,29 @@
     vertical-align: middle;
   }
 
-  .App-titleControl > .Dropdown-toggle .Button-label {
+  .App-titleControl:not(.FlatRateDiscussionBrandPicker) > .Dropdown-toggle .Button-label {
     display: inline-flex;
     align-items: center;
     line-height: 1 !important;
     font-size: 0 !important;
   }
 
-  .App-titleControl > .Dropdown-toggle .Button-label::after {
+  .App-titleControl:not(.FlatRateDiscussionBrandPicker) > .Dropdown-toggle .Button-label::after {
     content: "FLATRATE.WIKI";
     font-size: 16px;
     color: var(--primary-color);
+  }
+
+  .FlatRateDiscussionBrandPicker > .Dropdown-toggle .Button-label {
+    display: inline-flex;
+    align-items: center;
+    line-height: 1 !important;
+    font-size: 16px !important;
+    color: var(--primary-color);
+  }
+
+  .FlatRateDiscussionBrandPicker > .Dropdown-toggle .Button-label::after {
+    content: none !important;
   }
 
   .App-titleControl > .Dropdown-toggle > .icon:not(.Button-caret),
@@ -590,7 +678,7 @@
     font-weight: 900;
   }
 
-  /* HOME is a text/icon accent, not a filled active-state tile. */
+  /* MAIN is a text/icon accent, not a filled active-state tile. */
   .App-titleControl .Dropdown-menu .item-allDiscussions > a,
   .App-titleControl .Dropdown-menu .FlatRateDiscussionPicker-home {
     background: transparent !important;
@@ -621,7 +709,7 @@
     max-width: calc(100% - 40px);
     box-sizing: border-box;
     min-height: 0;
-    margin-left: auto;
+    margin-left: calc(50% - 7.5rem + var(--flatrate-mobile-nav-rail-offset, 0rem));
     margin-right: auto;
     padding: 15px 0 !important;
     text-align: left;
@@ -659,4 +747,61 @@
   .IndexPage-nav .FlatRatePresentationNav-brandLink .icon {
     display: none;
   }
+}
+
+
+/* FORUM-BRAND-VOTE-TOTALS-001
+ * One exact-Brand total is reused in sidebar, center picker, and Brand hero.
+ * Lime is the default/read state; pink is a secondary accent for the exact
+ * Brand's positive Follow state. The number itself is never a Follow control.
+ */
+.FlatRateBrandVoteTotal {
+  display: inline-block;
+  margin-left: 0.5rem;
+  color: #84cc16;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.FlatRateBrandVoteTotal.is-followed {
+  color: #c72d5d;
+}
+
+.FlatRatePresentationNav-brandLink {
+  display: flex !important;
+  align-items: center;
+  width: 100%;
+}
+
+.FlatRatePresentationNav-brandName {
+  min-width: 0;
+}
+
+.FlatRatePresentationNav-brandLink .FlatRateBrandVoteTotal {
+  margin-left: auto;
+  padding-left: 0.75rem;
+}
+
+.FlatRateDiscussionBrandLink .Button-label {
+  display: flex !important;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.FlatRateDiscussionBrandName {
+  min-width: 0;
+}
+
+.FlatRateDiscussionBrandLink .FlatRateBrandVoteTotal {
+  margin-left: auto;
+  padding-left: 0.75rem;
+}
+
+.TagHero .Hero-title .FlatRateBrandVoteTotal {
+  margin-left: 0.5rem;
+  font-size: 0.72em;
+  vertical-align: baseline;
 }

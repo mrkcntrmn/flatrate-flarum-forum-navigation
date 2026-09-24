@@ -1,4 +1,7 @@
-export const DEFAULT_ROOT_SORT = 'top';
+/**
+ * Root sort helpers. Authenticated MAIN uses Flarum's native Latest default.
+ * These helpers intentionally no longer inject sort=top.
+ */
 
 export function isRootDiscussionPath(pathname) {
   const normalized = String(pathname || '/').replace(/\/+$/, '') || '/';
@@ -10,19 +13,13 @@ export function hasSearchQuery(params = {}) {
   return typeof query === 'string' ? query.trim() !== '' : Boolean(query);
 }
 
-export function withDefaultRootSort(params = {}, pathname = '/') {
-  if (!isRootDiscussionPath(pathname) || hasSearchQuery(params) || params.sort) {
-    return params;
-  }
+/** @deprecated Retained for import stability; no longer forces a root sort. */
+export const DEFAULT_ROOT_SORT = null;
 
-  return { ...params, sort: DEFAULT_ROOT_SORT };
+export function withDefaultRootSort(params = {}, pathname = '/') {
+  return params;
 }
 
 export function withRootSortOrder(sortMap = {}, params = {}, pathname = '/') {
-  if (!isRootDiscussionPath(pathname) || hasSearchQuery(params) || !sortMap[DEFAULT_ROOT_SORT]) {
-    return sortMap;
-  }
-
-  const { [DEFAULT_ROOT_SORT]: top, ...rest } = sortMap;
-  return { [DEFAULT_ROOT_SORT]: top, ...rest };
+  return sortMap;
 }

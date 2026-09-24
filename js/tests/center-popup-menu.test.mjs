@@ -15,13 +15,13 @@ test('center popup hides Following and START without removing other navigation c
   assert.match(less, /\.App-drawer \.item-flatrateDrawerStart/);
 });
 
-test('center popup presents HOME on the same left-aligned column as Brand rows', () => {
+test('center popup presents MAIN on the same left-aligned column as Brand rows', () => {
   assert.match(less, /\.App-titleControl \.Dropdown-menu \.item-allDiscussions > a/);
   assert.match(less, /justify-content: flex-start/);
   assert.match(less, /width: 15rem/);
-  assert.match(less, /margin-left: auto/);
+  assert.match(less, /flatrate-mobile-nav-rail-offset/);
   assert.match(less, /margin-right: auto/);
-  assert.match(less, /content: "HOME"/);
+  assert.match(less, /content: "MAIN"/);
   assert.match(less, /content: "\\f494"/);
   assert.match(less, /font-family: "Font Awesome 5 Free"/);
   assert.match(less, /font-weight: 900/);

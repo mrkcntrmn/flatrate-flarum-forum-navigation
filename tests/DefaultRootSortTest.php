@@ -2,49 +2,31 @@
 
 namespace FlatRate\ForumNavigation\Tests;
 
-use FlatRate\ForumNavigation\Middleware\DefaultRootSort;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Authenticated MAIN returns to native Latest — no forced sort=top middleware.
+ */
 class DefaultRootSortTest extends TestCase
 {
-    public function testCleanRootDefaultsToTop(): void
+    public function testDefaultRootSortMiddlewareIsRetired(): void
     {
-        $this->assertSame(['sort' => 'top'], DefaultRootSort::queryParamsFor('GET', '/', []));
-        $this->assertSame(
-            ['page' => '2', 'sort' => 'top'],
-            DefaultRootSort::queryParamsFor('GET', '/', ['page' => '2'])
-        );
-        $this->assertSame(
-            ['sort' => 'top'],
-            DefaultRootSort::queryParamsFor('GET', '/', ['sort' => ''])
-        );
+        $root = dirname(__DIR__);
+        $this->assertFileDoesNotExist($root . '/src/Middleware/DefaultRootSort.php');
+
+        $extend = (string) file_get_contents($root . '/extend.php');
+        $this->assertStringNotContainsString('DefaultRootSort', $extend);
+        $this->assertStringNotContainsString("Extend\\Middleware('forum')", $extend);
     }
 
-    public function testExplicitSortRemainsUserControlled(): void
+    public function testFrontendNoLongerForcesTopRootSort(): void
     {
-        $this->assertSame(
-            ['sort' => 'latest'],
-            DefaultRootSort::queryParamsFor('GET', '/', ['sort' => 'latest'])
-        );
-        $this->assertSame(
-            ['sort' => 'newest'],
-            DefaultRootSort::queryParamsFor('GET', '/', ['sort' => 'newest'])
-        );
-    }
+        $root = dirname(__DIR__);
+        $index = (string) file_get_contents($root . '/js/src/forum/index.js');
+        $helper = (string) file_get_contents($root . '/js/src/forum/utils/defaultRootSort.js');
 
-    public function testSearchAndNonRootRoutesKeepNativeBehavior(): void
-    {
-        $this->assertSame(
-            ['q' => 'brakes'],
-            DefaultRootSort::queryParamsFor('GET', '/', ['q' => 'brakes'])
-        );
-        $this->assertSame([], DefaultRootSort::queryParamsFor('GET', '/t/toyota', []));
-        $this->assertSame([], DefaultRootSort::queryParamsFor('GET', '/following', []));
-        $this->assertSame([], DefaultRootSort::queryParamsFor('POST', '/', []));
-    }
-
-    public function testTrailingSlashNormalizationStaysAtForumRoot(): void
-    {
-        $this->assertSame(['sort' => 'top'], DefaultRootSort::queryParamsFor('GET', '///', []));
+        $this->assertStringNotContainsString('withDefaultRootSort', $index);
+        $this->assertStringNotContainsString("sort: 'top'", $helper);
+        $this->assertStringContainsString('DEFAULT_ROOT_SORT = null', $helper);
     }
 }

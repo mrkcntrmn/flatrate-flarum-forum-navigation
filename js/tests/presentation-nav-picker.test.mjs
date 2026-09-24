@@ -42,7 +42,7 @@ test('phone hamburger drawer mounts presentation nav via HeaderSecondary', () =>
   assert.match(indexSrc, /flatrateDrawerNav/);
   assert.match(indexSrc, /flatrateDrawerHome/);
   assert.match(indexSrc, /fa-warehouse/);
-  assert.match(indexSrc, />\s*HOME\s*<\/LinkButton>/);
+  assert.match(indexSrc, />\s*MAIN\s*<\/LinkButton>/);
   assert.match(indexSrc, /flatrateDrawerFollowing/);
   assert.match(indexSrc, /flatrateDrawerStart/);
   assert.match(indexSrc, /pushToStartHref/);
