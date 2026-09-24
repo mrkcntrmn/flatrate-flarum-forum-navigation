@@ -27,7 +27,9 @@ import { isCleanRootIndex, mainPinIdsFromForum } from './utils/mainLandingPins';
 
 let TagHero;
 try {
-  TagHero = require('flarum/tags/components/TagHero').default;
+  // flarum.core.compat may export the class directly (no __esModule/.default).
+  const TagHeroModule = require('flarum/tags/components/TagHero');
+  TagHero = TagHeroModule && TagHeroModule.default ? TagHeroModule.default : TagHeroModule;
 } catch (error) {
   TagHero = null;
 }

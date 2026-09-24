@@ -42,6 +42,12 @@ test('Brand hero attaches the total to the native Hero title', () => {
   assert.match(index, /titleChildren\.push/);
   assert.match(index, /flatrate-brand-vote-total/);
   assert.match(less, /\.TagHero \.Hero-title \.FlatRateBrandVoteTotal/);
+  // Compat may export the class directly; bare `.default` leaves TagHero undefined.
+  assert.match(
+    index,
+    /TagHeroModule\.default \? TagHeroModule\.default : TagHeroModule/
+  );
+  assert.doesNotMatch(index, /require\('flarum\/tags\/components\/TagHero'\)\.default/);
 });
 
 test('Brand totals are read-only and have an accessible label', () => {
