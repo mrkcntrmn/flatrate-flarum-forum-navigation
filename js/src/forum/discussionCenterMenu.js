@@ -8,6 +8,7 @@ import LinkButton from 'flarum/common/components/LinkButton';
 import SelectDropdown from 'flarum/common/components/SelectDropdown';
 import ItemList from 'flarum/common/utils/ItemList';
 
+import BrandVoteTotal from './components/BrandVoteTotal';
 import {
   resolveDiscussionBoardTarget,
   resolveDiscussionBrandAccessibleLabel,
@@ -100,7 +101,8 @@ app.initializers.add(
             href={brandHref(board)}
             force
           >
-            {board.name}
+            <span className="FlatRateDiscussionBrandName">{board.name}</span>
+            <BrandVoteTotal board={board} />
           </LinkButton>,
           -14 - index
         );
