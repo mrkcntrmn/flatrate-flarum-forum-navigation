@@ -10,6 +10,7 @@ import PresentationNav from './components/PresentationNav';
 import StartBoardPin from './components/StartBoardPin';
 import MainLandingPins from './components/MainLandingPins';
 import BrandFamilyLinks from './components/BrandFamilyLinks';
+import BrandVoteTotal from './components/BrandVoteTotal';
 import './discussionCenterMenu';
 import { getNavigationManifest, pushToStartHref } from './utils/manifest';
 import { resolvePresentationTitle, TECHNICIAN_TOPICS_LABEL } from './utils/presentationTitle';
@@ -428,6 +429,24 @@ app.initializers.add(
             const containerChildren = Array.isArray(child.children)
               ? child.children.slice()
               : [child.children];
+
+            // Keep the exact Brand total visually associated with the native
+            // Hero title rather than rendering it as a separate badge row.
+            const titleNode = containerChildren.find((node) => {
+              const titleClass =
+                node && node.attrs && String(node.attrs.className || '');
+              return titleClass.includes('Hero-title');
+            });
+            if (titleNode) {
+              const titleChildren = Array.isArray(titleNode.children)
+                ? titleNode.children.slice()
+                : [titleNode.children];
+              titleChildren.push(
+                <BrandVoteTotal board={board} key="flatrate-brand-vote-total" />
+              );
+              titleNode.children = titleChildren;
+            }
+
             containerChildren.push(...extras.filter(Boolean));
             child.children = containerChildren;
             inserted = true;
