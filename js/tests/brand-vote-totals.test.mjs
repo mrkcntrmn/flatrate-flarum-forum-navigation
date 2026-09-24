@@ -36,7 +36,9 @@ test('same Brand total component is reused in all required surfaces', () => {
 });
 
 test('Brand hero attaches the total to the native Hero title', () => {
-  assert.match(index, /titleClass\.includes\('Hero-title'\)/);
+  assert.match(index, /findHeroTitle/);
+  assert.match(index, /containerNarrow/);
+  assert.match(index, /nodeClass\.includes\('Hero-title'\)/);
   assert.match(index, /titleChildren\.push/);
   assert.match(index, /flatrate-brand-vote-total/);
   assert.match(less, /\.TagHero \.Hero-title \.FlatRateBrandVoteTotal/);

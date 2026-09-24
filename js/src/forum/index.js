@@ -430,13 +430,27 @@ app.initializers.add(
               ? child.children.slice()
               : [child.children];
 
+            // Flarum TagHero nests the title under `.containerNarrow`.
+            // Walk one level of wrappers so the total stays on the Hero title.
+            const findHeroTitle = (nodes) => {
+              const list = Array.isArray(nodes) ? nodes : [nodes];
+              for (const node of list) {
+                if (!node || !node.attrs) continue;
+                const nodeClass = String(node.attrs.className || '');
+                if (nodeClass.includes('Hero-title')) {
+                  return node;
+                }
+                if (nodeClass.includes('containerNarrow') || nodeClass.includes('container')) {
+                  const nested = findHeroTitle(node.children);
+                  if (nested) return nested;
+                }
+              }
+              return null;
+            };
+
             // Keep the exact Brand total visually associated with the native
             // Hero title rather than rendering it as a separate badge row.
-            const titleNode = containerChildren.find((node) => {
-              const titleClass =
-                node && node.attrs && String(node.attrs.className || '');
-              return titleClass.includes('Hero-title');
-            });
+            const titleNode = findHeroTitle(containerChildren);
             if (titleNode) {
               const titleChildren = Array.isArray(titleNode.children)
                 ? titleNode.children.slice()
@@ -447,8 +461,20 @@ app.initializers.add(
               titleNode.children = titleChildren;
             }
 
-            containerChildren.push(...extras.filter(Boolean));
-            child.children = containerChildren;
+            const narrow = containerChildren.find((node) => {
+              const nodeClass = node && node.attrs && String(node.attrs.className || '');
+              return nodeClass.includes('containerNarrow');
+            });
+            if (narrow) {
+              const narrowChildren = Array.isArray(narrow.children)
+                ? narrow.children.slice()
+                : [narrow.children];
+              narrowChildren.push(...extras.filter(Boolean));
+              narrow.children = narrowChildren;
+            } else {
+              containerChildren.push(...extras.filter(Boolean));
+              child.children = containerChildren;
+            }
             inserted = true;
             break;
           }
