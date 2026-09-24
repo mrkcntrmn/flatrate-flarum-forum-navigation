@@ -69,8 +69,8 @@ class NavigationManifestTest extends TestCase
         $walk($boards);
 
         $this->assertCount(45, $keys);
-        $this->assertCount(41, array_unique($keys));
-        $this->assertCount(33, $boards);
+        $this->assertCount(45, array_unique($keys));
+        $this->assertCount(34, $boards);
 
         $byKey = [];
         $index = static function (array $nodes) use (&$index, &$byKey): void {
