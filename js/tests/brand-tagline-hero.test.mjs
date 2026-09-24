@@ -73,16 +73,14 @@ test('parent brand family links are manifest-driven direct children only', () =>
   assert.match(indexSrc, /resolveBrandTagline/);
 });
 
-test('JLR hierarchy is not invented in the navigation runtime manifest yet', () => {
-  const brands = manifest.groups.find((group) => group.id === 'brands');
-  const slugs = [];
-  function walk(board) {
-    slugs.push(board.slug);
-    (board.children || []).forEach(walk);
-  }
-  (brands.boards || []).forEach(walk);
-  assert.ok(slugs.includes('jaguar'));
-  assert.equal(slugs.includes('jlr'), false);
-  assert.equal(slugs.includes('land-rover'), false);
-  assert.equal(slugs.includes('range-rover'), false);
+test('JLR hierarchy is embedded in the 45-Brand runtime projection pending control acceptance', () => {
+  const jlr = findBrandNodeBySlug(manifest, 'jlr');
+  assert.ok(jlr);
+  assert.deepEqual(
+    listDirectBrandChildren(jlr).map((child) => child.name),
+    ['Jaguar', 'Land Rover', 'Range Rover']
+  );
+  assert.equal(findBrandNodeBySlug(manifest, 'jaguar')?.boardKey, 'jaguar');
+  assert.equal(findBrandNodeBySlug(manifest, 'land-rover')?.boardKey, 'land-rover');
+  assert.equal(findBrandNodeBySlug(manifest, 'range-rover')?.boardKey, 'range-rover');
 });
