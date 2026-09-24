@@ -41,6 +41,12 @@
           "children": []
         },
         {
+          "boardKey": "aston-martin",
+          "name": "Aston Martin",
+          "slug": "aston-martin",
+          "children": []
+        },
+        {
           "boardKey": "audi",
           "name": "Audi",
           "slug": "audi",
@@ -157,10 +163,29 @@
           "children": []
         },
         {
-          "boardKey": "jaguar",
-          "name": "Jaguar",
-          "slug": "jaguar",
-          "children": []
+          "boardKey": "jlr",
+          "name": "JLR",
+          "slug": "jlr",
+          "children": [
+            {
+              "boardKey": "jaguar",
+              "name": "Jaguar",
+              "slug": "jaguar",
+              "children": []
+            },
+            {
+              "boardKey": "land-rover",
+              "name": "Land Rover",
+              "slug": "land-rover",
+              "children": []
+            },
+            {
+              "boardKey": "range-rover",
+              "name": "Range Rover",
+              "slug": "range-rover",
+              "children": []
+            }
+          ]
         },
         {
           "boardKey": "kia",
