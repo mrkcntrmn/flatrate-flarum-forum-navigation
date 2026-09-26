@@ -4,7 +4,14 @@
  * once the user is already on a brand board. Keep the board title and
  * discussion tag labels text-first without changing tag metadata or picker
  * navigation icons elsewhere.
+ *
+ * Board title color matches the mobile FLATRATE.WIKI mark (primary). Vote
+ * totals keep their own lime / followed colors on .FlatRateBrandVoteTotal.
  */
+.IndexPage .TagHero .Hero-title {
+  color: var(--primary-color);
+}
+
 .IndexPage .TagHero .Hero-title .fa-car,
 .IndexPage-results .TagLabel .fa-car {
   display: none !important;
