@@ -770,6 +770,23 @@
   .App-titleControl .Dropdown-menu .FlatRatePresentationNav-brand.depth-2 > .FlatRatePresentationNav-row .FlatRatePresentationNav-brandLink {
     padding-left: 3rem !important;
   }
+
+  /* The two mobile Brand menus share the same left-justified label/count tab
+     stop. Counts sit one tab after a fixed Brand label column instead of at
+     the far-right edge of the sheet/drawer. */
+  .App-drawer .FlatRatePresentationNav-brandName,
+  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-brandName {
+    flex: 0 0 10rem;
+    min-width: 0;
+    text-align: left;
+  }
+
+  .App-drawer .FlatRatePresentationNav-brandLink .FlatRateBrandVoteTotal,
+  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-brandLink .FlatRateBrandVoteTotal {
+    flex: 0 0 auto;
+    margin-left: 1.25rem;
+    padding-left: 0;
+  }
 }
 
 /* HeaderSecondary also renders in the desktop top bar. Do not mount the
@@ -821,9 +838,8 @@
    both the drawer tree and the center picker left-justified while placing the
    number one visual tab to the right of the Brand label column. */
 .FlatRatePresentationNav-brandLink .FlatRateBrandVoteTotal {
-  flex: 0 0 auto;
-  margin-left: 1.25rem;
-  padding-left: 0;
+  margin-left: auto;
+  padding-left: 0.75rem;
 }
 
 .FlatRateDiscussionBrandLink .Button-label {
