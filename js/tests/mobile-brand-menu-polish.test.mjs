@@ -58,3 +58,31 @@ test('center-menu brands use a centered left-aligned column with consistent chil
   assert.match(less, /\.FlatRatePresentationNav-brandLink \.icon/);
   assert.match(less, /display: none !important/);
 });
+
+
+test('mobile Follow is star-only while preserving the FoF SubscriptionButton mutation surface', () => {
+  assert.match(less, /\.IndexPage-nav \.SubscriptionButton \.Button-label/);
+  assert.match(less, /\.IndexPage-nav \.SubscriptionButton \.Button-caret/);
+  assert.match(less, /display: none !important/);
+  assert.match(less, /font-size: 24px !important/);
+  assert.match(less, /width: 44px !important/);
+});
+
+test('center label itself owns the header centerline while the caret is positioned outside its width', () => {
+  assert.match(less, /\.App-titleControl > \.Dropdown-toggle\s*\{[^}]*position: relative/s);
+  assert.match(less, /\.Dropdown-toggle \.Button-caret\s*\{[^}]*position: absolute !important/s);
+  assert.match(less, /left: calc\(100% \+ 0\.45rem\)/);
+});
+
+test('both mobile Brand menus use a left-aligned label/count tab stop and zero totals are omitted', () => {
+  assert.match(less, /\.App-drawer \.FlatRatePresentationNav-brandName/);
+  assert.match(less, /\.App-titleControl \.Dropdown-menu \.FlatRatePresentationNav-brandName/);
+  assert.match(less, /flex: 0 0 10rem/);
+  assert.match(less, /margin-left: 1\.25rem/);
+  assert.match(less, /\.FlatRateDiscussionBrandName\s*\{[^}]*flex: 0 0 10rem/s);
+  assert.match(less, /\.FlatRateBrandVoteTotal\[aria-label\*="board total: 0 upvotes"\]/);
+});
+
+test('canonical Brand hero suppresses the redundant native tag icon', () => {
+  assert.match(less, /\.TagHero:has\(\.FlatRateBrandTagline\) \.Hero-title \.icon/);
+});
