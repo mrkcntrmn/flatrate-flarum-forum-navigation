@@ -8,6 +8,7 @@ import icon from 'flarum/common/helpers/icon';
 
 import PresentationNav from './components/PresentationNav';
 import StartBoardPin from './components/StartBoardPin';
+import MainLiveChatPin from './components/MainLiveChatPin';
 import MainLandingPins from './components/MainLandingPins';
 import BrandFamilyLinks from './components/BrandFamilyLinks';
 import BrandVoteTotal from './components/BrandVoteTotal';
@@ -19,6 +20,12 @@ import {
   removeStartBoardPinItem,
   shouldShowStartBoardPin,
 } from './utils/startBoardPin';
+import {
+  addMainLiveChatItem,
+  getLiveMainProvider,
+  removeMainLiveChatItem,
+  shouldShowMainLiveChat,
+} from './utils/mainLiveChat';
 import { START_NAV_ICON, START_NAV_LABEL, TECHNICIAN_TOPICS_ICON } from './utils/startNav';
 import { stripNativeTagPresentation } from './utils/stripNativeTagPresentation';
 import { resolveBrandTagline } from './utils/brandTagline';
@@ -141,8 +148,9 @@ app.initializers.add(
         page,
       });
 
-      // Public MAIN: curated pins only — hide ordinary feed/sort/pagination/START.
+      // Public MAIN: curated pins only — hide ordinary feed/sort/pagination/START/Live.
       if (!signedIn && cleanRoot) {
+        removeMainLiveChatItem(items);
         removeStartBoardPinItem(items);
         if (items.items && items.items.toolbar) {
           items.remove('toolbar');
@@ -159,6 +167,25 @@ app.initializers.add(
           105
         );
         return;
+      }
+
+      // Synthetic General Live row (priority 120). Fail closed without provider.
+      if (
+        signedIn &&
+        shouldShowMainLiveChat({
+          signedIn: true,
+          pathname,
+          routeName,
+          searchParams,
+          stickyParams,
+          currentTag,
+          page,
+          provider: getLiveMainProvider(app),
+        })
+      ) {
+        addMainLiveChatItem(items, <MainLiveChatPin />);
+      } else {
+        removeMainLiveChatItem(items);
       }
 
       // Signed-in START pin (independent of discussion MAIN pins).
