@@ -1,6 +1,6 @@
 # flatrate/flarum-forum-navigation
 
-FlatRate.wiki presentation navigation for Flarum 1.8.x.
+FlatRate.wiki presentation navigation for Flarum 1.8.x (`flarum/core` ^1.8.19).
 
 ## What it does
 
@@ -34,6 +34,40 @@ Disabling this extension restores native Flarum sideNav without mutating tag IDs
 | Composer | `flatrate/flarum-forum-navigation` |
 | Extension ID | `flatrate-forum-navigation` |
 | Namespace | `FlatRate\ForumNavigation\` |
+| Release | `v1.4.0` |
+
+## Requirements
+
+- PHP ^8.1
+- Flarum `flarum/core` ^1.8.19
+
+## Install
+
+```bash
+composer require flatrate/flarum-forum-navigation:^1.4
+```
+
+To install from the GitHub repository (instead of Packagist), add a VCS repository and require the tagged release:
+
+```json
+{
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/mrkcntrmn/flatrate-flarum-forum-navigation"
+        }
+    ],
+    "require": {
+        "flatrate/flarum-forum-navigation": "^1.4"
+    }
+}
+```
+
+Tracking `main` for development (maps to `1.x-dev` via Composer branch alias):
+
+```bash
+composer require flatrate/flarum-forum-navigation:dev-main
+```
 
 ## Build
 
