@@ -43,11 +43,7 @@ Disabling this extension restores native Flarum sideNav without mutating tag IDs
 
 ## Install
 
-```bash
-composer require flatrate/flarum-forum-navigation:^1.4
-```
-
-To install from the GitHub repository (instead of Packagist), add a VCS repository and require the tagged release:
+For **v1.4.0** (not yet published on Packagist), install from the GitHub VCS repository at tag `v1.4.0` with constraint `^1.4` or `1.4.0`. Add to your project `composer.json`:
 
 ```json
 {
@@ -61,6 +57,12 @@ To install from the GitHub repository (instead of Packagist), add a VCS reposito
         "flatrate/flarum-forum-navigation": "^1.4"
     }
 }
+```
+
+After **v1.4.0** is published to Packagist:
+
+```bash
+composer require flatrate/flarum-forum-navigation:^1.4
 ```
 
 Tracking `main` for development (maps to `1.x-dev` via Composer branch alias):
