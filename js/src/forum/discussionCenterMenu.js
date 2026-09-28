@@ -9,6 +9,7 @@ import SelectDropdown from 'flarum/common/components/SelectDropdown';
 import ItemList from 'flarum/common/utils/ItemList';
 
 import BrandVoteTotal from './components/BrandVoteTotal';
+import CenterQuickRail from './components/CenterQuickRail';
 import {
   resolveDiscussionBoardTarget,
   resolveDiscussionBrandAccessibleLabel,
@@ -78,16 +79,9 @@ app.initializers.add(
 
       const pickerItems = new ItemList();
       pickerItems.add(
-        'allDiscussions',
-        <LinkButton
-          className="Button--flat FlatRateDiscussionPicker-link FlatRateDiscussionPicker-home"
-          href={app.route('index')}
-          icon="fas fa-warehouse"
-          force
-        >
-          MAIN
-        </LinkButton>,
-        100
+        'flatrateQuickRail',
+        <CenterQuickRail manifest={manifest} page={this} />,
+        200
       );
 
       // SelectDropdown styles only li > a|button. Do not nest PresentationNav
