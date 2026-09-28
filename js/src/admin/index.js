@@ -1,6 +1,7 @@
 import app from 'flarum/admin/app';
 import ExtensionPage from 'flarum/admin/components/ExtensionPage';
 import MainLandingPinnedDiscussions from './components/MainLandingPinnedDiscussions';
+import QuickRailSettings from './components/QuickRailSettings';
 
 app.initializers.add('flatrate-forum-navigation-admin', () => {
   app.extensionData
@@ -17,6 +18,7 @@ app.initializers.add('flatrate-forum-navigation-admin', () => {
               </p>
               <MainLandingPinnedDiscussions />
             </div>
+            <QuickRailSettings />
           </div>
         );
       }
