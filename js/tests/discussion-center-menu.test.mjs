@@ -136,16 +136,15 @@ test('GM board index retains the FlatRate.wiki title contract', () => {
   assert.equal(resolvePresentationTitle({ currentTag: tag('gm') }), PICK_A_BRAND);
 });
 
-test('DiscussionPage center popup is MAIN + Brand presentation without START or Following', () => {
+test('DiscussionPage center popup is the shared quick rail plus Brand rows without START or Following', () => {
   assert.match(discussionSrc, /DiscussionPage\.prototype, 'sidebarItems'/);
   assert.match(discussionSrc, /flatrateDiscussionBrandPicker/);
   assert.match(discussionSrc, /resolveDiscussionBrandTitle/);
-  assert.match(discussionSrc, /pickerItems\.add\(\s*'allDiscussions'/);
-  assert.match(discussionSrc, /icon="fas fa-warehouse"/);
-  assert.match(discussionSrc, />\s*MAIN\s*<\/LinkButton>/);
+  assert.match(discussionSrc, /pickerItems\.add\(\s*'flatrateQuickRail'/);
+  assert.match(discussionSrc, /<CenterQuickRail/);
+  assert.doesNotMatch(discussionSrc, /pickerItems\.add\(\s*'allDiscussions'/);
   assert.match(discussionSrc, /listDiscussionBrandBoards\(manifest\)/);
   assert.match(discussionSrc, /FlatRateDiscussionBrandLink/);
-  assert.match(discussionSrc, /FlatRateDiscussionPicker-home/);
   assert.doesNotMatch(
     discussionSrc,
     /pickerItems\.add\(\s*'flatratePresentationNav',\s*<PresentationNav/

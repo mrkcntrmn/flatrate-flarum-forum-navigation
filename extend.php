@@ -11,6 +11,8 @@ use Flarum\Discussion\Filter\DiscussionFilterer;
 use Flarum\Extend;
 use FlatRate\ForumNavigation\Api\MainLandingSettingsAttribute;
 use FlatRate\ForumNavigation\Api\NavigationManifestAttribute;
+use FlatRate\ForumNavigation\Api\QuickRailSettingsAttribute;
+use FlatRate\ForumNavigation\QuickRailGate;
 use FlatRate\ForumNavigation\Search\Filter\ExcludeMainPinsFilter;
 use FlatRate\ForumNavigation\Search\Filter\MainPinsFilter;
 
@@ -36,7 +38,17 @@ return [
 
     (new Extend\Settings())
         ->default(MainPinsFilter::SETTING_PUBLIC, '[]')
-        ->default(MainPinsFilter::SETTING_MEMBER, '[]'),
+        ->default(MainPinsFilter::SETTING_MEMBER, '[]')
+        ->default(QuickRailGate::SETTING_ENABLED, '0')
+        ->default(QuickRailGate::SETTING_USER_CONTROL_ENABLED, '1')
+        ->default(QuickRailGate::SETTING_MEMBER_DEFAULT_VISIBLE, '1'),
+
+    (new Extend\User())
+        ->registerPreference(
+            QuickRailGate::PREFERENCE_VISIBLE,
+            [QuickRailGate::class, 'transformPreference'],
+            null
+        ),
 
     // Flarum 1.8.19 discussion list filter seam (filter[key]=value).
     // Plan docs mention SearchDriver (2.x naming); 1.8 uses Extend\Filter.
@@ -46,5 +58,6 @@ return [
 
     (new Extend\ApiSerializer(ForumSerializer::class))
         ->attributes(NavigationManifestAttribute::class)
-        ->attributes(MainLandingSettingsAttribute::class),
+        ->attributes(MainLandingSettingsAttribute::class)
+        ->attributes(QuickRailSettingsAttribute::class),
 ];
