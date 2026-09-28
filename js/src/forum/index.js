@@ -7,6 +7,8 @@ import SelectDropdown from 'flarum/common/components/SelectDropdown';
 import icon from 'flarum/common/helpers/icon';
 
 import PresentationNav from './components/PresentationNav';
+import CenterQuickRail from './components/CenterQuickRail';
+import './quickRailSettingsPage';
 import StartBoardPin from './components/StartBoardPin';
 import MainLiveChatPin from './components/MainLiveChatPin';
 import MainLandingPins from './components/MainLandingPins';
@@ -112,9 +114,19 @@ app.initializers.add(
         return;
       }
 
+      if (items.items && items.items.flatrateQuickRail) {
+        items.remove('flatrateQuickRail');
+      }
+
       if (items.items && items.items.flatratePresentationNav) {
         items.remove('flatratePresentationNav');
       }
+
+      items.add(
+        'flatrateQuickRail',
+        <CenterQuickRail manifest={manifest} page={this} />,
+        200
+      );
 
       items.add(
         'flatratePresentationNav',
