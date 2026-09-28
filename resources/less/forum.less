@@ -910,6 +910,90 @@
     margin-left: 1.25rem;
     padding-left: 0;
   }
+  /* FORUM-NAV-UI-003: sticky quick rail above the scrolling Brand region.
+     One scrollport on the center sheet. The rail does not use the Brand offset. */
+  .App-titleControl .Dropdown-menu {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    max-height: calc(100dvh - var(--header-height, 52px) - env(safe-area-inset-top, 0px));
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .App-titleControl .Dropdown-menu > .item-allDiscussions {
+    display: none !important;
+  }
+
+  .App-titleControl .item-flatrateQuickRail {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    flex: 0 0 auto;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background: var(--dropdown-bg, var(--body-bg, #fff));
+    list-style: none;
+  }
+
+  .FlatRateCenterQuickRail {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 4px 8px;
+    overflow-x: hidden;
+  }
+
+  .FlatRateCenterQuickRail--guest {
+    justify-content: center;
+  }
+
+  .FlatRateCenterQuickRail-control {
+    flex: 0 0 44px;
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--primary-color);
+    text-decoration: none;
+    box-sizing: border-box;
+  }
+
+  .FlatRateCenterQuickRail-control:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+  }
+
+  .FlatRateCenterQuickRail-control .Avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 14px;
+    line-height: 28px;
+  }
+
+  /* 320–430 covers mandatory 360, 390, and 412. Five 44px targets fit without a second axis. */
+  @media (min-width: 320px) and (max-width: 430px) {
+    .FlatRateCenterQuickRail {
+      width: 100%;
+      overflow-x: hidden;
+    }
+  }
 }
 
 /* HeaderSecondary also renders in the desktop top bar. Do not mount the
@@ -918,7 +1002,9 @@
 @media (min-width: 768px) {
   .item-flatrateDrawerNav,
   .item-flatrateDrawerFollowing,
-  .item-flatrateDrawerStart {
+  .item-flatrateDrawerStart,
+  .IndexPage-nav .item-flatrateQuickRail,
+  .FlatRateCenterQuickRail {
     display: none !important;
   }
 
