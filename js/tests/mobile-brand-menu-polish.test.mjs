@@ -26,8 +26,9 @@ test('center trigger is FLATRATE.WIKI with a visible down chevron and viewport c
   assert.match(less, /> \.icon:not\(\.Button-caret\)/);
   assert.match(
     less,
-    /\.App-titleControl\s*\{[^}]*left: 50% !important;[^}]*width: max-content !important;[^}]*margin-left: 0 !important;[^}]*transform: translateX\(-50%\) !important;/s
+    /\.App-titleControl\s*\{[^}]*left: 50% !important;[^}]*width: max-content !important;[^}]*max-width: ~"calc\(100% - 120px\)";[^}]*margin-left: 0 !important;[^}]*transform: translateX\(-50%\) !important;/s
   );
+  assert.doesNotMatch(less, /max-width: calc\(100% - 120px\)/);
   assert.doesNotMatch(less, /\.App-header \.App-titleControl\s*\{/);
   assert.match(
     less,
@@ -74,7 +75,8 @@ test('mobile Follow is star-only while preserving the FoF SubscriptionButton mut
 test('center label itself owns the header centerline while the unclipped caret sits outside its width', () => {
   assert.match(less, /\.App-titleControl > \.Dropdown-toggle\s*\{[^}]*position: relative/s);
   assert.match(less, /\.Dropdown-toggle \.Button-caret\s*\{[^}]*position: absolute !important/s);
-  assert.match(less, /left: calc\(100% \+ 0\.45rem\)/);
+  assert.match(less, /left: ~"calc\(100% \+ 0\.45rem\)"/);
+  assert.doesNotMatch(less, /left: calc\(100% \+ 0\.45rem\)/);
   assert.match(less, /overflow: visible !important/);
 });
 
