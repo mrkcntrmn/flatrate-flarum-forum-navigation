@@ -237,11 +237,20 @@ test('admin settings use canonical keys and do not touch member preferences', ()
   assert.match(locale, /quick_rail_save_error:/);
 });
 
-test('phone sheet keeps a sticky rail, brand scroll, and the mandatory widths', () => {
+test('phone sheet stays below the header, half-screen, scrollable, and full-width', () => {
   assert.match(less, /\.item-flatrateQuickRail[\s\S]*position:\s*sticky/);
+  assert.match(
+    less,
+    /\.App-titleControl \.Dropdown-menu\s*\{[\s\S]*position:\s*absolute !important/
+  );
+  assert.match(less, /top:\s*100% !important/);
+  assert.match(less, /bottom:\s*auto !important/);
+  assert.match(less, /left:\s*~"calc\(50% - 50vw\)" !important/);
+  assert.match(less, /width:\s*100vw !important/);
+  assert.match(less, /max-height:\s*50dvh/);
   assert.match(less, /overflow-y:\s*auto/);
   assert.match(less, /overflow-x:\s*hidden/);
-  assert.match(less, /100dvh/);
+  assert.doesNotMatch(less, /max-height:\s*calc\(100dvh/);
   assert.match(less, /safe-area-inset-bottom/);
   assert.match(less, /min-width:\s*44px/);
   assert.match(less, /min-height:\s*44px/);
