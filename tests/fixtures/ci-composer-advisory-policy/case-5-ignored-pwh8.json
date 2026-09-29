@@ -1,0 +1,20 @@
+{
+  "advisories": {
+    "league/flysystem": [
+      {
+        "advisoryId": "PKSA-w9tt-7782-78jx",
+        "packageName": "league/flysystem"
+      }
+    ]
+  },
+  "ignored-advisories": {
+    "league/flysystem": [
+      {
+        "advisoryId": "PKSA-pwh8-d4fr-nywn",
+        "packageName": "league/flysystem"
+      }
+    ]
+  },
+  "abandoned": {},
+  "filter": {}
+}

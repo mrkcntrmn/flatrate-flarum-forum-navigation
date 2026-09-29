@@ -1,0 +1,15 @@
+{
+  "advisories": {
+    "league/flysystem": [
+      {
+        "advisoryId": "PKSA-w9tt-7782-78jx",
+        "packageName": "league/flysystem"
+      }
+    ]
+  },
+  "abandoned": {
+    "doctrine/cache": null,
+    "swiftmailer/swiftmailer": "symfony/mailer"
+  },
+  "filter": {}
+}
