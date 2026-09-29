@@ -8,12 +8,15 @@ use PHPUnit\Framework\TestCase;
 /**
  * Flarum 1.8 LessCompiler constructs Less_Parser with compress=true and the
  * library default strictMath=false. A bare calc() is arithmetic to that
- * compiler: calc(100% - 120px) became calc(-20%), and calc(100% + 0.45rem)
+ * compiler: calc(100% - 120px) became calc(-20%), and the former caret calc
  * became calc(100.45%). Raw forum.less assertions cannot see that rewrite.
+ * The title max-width still needs an escaped calc; the caret now uses a plain
+ * 100% offset after removing horizontal button padding so it is flush to the
+ * centered label.
  */
 class MobileTitleCompiledCssTest extends TestCase
 {
-    public function testFlarumLessParserPreservesTitleCenterAndCaretCalcs(): void
+    public function testFlarumLessParserPreservesTitleCenterAndAdjacentCaret(): void
     {
         $this->assertTrue(class_exists(Less_Parser::class), 'wikimedia/less.php must be installed with flarum/core');
 
@@ -56,7 +59,11 @@ class MobileTitleCompiledCssTest extends TestCase
         $this->assertStringNotContainsString('calc(-20%)', $css);
         $this->assertStringNotContainsString('calc(100.45%)', $css);
         $this->assertMatchesRegularExpression(
-            '/\.App-titleControl>\.Dropdown-toggle \.Button-caret\{[^}]*left:calc\(100% \+ 0\.45rem\);/',
+            '/\.App-titleControl>\.Dropdown-toggle\{[^}]*padding-left:0 !important;[^}]*padding-right:0 !important;/',
+            $css
+        );
+        $this->assertMatchesRegularExpression(
+            '/\.App-titleControl>\.Dropdown-toggle \.Button-caret\{[^}]*left:100%;/',
             $css
         );
     }

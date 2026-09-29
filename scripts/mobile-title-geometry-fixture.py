@@ -113,6 +113,7 @@ window.measure = () => {{
     return {{l: r.left, r: r.right, w: r.width, t: r.top, h: r.height}};
   }};
   const lr = box(label);
+  const cr = box(caret);
   const before = getComputedStyle(caret, '::before');
   return {{
     innerWidth: window.innerWidth,
@@ -121,9 +122,10 @@ window.measure = () => {{
     labelText: label.innerText.trim(),
     after: getComputedStyle(label, '::after').content,
     labelDelta: ((lr.l + lr.r) / 2) - (window.innerWidth / 2),
+    caretGap: cr.l - lr.r,
     title: box(title),
     label: lr,
-    caret: box(caret),
+    caret: cr,
     maxWidth: getComputedStyle(title).maxWidth,
     overflow: getComputedStyle(toggle).overflow,
     caretContent: before.content,
@@ -179,6 +181,8 @@ def judge(row):
         errors.append(f"maxWidth {row['maxWidth']}")
     if abs(row["caret"]["w"] - 16) > 0.6:
         errors.append(f"caret width {row['caret']['w']}")
+    if abs(row["caretGap"]) > 1:
+        errors.append(f"caret gap {row['caretGap']:.2f}")
     if row["caret"]["l"] < row["label"]["r"] - 0.5:
         errors.append("caret overlaps label")
     if row["caret"]["r"] > row["innerWidth"] + 0.5 or row["caret"]["l"] < 0:
@@ -281,6 +285,8 @@ def main():
         raise SystemExit("compiled CSS still contains the Less arithmetic rewrite")
     if "max-width:calc(100% - 120px)" not in compiled:
         raise SystemExit("compiled CSS is missing max-width:calc(100% - 120px)")
+    if "left:100%" not in compiled:
+        raise SystemExit("compiled CSS is missing adjacent caret left:100%")
     fixture = Path(tempfile.mkdtemp(prefix="nav-title-geometry-"))
     try:
         write_fixture(fixture, compiled)
@@ -316,7 +322,8 @@ def main():
             f"{state} width={row['innerWidth']} mode={row['mode']} "
             f"label={row.get('expected') or row['after']} delta={row['labelDelta']:.2f} "
             f"titleW={row['title']['w']:.2f} maxWidth={row['maxWidth']} "
-            f"caretW={row['caret']['w']:.2f} caretL={row['caret']['l']:.2f} labelR={row['label']['r']:.2f}"
+            f"caretW={row['caret']['w']:.2f} caretL={row['caret']['l']:.2f} "
+            f"labelR={row['label']['r']:.2f} caretGap={row['caretGap']:.2f}"
         )
     if failed:
         raise SystemExit(1)

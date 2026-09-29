@@ -785,6 +785,12 @@
     min-height: 44px;
     padding-top: 0 !important;
     padding-bottom: 0 !important;
+    /* Core Button horizontal padding creates a visible gap between the
+       centered label and the absolutely-positioned caret. Remove it here so
+       the label still owns the viewport centerline and the caret can sit flush
+       against the label edge. */
+    padding-left: 0 !important;
+    padding-right: 0 !important;
     line-height: 1 !important;
     overflow: visible !important;
     text-overflow: clip !important;
@@ -823,8 +829,9 @@
 
   .App-titleControl > .Dropdown-toggle .Button-caret {
     position: absolute !important;
-    /* Less.php evaluated 100% + 0.45rem into calc(100.45%). Keep the CSS calc. */
-    left: ~"calc(100% + 0.45rem)";
+    /* Horizontal toggle padding is zero above, so 100% is the label edge.
+       Keep the caret directly adjacent without shifting the centered label. */
+    left: 100%;
     top: 50%;
     display: inline-flex !important;
     align-items: center;
