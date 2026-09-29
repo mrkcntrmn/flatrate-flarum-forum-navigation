@@ -66,5 +66,13 @@ class MobileTitleCompiledCssTest extends TestCase
             '/\.App-titleControl>\.Dropdown-toggle \.Button-caret\{[^}]*left:100%;/',
             $css
         );
+        $this->assertMatchesRegularExpression(
+            '/\.App-titleControl \.Dropdown-menu\{[^}]*max-height:50dvh;[^}]*overflow-x:hidden;[^}]*overflow-y:auto;/',
+            $css
+        );
+        $this->assertDoesNotMatchRegularExpression(
+            '/\.App-titleControl \.Dropdown-menu\{[^}]*max-height:calc\(100dvh/',
+            $css
+        );
     }
 }
