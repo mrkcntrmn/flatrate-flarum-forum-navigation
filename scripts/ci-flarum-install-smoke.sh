@@ -39,9 +39,17 @@ composer require \
   "flarum/core:${EXPECTED_CORE}" \
   --no-update \
   --no-interaction
+
+# Composer 2.10 blocks the Flysystem 1.x versions required by Flarum 1.8.x.
+# Apply only the two accepted advisory IDs for dependency resolution. The
+# advisories remain visible to the explicit audit gate below.
+php "${ROOT}/scripts/ci-composer-advisory-policy.php" apply composer.json
+php "${ROOT}/scripts/ci-composer-advisory-policy.php" verify composer.json
+
 composer update \
   --no-interaction \
-  --prefer-dist
+  --prefer-dist \
+  --no-audit
 
 INSTALLED_CORE="$(
   composer show flarum/core --format=json \
@@ -54,7 +62,16 @@ if [[ "${INSTALLED_CORE}" != "${EXPECTED_CORE}" ]]; then
 fi
 
 composer config repositories.flatrate-forum-navigation path "${ROOT}"
-composer require "flatrate/flarum-forum-navigation:*@dev" --no-interaction --prefer-dist
+composer require "flatrate/flarum-forum-navigation:*@dev" --no-interaction --prefer-dist --no-audit
+
+AUDIT_JSON="${SMOKE_ROOT}/composer-audit.json"
+set +e
+composer audit --format=json > "${AUDIT_JSON}"
+AUDIT_RC=$?
+set -e
+echo "COMPOSER_AUDIT_EXIT=${AUDIT_RC}"
+php "${ROOT}/scripts/ci-composer-advisory-policy.php" assert-audit "${AUDIT_JSON}"
+rm -f "${AUDIT_JSON}"
 
 composer show flatrate/flarum-forum-navigation >/dev/null
 
