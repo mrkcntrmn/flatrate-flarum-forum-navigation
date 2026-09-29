@@ -928,7 +928,10 @@
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    max-height: calc(100dvh - var(--header-height, 52px) - env(safe-area-inset-top, 0px));
+    /* Keep the mobile center picker as a compact half-screen sheet. The
+       single sheet remains the vertical scrollport; the accepted centered
+       title/caret geometry above is intentionally independent of this size. */
+    max-height: 50dvh;
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
