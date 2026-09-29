@@ -18,19 +18,22 @@ test('mobile follow control is pinned to the right edge', () => {
   assert.match(less, /\.IndexPage-nav \.SubscriptionButton\s*\{\s*right: 0 !important;/);
 });
 
-test('center trigger is FLATRATE.WIKI with a down chevron only and true header centering', () => {
+test('center trigger is FLATRATE.WIKI with a visible down chevron and viewport centering', () => {
   assert.match(less, /content: "FLATRATE\.WIKI"/);
   assert.match(less, /\.Button-caret\.fa-sort::before/);
   assert.match(less, /content: "\\f078"/);
   assert.doesNotMatch(less, /content: "\\\\f078"/);
   assert.match(less, /> \.icon:not\(\.Button-caret\)/);
-  assert.match(less, /\.App-header \.App-titleControl/);
-  assert.match(less, /top: 50% !important/);
-  assert.match(less, /left: 50% !important/);
-  assert.match(less, /transform: translate\(-50%, -50%\) !important/);
-  assert.match(less, /width: max-content !important/);
+  assert.match(
+    less,
+    /\.App-titleControl\s*\{[^}]*left: 50% !important;[^}]*width: max-content !important;[^}]*margin-left: 0 !important;[^}]*transform: translateX\(-50%\) !important;/s
+  );
+  assert.doesNotMatch(less, /\.App-header \.App-titleControl\s*\{/);
+  assert.match(
+    less,
+    /\.App-titleControl > \.Dropdown-toggle\s*\{[^}]*overflow: visible !important;[^}]*text-overflow: clip !important;/s
+  );
   assert.match(less, /\.Dropdown-toggle \.Button-caret/);
-  assert.match(less, /margin: 0 !important/);
 });
 
 test('center-menu MAIN is transparent and shares the centered Brand column', () => {
@@ -68,10 +71,11 @@ test('mobile Follow is star-only while preserving the FoF SubscriptionButton mut
   assert.match(less, /width: 44px !important/);
 });
 
-test('center label itself owns the header centerline while the caret is positioned outside its width', () => {
+test('center label itself owns the header centerline while the unclipped caret sits outside its width', () => {
   assert.match(less, /\.App-titleControl > \.Dropdown-toggle\s*\{[^}]*position: relative/s);
   assert.match(less, /\.Dropdown-toggle \.Button-caret\s*\{[^}]*position: absolute !important/s);
   assert.match(less, /left: calc\(100% \+ 0\.45rem\)/);
+  assert.match(less, /overflow: visible !important/);
 });
 
 test('both mobile Brand menus use a left-aligned label/count tab stop and zero totals are omitted', () => {
