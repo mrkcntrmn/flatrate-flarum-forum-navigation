@@ -82,6 +82,17 @@ test('center label itself owns the header centerline while the unclipped caret s
   assert.match(less, /overflow: visible !important/);
 });
 
+test('center popup is capped at half the mobile viewport and remains the vertical scrollport', () => {
+  assert.match(
+    less,
+    /\.App-titleControl \.Dropdown-menu\s*\{[^}]*max-height: 50dvh;[^}]*overflow-x: hidden;[^}]*overflow-y: auto;[^}]*overscroll-behavior: contain;[^}]*-webkit-overflow-scrolling: touch;/s
+  );
+  assert.doesNotMatch(
+    less,
+    /\.App-titleControl \.Dropdown-menu\s*\{[^}]*max-height: calc\(100dvh - var\(--header-height/
+  );
+});
+
 test('both mobile Brand menus use a left-aligned label/count tab stop and zero totals are omitted', () => {
   assert.match(less, /\.App-drawer \.FlatRatePresentationNav-brandName/);
   assert.match(less, /\.App-titleControl \.Dropdown-menu \.FlatRatePresentationNav-brandName/);
