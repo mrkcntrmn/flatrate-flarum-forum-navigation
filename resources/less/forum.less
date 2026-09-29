@@ -760,17 +760,18 @@
 
   /* Board/index center trigger shows FLATRATE.WIKI. Discussion routes use
      FlatRateDiscussionBrandPicker and must keep the JS contextual label. */
-  /* Keep the mobile center control geometrically centered in the header, not
-     merely centered in whatever width remains between left/right controls. */
-  .App-header .App-titleControl {
-    position: absolute !important;
-    top: 50% !important;
+  /* Flarum 1.8.19 mounts App-titleControl in the App navigation layer, not
+     inside App-header. Preserve Flarum's absolute/fixed + top: 0 behavior,
+     but neutralize its 200px box / -100px margin so the trigger's own width
+     is centered on the viewport centerline. */
+  .App-titleControl {
     left: 50% !important;
     right: auto !important;
     width: max-content !important;
     max-width: calc(100% - 120px);
-    margin: 0 !important;
-    transform: translate(-50%, -50%) !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    transform: translateX(-50%) !important;
   }
 
   .App-titleControl > .Dropdown-toggle {
@@ -784,6 +785,8 @@
     padding-top: 0 !important;
     padding-bottom: 0 !important;
     line-height: 1 !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
     vertical-align: middle;
   }
 
