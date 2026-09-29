@@ -20,12 +20,12 @@ class MobileTitleCompiledCssTest extends TestCase
         $parser = new Less_Parser([
             'compress' => true,
         ]);
-        // Flarum's LessCompiler does not fail the asset build on this Less.php
-        // warning. The remaining bare calc(100% - 40px) menu rules still trip it
-        // and are outside this title/caret fix.
+        // Flarum's LessCompiler does not fail the asset build on Less.php
+        // warnings. Untouched menu calc(100% - 40px) rules still evaluate to
+        // calc(60%) and emit that warning family; they are outside this fix.
         $previous = null;
         $previous = set_error_handler(static function (int $severity, string $message, string $file, int $line) use (&$previous) {
-            if ($severity === E_WARNING && str_contains($message, 'Less_Tree_Call::$unit')) {
+            if ($severity === E_WARNING && str_contains($file, 'wikimedia/less.php')) {
                 return true;
             }
             if (is_callable($previous)) {
