@@ -75,8 +75,10 @@ test('mobile Follow is star-only while preserving the FoF SubscriptionButton mut
 test('center label itself owns the header centerline while the unclipped caret sits outside its width', () => {
   assert.match(less, /\.App-titleControl > \.Dropdown-toggle\s*\{[^}]*position: relative/s);
   assert.match(less, /\.Dropdown-toggle \.Button-caret\s*\{[^}]*position: absolute !important/s);
-  assert.match(less, /left: ~"calc\(100% \+ 0\.45rem\)"/);
-  assert.doesNotMatch(less, /left: calc\(100% \+ 0\.45rem\)/);
+  assert.match(less, /left: 100%;/);
+  assert.doesNotMatch(less, /left: ~"calc\(100% \+ 0\.45rem\)"/);
+  assert.match(less, /padding-left: 0 !important/);
+  assert.match(less, /padding-right: 0 !important/);
   assert.match(less, /overflow: visible !important/);
 });
 
