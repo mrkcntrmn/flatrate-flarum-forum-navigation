@@ -26,6 +26,7 @@ jobs:
         run: |
           php scripts/ci-composer-advisory-policy.php apply composer.json
           php scripts/ci-composer-advisory-policy.php verify composer.json
+          php scripts/ci-composer-advisory-policy-fixtures.php
           composer validate --no-check-publish --strict
       - name: Install package dependencies
         run: composer update --no-interaction --prefer-dist --no-audit

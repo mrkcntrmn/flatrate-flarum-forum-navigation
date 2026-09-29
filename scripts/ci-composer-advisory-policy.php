@@ -166,59 +166,208 @@ function applyPolicy(array $root): array
     return $root;
 }
 
-/** @param array<string, mixed> $audit */
-function assertAudit(array $audit): void
+/**
+ * @param mixed $grouped
+ * @param list<string> $invalid
+ * @return list<array{id: string, package: string}>
+ */
+function collectAdvisoryGroup(mixed $grouped, string $label, array &$invalid): array
 {
-    $advisories = $audit['advisories'] ?? null;
-    if (!is_array($advisories)) {
-        fail('audit_missing_advisories_object');
+    if (!is_array($grouped)) {
+        $invalid[] = "{$label}_not_object";
+
+        return [];
     }
 
-    $found = [];
-    foreach ($advisories as $package => $packageAdvisories) {
-        if ($package !== EXPECTED_PACKAGE) {
-            fail("unexpected_advisory_package={$package}");
+    $entries = [];
+    foreach ($grouped as $package => $packageAdvisories) {
+        if (!is_string($package) || $package === '' || !is_array($packageAdvisories)) {
+            $invalid[] = "{$label}_package_invalid";
+            continue;
         }
-        if (!is_array($packageAdvisories)) {
-            fail("invalid_advisory_list package={$package}");
-        }
-
         foreach ($packageAdvisories as $advisory) {
             if (!is_array($advisory)) {
-                fail("invalid_advisory package={$package}");
+                $invalid[] = "{$label}_advisory_invalid";
+                continue;
             }
             $id = $advisory['advisoryId'] ?? null;
             $packageName = $advisory['packageName'] ?? $package;
-            if (!is_string($id) || !is_string($packageName)) {
-                fail("invalid_advisory_identity package={$package}");
+            if (!is_string($id) || $id === '' || !is_string($packageName) || $packageName === '') {
+                $invalid[] = "{$label}_identity_invalid";
+                continue;
             }
-            if ($packageName !== EXPECTED_PACKAGE) {
-                fail("unexpected_advisory_package_name={$packageName}");
-            }
-            $found[] = $id;
+            $entries[] = ['id' => $id, 'package' => $packageName];
         }
     }
 
-    sort($found);
-    $expected = array_keys(EXPECTED_ADVISORIES);
-    sort($expected);
-    if ($found !== $expected) {
-        fail('audit_advisory_set_mismatch expected=' . implode(',', $expected) . ' got=' . implode(',', $found));
+    return $entries;
+}
+
+/** @param list<string> $values */
+function echoRepeated(string $key, array $values): void
+{
+    foreach ($values as $value) {
+        echo "{$key}={$value}\n";
+    }
+}
+
+/** @param array<string, mixed> $audit */
+function assertAudit(array $audit): void
+{
+    $approved = array_keys(EXPECTED_ADVISORIES);
+    $invalid = [];
+
+    if (!array_key_exists('advisories', $audit)) {
+        $invalid[] = 'advisories_missing';
+        $active = [];
+    } else {
+        $active = collectAdvisoryGroup($audit['advisories'], 'advisories', $invalid);
     }
 
-    foreach (['ignored-advisories', 'abandoned', 'filter', 'unreachable-repositories'] as $key) {
-        if (isset($audit[$key]) && $audit[$key] !== []) {
-            fail("unexpected_audit_finding key={$key}");
+    $ignored = collectAdvisoryGroup($audit['ignored-advisories'] ?? [], 'ignored-advisories', $invalid);
+
+    $abandoned = [];
+    $abandonedRaw = $audit['abandoned'] ?? [];
+    if (!is_array($abandonedRaw)) {
+        $invalid[] = 'abandoned_not_object';
+    } else {
+        foreach ($abandonedRaw as $package => $replacement) {
+            if (!is_string($package) || $package === '') {
+                $invalid[] = 'abandoned_package_invalid';
+                continue;
+            }
+            $abandoned[] = [
+                'package' => $package,
+                'replacement' => is_string($replacement) ? $replacement : '',
+            ];
         }
     }
 
-    echo "ACCEPTED_ADVISORY_PACKAGE=" . EXPECTED_PACKAGE . "\n";
-    foreach ($expected as $id) {
-        echo "AUDIT_VISIBLE_ADVISORY_ID={$id}\n";
+    $unreachable = [];
+    $unreachableRaw = $audit['unreachable-repositories'] ?? [];
+    if (!is_array($unreachableRaw)) {
+        $invalid[] = 'unreachable_repositories_not_list';
+    } else {
+        foreach ($unreachableRaw as $repository) {
+            if (is_string($repository) && $repository !== '') {
+                $unreachable[] = $repository;
+                continue;
+            }
+            $invalid[] = 'unreachable_repository_invalid';
+        }
     }
-    echo "KNOWN_ADVISORY_COUNT=" . count($expected) . "\n";
-    echo "UNKNOWN_ADVISORY_COUNT=0\n";
-    echo "SECURITY_AUDIT_GATE=PASS_ACCEPTED_KNOWN_DEBT\n";
+
+    $filterPackages = [];
+    $filterRaw = $audit['filter'] ?? [];
+    if (!is_array($filterRaw)) {
+        $invalid[] = 'filter_not_object';
+    } else {
+        foreach ($filterRaw as $package => $entries) {
+            if ($entries === [] || $entries === null) {
+                continue;
+            }
+            $filterPackages[] = is_string($package) ? $package : 'invalid';
+        }
+    }
+
+    $rawIds = [];
+    $unknownPackages = [];
+    $unknownIds = [];
+    $approvedActive = [];
+    foreach ($active as $entry) {
+        $rawIds[] = $entry['id'];
+        if ($entry['package'] !== EXPECTED_PACKAGE) {
+            $unknownPackages[] = $entry['package'];
+        }
+        if (!array_key_exists($entry['id'], EXPECTED_ADVISORIES)) {
+            $unknownIds[] = $entry['id'];
+        } elseif ($entry['package'] === EXPECTED_PACKAGE) {
+            $approvedActive[] = $entry['id'];
+        }
+    }
+
+    $duplicateIds = [];
+    foreach (array_count_values($rawIds) as $id => $count) {
+        if ($count > 1) {
+            $duplicateIds[] = (string) $id;
+        }
+    }
+
+    $activeOrdered = [];
+    $inactive = [];
+    foreach ($approved as $id) {
+        if (in_array($id, $approvedActive, true)) {
+            $activeOrdered[] = $id;
+        } else {
+            $inactive[] = $id;
+        }
+    }
+
+    $ignoredIds = [];
+    foreach ($ignored as $entry) {
+        $ignoredIds[] = $entry['id'];
+    }
+    $unknownPackages = array_values(array_unique($unknownPackages));
+    $unknownIds = array_values(array_unique($unknownIds));
+
+    echo 'BLOCKING_ALLOWLIST_COUNT=' . count($approved) . "\n";
+    echo 'RAW_ACTIVE_ADVISORY_COUNT=' . count($rawIds) . "\n";
+    echo 'UNIQUE_ACTIVE_ADVISORY_COUNT=' . count(array_unique($rawIds)) . "\n";
+    echo 'ACTIVE_AUDIT_IDS_UNIQUE=' . ($duplicateIds === [] ? 'true' : 'false') . "\n";
+    echo 'ACTIVE_AUDIT_ADVISORY_COUNT=' . count($activeOrdered) . "\n";
+    echoRepeated('ACTIVE_AUDIT_ADVISORY_ID', $activeOrdered);
+    echo 'INACTIVE_APPROVED_ADVISORY_COUNT=' . count($inactive) . "\n";
+    echoRepeated('INACTIVE_APPROVED_ADVISORY_ID', $inactive);
+    echo 'UNKNOWN_ACTIVE_ADVISORY_COUNT=' . count($unknownIds) . "\n";
+    echoRepeated('UNKNOWN_ACTIVE_ADVISORY_ID', $unknownIds);
+    echo 'UNKNOWN_ACTIVE_ADVISORY_PACKAGE_COUNT=' . count($unknownPackages) . "\n";
+    echoRepeated('UNKNOWN_ACTIVE_ADVISORY_PACKAGE', $unknownPackages);
+    echo 'IGNORED_ADVISORY_COUNT=' . count($ignoredIds) . "\n";
+    echoRepeated('IGNORED_ADVISORY_ID', $ignoredIds);
+    echo 'ABANDONED_COUNT=' . count($abandoned) . "\n";
+    foreach ($abandoned as $package) {
+        echo 'ABANDONED_PACKAGE=' . $package['package'] . "\n";
+        echo 'ABANDONED_REPLACEMENT=' . $package['replacement'] . "\n";
+    }
+    echo 'UNREACHABLE_REPOSITORY_COUNT=' . count($unreachable) . "\n";
+    echoRepeated('UNREACHABLE_REPOSITORY', $unreachable);
+    echo 'FILTER_FINDING_COUNT=' . count($filterPackages) . "\n";
+    echoRepeated('FILTER_PACKAGE', $filterPackages);
+
+    if ($invalid !== []) {
+        echo "SECURITY_AUDIT_GATE=FAIL_INVALID_AUDIT_JSON\n";
+        fail('invalid_audit=' . implode(',', array_values(array_unique($invalid))));
+    }
+    if ($unreachable !== []) {
+        echo "SECURITY_AUDIT_GATE=FAIL_UNREACHABLE_REPOSITORIES\n";
+        fail('unreachable_repositories=' . implode(',', $unreachable));
+    }
+    if ($ignored !== []) {
+        echo "SECURITY_AUDIT_GATE=FAIL_AUDIT_VISIBILITY\n";
+        fail('ignored_advisories=' . implode(',', $ignoredIds));
+    }
+    if ($unknownPackages !== []) {
+        echo "SECURITY_AUDIT_GATE=FAIL_UNKNOWN_ADVISORY_PACKAGE\n";
+        fail('unknown_active_advisory_package=' . implode(',', $unknownPackages));
+    }
+    if ($unknownIds !== []) {
+        echo "SECURITY_AUDIT_GATE=FAIL_UNKNOWN_ADVISORY\n";
+        fail('unknown_active_advisory=' . implode(',', $unknownIds));
+    }
+    if ($duplicateIds !== []) {
+        echo "SECURITY_AUDIT_GATE=FAIL_DUPLICATE_ACTIVE_ADVISORY\n";
+        fail('duplicate_active_advisory=' . implode(',', $duplicateIds));
+    }
+    if ($abandoned !== []) {
+        echo "SECURITY_AUDIT_GATE=FAIL_ABANDONED_DEPENDENCIES\n";
+        fail('abandoned_packages=' . implode(',', array_column($abandoned, 'package')));
+    }
+    if ($filterPackages !== []) {
+        echo "SECURITY_AUDIT_GATE=FAIL_FILTER_FINDING\n";
+        fail('filter_packages=' . implode(',', $filterPackages));
+    }
+
+    echo "SECURITY_AUDIT_GATE=PASS_ACCEPTED_APPLICABLE_DEBT\n";
 }
 
 $command = $argv[1] ?? '';

@@ -1,0 +1,12 @@
+{
+  "advisories": {
+    "league/flysystem": [
+      {
+        "advisoryId": "PKSA-unknown-0000-0000",
+        "packageName": "league/flysystem"
+      }
+    ]
+  },
+  "abandoned": {},
+  "filter": {}
+}
