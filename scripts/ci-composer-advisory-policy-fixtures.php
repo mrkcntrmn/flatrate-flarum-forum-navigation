@@ -74,16 +74,20 @@ $cases = [
     ],
     'CASE_6' => [
         'file' => 'case-6-abandoned.json',
-        'exit' => 1,
+        'exit' => 0,
         'stdout' => [
             'ACTIVE_AUDIT_ADVISORY_ID=PKSA-w9tt-7782-78jx',
             'IGNORED_ADVISORY_COUNT=0',
-            'ABANDONED_COUNT=1',
+            'APPROVED_ABANDONED_COUNT=2',
+            'APPROVED_ABANDONED_PACKAGE=doctrine/cache',
+            'APPROVED_ABANDONED_PACKAGE=swiftmailer/swiftmailer',
+            'ABANDONED_COUNT=2',
             'ABANDONED_PACKAGE=doctrine/cache',
-            'SECURITY_AUDIT_GATE=FAIL_ABANDONED_DEPENDENCIES',
-        ],
-        'stderr' => [
-            'abandoned_packages=doctrine/cache',
+            'ABANDONED_REPLACEMENT=',
+            'ABANDONED_PACKAGE=swiftmailer/swiftmailer',
+            'ABANDONED_REPLACEMENT=symfony/mailer',
+            'UNKNOWN_ABANDONED_COUNT=0',
+            'SECURITY_AUDIT_GATE=PASS_ACCEPTED_APPLICABLE_DEBT',
         ],
     ],
     'CASE_7' => [
@@ -97,6 +101,21 @@ $cases = [
         ],
         'stderr' => [
             'unreachable_repositories=packagist.org',
+        ],
+    ],
+    'CASE_8' => [
+        'file' => 'case-8-additional-abandoned.json',
+        'exit' => 1,
+        'stdout' => [
+            'ABANDONED_PACKAGE=doctrine/cache',
+            'ABANDONED_PACKAGE=swiftmailer/swiftmailer',
+            'ABANDONED_PACKAGE=vendor/unexpected-abandoned',
+            'UNKNOWN_ABANDONED_COUNT=1',
+            'UNKNOWN_ABANDONED_PACKAGE=vendor/unexpected-abandoned',
+            'SECURITY_AUDIT_GATE=FAIL_ABANDONED_DEPENDENCIES',
+        ],
+        'stderr' => [
+            'unknown_abandoned_package=vendor/unexpected-abandoned',
         ],
     ],
 ];

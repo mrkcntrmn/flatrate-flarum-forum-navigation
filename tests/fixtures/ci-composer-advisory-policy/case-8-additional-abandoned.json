@@ -9,7 +9,8 @@
   },
   "abandoned": {
     "doctrine/cache": null,
-    "swiftmailer/swiftmailer": "symfony/mailer"
+    "swiftmailer/swiftmailer": "symfony/mailer",
+    "vendor/unexpected-abandoned": null
   },
   "filter": {}
 }

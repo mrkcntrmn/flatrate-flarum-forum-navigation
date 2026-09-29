@@ -2,6 +2,10 @@
 <?php declare(strict_types=1);
 
 const EXPECTED_PACKAGE = 'league/flysystem';
+const EXPECTED_ABANDONED = [
+    'doctrine/cache',
+    'swiftmailer/swiftmailer',
+];
 const EXPECTED_ADVISORIES = [
     'PKSA-w9tt-7782-78jx' => 'Required transitively by supported Flarum 1.8.x; allow dependency resolution in CI while keeping the advisory visible to audit.',
     'PKSA-pwh8-d4fr-nywn' => 'Required transitively by supported Flarum 1.8.x; allow dependency resolution in CI while keeping the advisory visible to audit.',
@@ -119,6 +123,22 @@ function verifyPolicy(array $root): void
     echo "ACCEPTED_ON_AUDIT=false\n";
     echo "GLOBAL_SECURITY_BLOCKING_DISABLED=false\n";
     echo "PACKAGE_WIDE_IGNORE=false\n";
+
+    $policy = $root['config']['policy'] ?? [];
+    $abandonedPolicy = is_array($policy) ? ($policy['abandoned'] ?? null) : null;
+    if ($abandonedPolicy === false) {
+        fail('abandoned_policy_disabled');
+    }
+    if (is_array($abandonedPolicy)) {
+        if (($abandonedPolicy['audit'] ?? 'fail') !== 'fail') {
+            fail('abandoned_audit_not_fail');
+        }
+        $abandonedIgnore = $abandonedPolicy['ignore'] ?? [];
+        if ($abandonedIgnore !== []) {
+            fail('abandoned_package_ignore_present');
+        }
+    }
+    echo "COMPOSER_ABANDONED_AUDIT=fail\n";
 }
 
 /** @param array<string, mixed> $root */
@@ -324,11 +344,21 @@ function assertAudit(array $audit): void
     echoRepeated('UNKNOWN_ACTIVE_ADVISORY_PACKAGE', $unknownPackages);
     echo 'IGNORED_ADVISORY_COUNT=' . count($ignoredIds) . "\n";
     echoRepeated('IGNORED_ADVISORY_ID', $ignoredIds);
+    $unknownAbandoned = [];
+    foreach ($abandoned as $package) {
+        if (!in_array($package['package'], EXPECTED_ABANDONED, true)) {
+            $unknownAbandoned[] = $package['package'];
+        }
+    }
+    echo 'APPROVED_ABANDONED_COUNT=' . count(EXPECTED_ABANDONED) . "\n";
+    echoRepeated('APPROVED_ABANDONED_PACKAGE', EXPECTED_ABANDONED);
     echo 'ABANDONED_COUNT=' . count($abandoned) . "\n";
     foreach ($abandoned as $package) {
         echo 'ABANDONED_PACKAGE=' . $package['package'] . "\n";
         echo 'ABANDONED_REPLACEMENT=' . $package['replacement'] . "\n";
     }
+    echo 'UNKNOWN_ABANDONED_COUNT=' . count($unknownAbandoned) . "\n";
+    echoRepeated('UNKNOWN_ABANDONED_PACKAGE', $unknownAbandoned);
     echo 'UNREACHABLE_REPOSITORY_COUNT=' . count($unreachable) . "\n";
     echoRepeated('UNREACHABLE_REPOSITORY', $unreachable);
     echo 'FILTER_FINDING_COUNT=' . count($filterPackages) . "\n";
@@ -358,9 +388,9 @@ function assertAudit(array $audit): void
         echo "SECURITY_AUDIT_GATE=FAIL_DUPLICATE_ACTIVE_ADVISORY\n";
         fail('duplicate_active_advisory=' . implode(',', $duplicateIds));
     }
-    if ($abandoned !== []) {
+    if ($unknownAbandoned !== []) {
         echo "SECURITY_AUDIT_GATE=FAIL_ABANDONED_DEPENDENCIES\n";
-        fail('abandoned_packages=' . implode(',', array_column($abandoned, 'package')));
+        fail('unknown_abandoned_package=' . implode(',', $unknownAbandoned));
     }
     if ($filterPackages !== []) {
         echo "SECURITY_AUDIT_GATE=FAIL_FILTER_FINDING\n";
