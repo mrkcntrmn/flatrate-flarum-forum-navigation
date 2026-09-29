@@ -22,8 +22,21 @@ jobs:
           # Lock is intentionally not published for this extension package.
           rm -f composer.lock
           composer validate --no-check-publish --strict
+      - name: Apply exact CI advisory resolution policy
+        run: |
+          php scripts/ci-composer-advisory-policy.php apply composer.json
+          php scripts/ci-composer-advisory-policy.php verify composer.json
+          composer validate --no-check-publish --strict
       - name: Install package dependencies
-        run: composer update --no-interaction --prefer-dist
+        run: composer update --no-interaction --prefer-dist --no-audit
+      - name: Audit exact accepted dependency debt
+        run: |
+          set +e
+          composer audit --format=json > /tmp/composer-audit.json
+          audit_rc=$?
+          set -e
+          echo "COMPOSER_AUDIT_EXIT=${audit_rc}"
+          php scripts/ci-composer-advisory-policy.php assert-audit /tmp/composer-audit.json
       - name: PHP syntax check
         run: |
           find src tests extend.php -type f -name '*.php' -print0 \
