@@ -162,6 +162,7 @@ window.setMode = (mode, text, affixed) => {{
   document.getElementById('toggle').setAttribute('aria-expanded', 'false');
   document.getElementById('label').textContent = text || 'FlatRate.wiki';
   document.getElementById('app').classList.toggle('affix', !!affixed);
+  window.scrollTo(0, 0);
   document.querySelector('.Dropdown-menu').scrollTop = 0;
   document.querySelector('.dropdown-backdrop')?.remove();
 }};
@@ -233,6 +234,7 @@ window.measure = () => {{
     caretW: cr.width,
     labelText: label.innerText.trim(),
     afterContent: getComputedStyle(label, '::after').content,
+    scrollY: window.scrollY,
     open: title.classList.contains('open'),
     backdrop: !!document.querySelector('.dropdown-backdrop'),
     hitMenu: !!(hit && (hit === menu || menu.contains(hit))),
@@ -385,6 +387,27 @@ async def run(fixture):
 
             await set_viewport(ws, window_id, 390, 757)
             await evaluate(ws, "window.setMode('index', 'FLATRATE.WIKI', false)")
+            await evaluate(ws, "window.scrollTo(0, 400)")
+            await evaluate(ws, "window.openMenu()")
+            scrolled = await evaluate(ws, "window.measure()")
+            await evaluate(ws, "window.scrollTo(0, 720)")
+            scrolled_more = await evaluate(ws, "window.measure()")
+            scrolled.update({
+                "mode": "index",
+                "label": "FLATRATE.WIKI",
+                "affix": False,
+                "kind": "page-scroll",
+                "laterScrollY": scrolled_more["scrollY"],
+                "laterMenuTop": scrolled_more["menuTop"],
+                "laterMenuBottom": scrolled_more["menuBottom"],
+                "laterMenuHeight": scrolled_more["menuHeight"],
+                "laterPosition": scrolled_more["position"],
+                "laterInnerHeight": scrolled_more["innerHeight"],
+            })
+            rows.append(scrolled)
+
+            await set_viewport(ws, window_id, 390, 757)
+            await evaluate(ws, "window.setMode('index', 'FLATRATE.WIKI', false)")
             await evaluate(ws, "window.openMenu()")
             await evaluate(ws, "document.querySelector('.Dropdown-menu').scrollTop = 200")
             point = await evaluate(ws, """(() => {
@@ -498,6 +521,26 @@ def main():
                 errors.append("backdrop missing")
             if row["rail"] != "main":
                 errors.append(f"rail {row['rail']}")
+        elif kind == "page-scroll":
+            errors = judge_open(row, phone=True)
+            if row["scrollY"] <= 0 or row["laterScrollY"] <= row["scrollY"]:
+                errors.append(f"PAGE_SCROLL_Y {row['scrollY']}->{row['laterScrollY']}")
+            anchor_broken = (
+                row["position"] != "fixed"
+                or row["laterPosition"] != "fixed"
+                or abs(row["menuBottom"] - row["innerHeight"]) > 1
+                or abs(row["laterMenuBottom"] - row["laterInnerHeight"]) > 1
+                or abs(row["menuHeight"] - (0.5 * row["innerHeight"])) > 1
+                or abs(row["laterMenuHeight"] - (0.5 * row["laterInnerHeight"])) > 1
+                or abs(row["menuTop"] - row["laterMenuTop"]) > 1
+            )
+            if anchor_broken:
+                errors.append(
+                    "FAIL_FIXED_VIEWPORT_BINDING "
+                    f"top={row['menuTop']:.2f}->{row['laterMenuTop']:.2f} "
+                    f"bottom={row['menuBottom']:.2f}->{row['laterMenuBottom']:.2f} "
+                    f"pos={row['position']}/{row['laterPosition']}"
+                )
         elif kind == "closed":
             if row["visibility"] != "hidden":
                 errors.append(f"visibility {row['visibility']}")
@@ -524,7 +567,7 @@ def main():
         state = "PASS" if not errors else "FAIL " + "; ".join(errors)
         if errors:
             failed = True
-        if kind in {"open", "reopen", "closed", "desktop"}:
+        if kind in {"open", "reopen", "closed", "desktop", "page-scroll"}:
             print(
                 f"{state} {kind} {row['mode']} {row['label']} affix={row['affix']} "
                 f"{row['innerWidth']}x{row['innerHeight']} "
@@ -536,6 +579,10 @@ def main():
                 f"delta={row['labelDelta']:.2f} gap={row['caretGap']:.2f} caret={row['caretW']:.2f} "
                 f"pad={row['paddingBottom']} vis={row['visibility']} "
                 f"wheel={row.get('wheel')} touch={row.get('touch')}"
+                + (
+                    f" scrollY={row['scrollY']:.0f}->{row['laterScrollY']:.0f} laterTop={row['laterMenuTop']:.2f} laterBottom={row['laterMenuBottom']:.2f}"
+                    if kind == "page-scroll" else ""
+                )
             )
         else:
             print(f"{state} backdrop {row['dismissed']}")
