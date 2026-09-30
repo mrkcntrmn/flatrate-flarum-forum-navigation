@@ -45,7 +45,7 @@ class MobileTitleCompiledCssTest extends TestCase
         }
 
         $this->assertMatchesRegularExpression(
-            '/\.App-titleControl\{[^}]*left:0 !important;right:0 !important;width:max-content !important;max-width:calc\(100% - 120px\);margin-left:auto !important;margin-right:auto !important;transform:none !important;/',
+            '/\.App-titleControl\{[^}]*left:0 !important;right:0 !important;width:max-content !important;max-width:calc\(100% - 120px\);margin-left:auto !important;margin-right:auto !important;transform:none !important/',
             $css
         );
         $this->assertDoesNotMatchRegularExpression(
