@@ -237,19 +237,23 @@ test('admin settings use canonical keys and do not touch member preferences', ()
   assert.match(locale, /quick_rail_save_error:/);
 });
 
-test('phone sheet stays below the header, half-screen, scrollable, and full-width', () => {
+test('phone sheet is a fixed bottom half-screen, scrollable, and full-width', () => {
   assert.match(less, /\.item-flatrateQuickRail[\s\S]*position:\s*sticky/);
   assert.match(
     less,
-    /\.App-titleControl \.Dropdown-menu\s*\{[\s\S]*position:\s*absolute !important/
+    /\.App-titleControl \.Dropdown-menu\s*\{[\s\S]*position:\s*fixed !important/
   );
-  assert.match(less, /top:\s*100% !important/);
-  assert.match(less, /bottom:\s*auto !important/);
-  assert.match(less, /left:\s*~"calc\(50% - 50vw\)" !important/);
+  assert.match(less, /top:\s*auto !important/);
+  assert.match(less, /bottom:\s*0 !important/);
+  assert.match(less, /left:\s*0 !important/);
+  assert.match(less, /right:\s*0 !important/);
   assert.match(less, /width:\s*100vw !important/);
+  assert.match(less, /height:\s*50dvh/);
   assert.match(less, /max-height:\s*50dvh/);
   assert.match(less, /overflow-y:\s*auto/);
   assert.match(less, /overflow-x:\s*hidden/);
+  assert.doesNotMatch(less, /transform: translateX\(-50%\) !important/);
+  assert.doesNotMatch(less, /left:\s*~"calc\(50% - 50vw\)" !important/);
   assert.doesNotMatch(less, /max-height:\s*calc\(100dvh/);
   assert.match(less, /safe-area-inset-bottom/);
   assert.match(less, /min-width:\s*44px/);
