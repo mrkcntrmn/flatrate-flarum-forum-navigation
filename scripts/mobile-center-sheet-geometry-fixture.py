@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Render the mobile center sheet with Flarum's phone dropdown plus compiled Less.php.
 
-The core shell is the fixed bottom sheet. Extension CSS is appended after it, so
-this reproduces the transformed-title containing block before the override and
-the top-anchored sheet after it. Viewports match the R1 measurement matrix.
+The core shell is the fixed bottom sheet. Extension CSS is appended after it.
+The title is centered without a transform, so the menu stays viewport-fixed
+and bottom-anchored. A top-anchored sheet attached to the title fails.
 """
 
 import asyncio
@@ -34,7 +34,7 @@ html, body { margin: 0; background: #15191e; color: #eaedf0; }
 .App-navigation { position: absolute; left: 0; right: 0; top: 0; height: 46px; background: #1b2026; }
 .App.affix .App-navigation { position: fixed; }
 .ButtonGroup { position: relative; display: inline-block; }
-.App-titleControl, .App-backControl, .App-primaryControl {
+.App-backControl, .App-primaryControl {
   position: absolute; top: 0; margin: 0; z-index: 2;
 }
 .App-backControl { left: 0; }
@@ -42,9 +42,12 @@ html, body { margin: 0; background: #15191e; color: #eaedf0; }
 .App-backControl > .Button, .App-primaryControl > .Button {
   width: 40px; height: 46px; padding: 0; border: 0; background: transparent; color: #fff;
 }
-/* Flarum's pre-extension phone title box. Extension CSS replaces it. */
-.App-titleControl { width: 200px; left: 50%; margin-left: -100px; text-align: center; }
 .Dropdown { position: relative; }
+/* Flarum's title rule wins over .Dropdown { position: relative }. */
+.App-titleControl {
+  position: absolute; top: 0; margin: 0; z-index: 2;
+  width: 200px; left: 50%; margin-left: -100px; text-align: center;
+}
 .Dropdown-menu { min-width: 160px; list-style: none; margin: 0; padding: 0; }
 @media (max-width: 767px) {
   .Dropdown .Dropdown-menu {
@@ -216,6 +219,9 @@ window.measure = () => {{
     top: style.top,
     bottom: style.bottom,
     left: style.left,
+    heightCss: style.height,
+    maxHeight: style.maxHeight,
+    railPosition: getComputedStyle(document.querySelector('.item-flatrateQuickRail') || menu).position,
     visibility: style.visibility,
     transform: style.transform,
     paddingBottom: style.paddingBottom,
@@ -295,17 +301,20 @@ async def set_viewport(ws, window_id, width, height):
 def judge_open(row, phone=True):
     errors = []
     if not phone:
-        if row["position"] == "absolute" and "50dvh" in row["top"]:
+        if row["position"] == "fixed" or "50dvh" in f"{row.get('heightCss', '')}{row.get('maxHeight', '')}":
             errors.append("phone sheet rule applied on desktop")
         if abs(row["menuWidth"] - row["innerWidth"]) <= 1 and row["innerWidth"] >= 768:
             errors.append("desktop menu is viewport width")
         return errors
-    if row["menuTop"] < -0.5:
-        errors.append(f"menuTop {row['menuTop']:.2f}")
-    if abs(row["menuTop"] - row["titleBottom"]) > 1:
+    room_for_bottom_sheet = (row["innerHeight"] - row["titleBottom"]) > (row["menuHeight"] + 1)
+    if room_for_bottom_sheet and abs(row["menuTop"] - row["titleBottom"]) <= 1:
+        errors.append("FAIL_TOP_ANCHORED_TO_TITLE")
+    if row["menuTop"] <= row["titleBottom"]:
         errors.append(f"menuTop {row['menuTop']:.2f} titleBottom {row['titleBottom']:.2f}")
-    if row["menuBottom"] > row["innerHeight"] + 1:
+    if abs(row["menuBottom"] - row["innerHeight"]) > 1:
         errors.append(f"menuBottom {row['menuBottom']:.2f}")
+    if abs(row["menuTop"] - (row["innerHeight"] - row["menuHeight"])) > 1:
+        errors.append(f"menuTop {row['menuTop']:.2f} expected {row['innerHeight'] - row['menuHeight']:.2f}")
     if abs(row["menuLeft"]) > 1 or abs(row["menuRight"] - row["innerWidth"]) > 1:
         errors.append(f"x {row['menuLeft']:.2f}-{row['menuRight']:.2f}")
     if abs(row["menuWidth"] - row["innerWidth"]) > 1:
@@ -320,8 +329,10 @@ def judge_open(row, phone=True):
         errors.append(f"caret {row['caretGap']:.2f}/{row['caretW']:.2f}")
     if row["overflowX"] != "hidden" or row["overflowY"] != "auto":
         errors.append(f"overflow {row['overflowX']}/{row['overflowY']}")
-    if row["position"] != "absolute":
+    if row["position"] != "fixed":
         errors.append(f"position {row['position']}")
+    if row.get("railPosition") != "sticky":
+        errors.append(f"rail {row.get('railPosition')}")
     if row["docScrollWidth"] > row["docClientWidth"] + 1:
         errors.append("horizontal scroll")
     if row["visibility"] != "visible":
@@ -390,6 +401,7 @@ async def run(fixture):
             })
             await asyncio.sleep(0.05)
             after_wheel = await evaluate(ws, "document.querySelector('.Dropdown-menu').scrollTop")
+            before_touch = after_wheel
             await cdp(ws, "Input.dispatchTouchEvent", {
                 "type": "touchStart",
                 "touchPoints": [{"x": point["x"], "y": point["y"]}],
@@ -402,7 +414,7 @@ async def run(fixture):
             after_touch = await evaluate(ws, "document.querySelector('.Dropdown-menu').scrollTop")
             await evaluate(ws, "window.closeMenu()")
             closed = await evaluate(ws, "window.measure()")
-            closed.update({"mode": "closed", "label": "FLATRATE.WIKI", "affix": False, "kind": "closed", "wheel": [before_wheel, after_wheel], "touch": after_touch})
+            closed.update({"mode": "closed", "label": "FLATRATE.WIKI", "affix": False, "kind": "closed", "wheel": [before_wheel, after_wheel], "touch": [before_touch, after_touch]})
             rows.append(closed)
             await evaluate(ws, "window.openMenu()")
             reopened = await evaluate(ws, "window.measure()")
@@ -430,20 +442,30 @@ async def run(fixture):
 def main():
     compiled = compile_less()
     required = (
-        "position:absolute !important",
-        "top:100% !important",
-        "bottom:auto !important",
-        "left:calc(50% - 50vw) !important",
+        "left:0 !important;right:0 !important;width:max-content !important;max-width:calc(100% - 120px);margin-left:auto !important;margin-right:auto !important;transform:none !important",
+        "position:fixed !important",
+        "top:auto !important",
+        "bottom:0 !important",
+        "left:0 !important",
+        "right:0 !important",
         "width:100vw !important",
+        "height:50dvh",
         "max-height:50dvh",
         "overflow-x:hidden",
         "overflow-y:auto",
-        "max-width:calc(100% - 120px)",
         "left:100%",
     )
+    forbidden = (
+        "transform:translateX(-50%)",
+        "position:absolute !important;top:100% !important",
+        "left:calc(50% - 50vw) !important",
+        "calc(-20%)",
+        "calc(100.45%)",
+    )
     missing = [item for item in required if item not in compiled]
-    if missing or "calc(-20%)" in compiled or "calc(100.45%)" in compiled:
-        raise SystemExit(f"compiled CSS contract failed: {missing}")
+    present = [item for item in forbidden if item in compiled]
+    if missing or present:
+        raise SystemExit(f"compiled CSS contract failed missing={missing} forbidden={present}")
     fixture = Path(tempfile.mkdtemp(prefix="nav-center-sheet-"))
     try:
         write_fixture(fixture, compiled)
@@ -487,6 +509,9 @@ def main():
                 errors.append("closed menu intercepts the page")
             if row["wheel"][1] <= row["wheel"][0]:
                 errors.append(f"wheel {row['wheel']}")
+            touch = row.get("touch") or [0, 0]
+            if touch[1] <= touch[0]:
+                errors.append(f"touch {touch}")
         elif kind == "reopen":
             errors = judge_open(row, phone=True)
         elif kind == "backdrop":

@@ -26,8 +26,9 @@ test('center trigger is FLATRATE.WIKI with a visible down chevron and viewport c
   assert.match(less, /> \.icon:not\(\.Button-caret\)/);
   assert.match(
     less,
-    /\.App-titleControl\s*\{[^}]*left: 50% !important;[^}]*width: max-content !important;[^}]*max-width: ~"calc\(100% - 120px\)";[^}]*margin-left: 0 !important;[^}]*transform: translateX\(-50%\) !important;/s
+    /\.App-titleControl\s*\{[^}]*left: 0 !important;[^}]*right: 0 !important;[^}]*width: max-content !important;[^}]*max-width: ~"calc\(100% - 120px\)";[^}]*margin-left: auto !important;[^}]*margin-right: auto !important;[^}]*transform: none !important;/s
   );
+  assert.doesNotMatch(less, /transform: translateX\(-50%\) !important/);
   assert.doesNotMatch(less, /max-width: calc\(100% - 120px\)/);
   assert.doesNotMatch(less, /\.App-header \.App-titleControl\s*\{/);
   assert.match(
@@ -82,14 +83,18 @@ test('center label itself owns the header centerline while the unclipped caret s
   assert.match(less, /overflow: visible !important/);
 });
 
-test('center popup is a top-anchored half-screen sheet across the phone viewport', () => {
+test('center popup is a viewport-fixed bottom-anchored half-screen sheet', () => {
   assert.match(
     less,
-    /\.App-titleControl \.Dropdown-menu\s*\{[^}]*position: absolute !important;[^}]*top: 100% !important;[^}]*bottom: auto !important;[^}]*left: ~"calc\(50% - 50vw\)" !important;[^}]*right: auto !important;[^}]*width: 100vw !important;[^}]*max-width: 100vw;[^}]*max-height: 50dvh;[^}]*overflow-x: hidden;[^}]*overflow-y: auto;/s
+    /\.App-titleControl \.Dropdown-menu\s*\{[^}]*position: fixed !important;[^}]*top: auto !important;[^}]*bottom: 0 !important;[^}]*left: 0 !important;[^}]*right: 0 !important;[^}]*width: 100vw !important;[^}]*max-width: 100vw;[^}]*height: 50dvh;[^}]*max-height: 50dvh;[^}]*overflow-x: hidden;[^}]*overflow-y: auto;/s
   );
   assert.doesNotMatch(
     less,
-    /\.App-titleControl \.Dropdown-menu\s*\{[^}]*bottom:\s*0/
+    /\.App-titleControl \.Dropdown-menu\s*\{[^}]*position: absolute !important;[^}]*top: 100% !important/
+  );
+  assert.doesNotMatch(
+    less,
+    /\.App-titleControl \.Dropdown-menu\s*\{[^}]*left: ~"calc\(50% - 50vw\)"/
   );
   assert.doesNotMatch(
     less,

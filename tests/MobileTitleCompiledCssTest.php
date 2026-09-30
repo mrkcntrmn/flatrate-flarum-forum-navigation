@@ -45,7 +45,11 @@ class MobileTitleCompiledCssTest extends TestCase
         }
 
         $this->assertMatchesRegularExpression(
-            '/\.App-titleControl\{[^}]*width:max-content !important;max-width:calc\(100% - 120px\);/',
+            '/\.App-titleControl\{[^}]*left:0 !important;right:0 !important;width:max-content !important;max-width:calc\(100% - 120px\);margin-left:auto !important;margin-right:auto !important;transform:none !important;/',
+            $css
+        );
+        $this->assertDoesNotMatchRegularExpression(
+            '/\.App-titleControl\{[^}]*transform:translateX\(-50%\)/',
             $css
         );
         $this->assertDoesNotMatchRegularExpression(
@@ -67,15 +71,23 @@ class MobileTitleCompiledCssTest extends TestCase
             $css
         );
         $this->assertMatchesRegularExpression(
-            '/\.App-titleControl \.Dropdown-menu\{[^}]*position:absolute !important;[^}]*top:100% !important;[^}]*bottom:auto !important;[^}]*left:calc\(50% - 50vw\) !important;[^}]*right:auto !important;[^}]*width:100vw !important;[^}]*max-width:100vw;[^}]*max-height:50dvh;[^}]*overflow-x:hidden;[^}]*overflow-y:auto;/',
+            '/\.App-titleControl \.Dropdown-menu\{[^}]*position:fixed !important;[^}]*top:auto !important;[^}]*bottom:0 !important;[^}]*left:0 !important;[^}]*right:0 !important;[^}]*width:100vw !important;[^}]*max-width:100vw;[^}]*height:50dvh;[^}]*max-height:50dvh;[^}]*overflow-x:hidden;[^}]*overflow-y:auto;/',
+            $css
+        );
+        $this->assertDoesNotMatchRegularExpression(
+            '/\.App-titleControl \.Dropdown-menu\{[^}]*position:absolute !important/',
+            $css
+        );
+        $this->assertDoesNotMatchRegularExpression(
+            '/\.App-titleControl \.Dropdown-menu\{[^}]*top:100% !important/',
+            $css
+        );
+        $this->assertDoesNotMatchRegularExpression(
+            '/\.App-titleControl \.Dropdown-menu\{[^}]*left:calc\(50% - 50vw\) !important/',
             $css
         );
         $this->assertDoesNotMatchRegularExpression(
             '/\.App-titleControl \.Dropdown-menu\{[^}]*max-height:calc\(100dvh/',
-            $css
-        );
-        $this->assertDoesNotMatchRegularExpression(
-            '/\.App-titleControl \.Dropdown-menu\{[^}]*bottom:0/',
             $css
         );
     }

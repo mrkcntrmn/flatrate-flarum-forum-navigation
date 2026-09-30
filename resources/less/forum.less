@@ -761,18 +761,18 @@
   /* Board/index center trigger shows FLATRATE.WIKI. Discussion routes use
      FlatRateDiscussionBrandPicker and must keep the JS contextual label. */
   /* Flarum 1.8.19 mounts App-titleControl in the App navigation layer, not
-     inside App-header. Preserve Flarum's absolute/fixed + top: 0 behavior,
-     but neutralize its 200px box / -100px margin so the trigger's own width
-     is centered on the viewport centerline. */
+     inside App-header. Center the max-content trigger with auto margins.
+     Do not transform this element: a transform becomes the containing block
+     for its fixed dropdown and breaks the viewport-fixed bottom sheet. */
   .App-titleControl {
-    left: 50% !important;
-    right: auto !important;
+    left: 0 !important;
+    right: 0 !important;
     width: max-content !important;
     /* Less.php evaluates a bare calc() and emitted calc(-20%) for this line. */
     max-width: ~"calc(100% - 120px)";
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    transform: translateX(-50%) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    transform: none !important;
   }
 
   .App-titleControl > .Dropdown-toggle {
@@ -923,26 +923,21 @@
     padding-left: 0;
   }
   /* FORUM-NAV-UI-003: sticky quick rail above the scrolling Brand region.
-     One scrollport on the center sheet. The rail does not use the Brand offset. */
+     One scrollport on the center sheet. The rail does not use the Brand offset.
+     The title is not transformed, so this menu can stay a viewport-fixed
+     bottom sheet instead of a top-anchored absolute box. */
   .App-titleControl .Dropdown-menu {
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    /*
-     * Flarum's phone Dropdown is normally a fixed bottom sheet. The centered
-     * App-titleControl is transformed, which makes that fixed menu use the
-     * title as its containing block and causes it to grow upward off-screen.
-     *
-     * Make only this center picker absolute to the title, anchor it immediately
-     * below the header, and expand it back across the viewport.
-     */
-    position: absolute !important;
-    top: 100% !important;
-    bottom: auto !important;
-    left: ~"calc(50% - 50vw)" !important;
-    right: auto !important;
+    position: fixed !important;
+    top: auto !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
     width: 100vw !important;
     max-width: 100vw;
+    height: 50dvh;
     max-height: 50dvh;
     overflow-x: hidden;
     overflow-y: auto;
