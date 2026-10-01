@@ -7,33 +7,43 @@ use PHPUnit\Framework\TestCase;
 
 class QuickRailGateTest extends TestCase
 {
-    public function testSettingKeysAndDefaultsAreRegisteredWithoutAMigration(): void
+    public function testV2AudienceKeysDefaultOffWithoutAMigration(): void
     {
         $root = dirname(__DIR__);
         $extend = (string) file_get_contents($root . '/extend.php');
         $attribute = (string) file_get_contents($root . '/src/Api/QuickRailSettingsAttribute.php');
 
-        $this->assertSame('flatrate-forum-navigation.quick_rail_enabled', QuickRailGate::SETTING_ENABLED);
-        $this->assertSame('flatrate-forum-navigation.quick_rail_user_control_enabled', QuickRailGate::SETTING_USER_CONTROL_ENABLED);
-        $this->assertSame('flatrate-forum-navigation.quick_rail_member_default_visible', QuickRailGate::SETTING_MEMBER_DEFAULT_VISIBLE);
-        $this->assertSame('flatrateForumNavigationQuickRailVisible', QuickRailGate::PREFERENCE_VISIBLE);
+        $this->assertSame(
+            'flatrate-forum-navigation.center_menu_v2_admin_visible',
+            QuickRailGate::SETTING_V2_ADMIN_VISIBLE
+        );
+        $this->assertSame(
+            'flatrate-forum-navigation.center_menu_v2_user_visible',
+            QuickRailGate::SETTING_V2_USER_VISIBLE
+        );
 
-        $this->assertStringContainsString("->default(QuickRailGate::SETTING_ENABLED, '0')", $extend);
-        $this->assertStringContainsString("->default(QuickRailGate::SETTING_USER_CONTROL_ENABLED, '1')", $extend);
-        $this->assertStringContainsString("->default(QuickRailGate::SETTING_MEMBER_DEFAULT_VISIBLE, '1')", $extend);
-        $this->assertStringContainsString('Extend\\User', $extend);
-        $this->assertStringContainsString('registerPreference', $extend);
-        $this->assertStringContainsString('QuickRailGate::PREFERENCE_VISIBLE', $extend);
+        $this->assertStringContainsString(
+            "->default(QuickRailGate::SETTING_V2_ADMIN_VISIBLE, '0')",
+            $extend
+        );
+        $this->assertStringContainsString(
+            "->default(QuickRailGate::SETTING_V2_USER_VISIBLE, '0')",
+            $extend
+        );
+        $this->assertStringNotContainsString('registerPreference', $extend);
+        $this->assertStringNotContainsString('QuickRailGate::PREFERENCE_VISIBLE', $extend);
+        $this->assertStringNotContainsString('quick_rail_user_control_enabled', $extend);
+        $this->assertStringNotContainsString('quick_rail_member_default_visible', $extend);
         $this->assertStringContainsString('QuickRailSettingsAttribute::class', $extend);
         $this->assertStringNotContainsString('Extend\\Migration', $extend);
         $this->assertStringNotContainsString('->migration(', $extend);
         $this->assertDirectoryDoesNotExist($root . '/migrations');
 
-        $this->assertStringNotContainsString('PREFERENCE_VISIBLE', $attribute);
-        $this->assertStringNotContainsString('flatrateForumNavigationQuickRailVisible', $attribute);
-        $this->assertStringContainsString('flatrateQuickRailEnabled', $attribute);
-        $this->assertStringContainsString('flatrateQuickRailUserControlEnabled', $attribute);
-        $this->assertStringContainsString('flatrateQuickRailMemberDefaultVisible', $attribute);
+        $this->assertStringContainsString('flatrateCenterMenuV2AdminVisible', $attribute);
+        $this->assertStringContainsString('flatrateCenterMenuV2UserVisible', $attribute);
+        $this->assertStringNotContainsString('flatrateQuickRailEnabled', $attribute);
+        $this->assertStringNotContainsString('flatrateQuickRailUserControlEnabled', $attribute);
+        $this->assertStringNotContainsString('flatrateQuickRailMemberDefaultVisible', $attribute);
     }
 
     /**
@@ -59,32 +69,8 @@ class QuickRailGateTest extends TestCase
             'bool true' => [true, false, true],
             'string false' => ['false', true, false],
             'string true' => ['true', false, true],
-        ];
-    }
-
-    /**
-     * @dataProvider preferenceProvider
-     * @param mixed $value
-     */
-    public function testPreferenceTransformerPreservesNullAndExplicitBooleans($value, ?bool $expected): void
-    {
-        $this->assertSame($expected, QuickRailGate::transformPreference($value));
-    }
-
-    public function preferenceProvider(): array
-    {
-        return [
-            'null' => [null, null],
-            'empty' => ['', null],
-            'string null' => ['null', null],
-            'false' => [false, false],
-            'true' => [true, true],
-            'string false' => ['false', false],
-            'string true' => ['true', true],
-            'string 0' => ['0', false],
-            'string 1' => ['1', true],
-            'int 0' => [0, false],
-            'int 1' => [1, true],
+            'invalid string uses default false' => ['maybe', false, false],
+            'invalid string uses default true' => ['maybe', true, true],
         ];
     }
 }
