@@ -1,15 +1,13 @@
 flatrate-forum-navigation:
   admin:
     quick_rail:
-      heading: Quick Navigation
-      intro_help: These switches control the member quick rail inside the center menu. Guest MAIN navigation is unaffected. Changing them does not edit stored member preferences.
-      enabled_label: Enable member quick navigation
-      enabled_help: Kill switch for the member quick rail. When this is off, members do not see the rail. Turning it back on restores each member's saved choice.
-      user_control_label: Allow members to show/hide quick navigation
-      user_control_help: When enabled, a member's saved show/hide choice is honored. When disabled, every member follows the default below and stored choices are left unchanged.
-      member_default_label: Visible by default for members
-      member_default_help: Used when a member has not chosen, and forced for every member while member control is off.
-      save_error: Could not save quick navigation settings.
+      heading: Center Menu V2
+      intro_help: V1 is the warehouse MAIN menu and remains the default. These independent switches expose V2 only to the selected signed-in audience. Public guests always stay on V1.
+      admin_v2_label: Show Center Menu V2 to admins
+      admin_v2_help: Admin-only preview gate. Admins stay on V1 when this is off, even if the user gate is on.
+      user_v2_label: Show Center Menu V2 to signed-in users
+      user_v2_help: Non-admin signed-in users receive V2 when this is on. Admins are controlled only by the admin gate.
+      save_error: Could not save Center Menu V2 settings.
   forum:
     nav:
       aria_label: Forum presentation navigation
@@ -23,7 +21,3 @@ flatrate-forum-navigation:
       new_discussion: New Discussion
       technician_topics: Technician Topics
       main: MAIN
-    settings:
-      quick_rail_label: Show quick navigation in the forum menu
-      quick_rail_help: Applies to your account in the center menu. Hiding this setting does not clear your saved choice.
-      quick_rail_save_error: Could not save quick navigation preference.
