@@ -71,7 +71,7 @@ class MobileTitleCompiledCssTest extends TestCase
             $css
         );
         $this->assertMatchesRegularExpression(
-            '/\.App-titleControl \.Dropdown-menu\{[^}]*position:fixed !important;[^}]*top:auto !important;[^}]*bottom:0 !important;[^}]*left:0 !important;[^}]*right:0 !important;[^}]*width:100vw !important;[^}]*max-width:100vw;[^}]*height:50dvh;[^}]*max-height:50dvh;[^}]*overflow-x:hidden;[^}]*overflow-y:auto;/',
+            '/\.App-titleControl \.Dropdown-menu\{[^}]*position:fixed !important;[^}]*top:auto !important;[^}]*bottom:0 !important;[^}]*left:0 !important;[^}]*right:0 !important;[^}]*width:100vw !important;[^}]*max-width:100vw;[^}]*height:65dvh;[^}]*max-height:65dvh;[^}]*overflow-x:hidden;[^}]*overflow-y:auto;/',
             $css
         );
         $this->assertDoesNotMatchRegularExpression(
