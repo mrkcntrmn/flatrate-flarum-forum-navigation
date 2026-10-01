@@ -29,9 +29,10 @@ test('exact positive Follow state recolors only presentation', () => {
   assert.match(less, /#c72d5d/);
 });
 
-test('same Brand total component is reused in all required surfaces', () => {
+test('Brand totals stay in sidebar and hero but are omitted from the center popup', () => {
   assert.match(nav, /<BrandVoteTotal board=\{board\}/);
-  assert.match(center, /<BrandVoteTotal board=\{board\}/);
+  assert.doesNotMatch(center, /BrandVoteTotal/);
+  assert.doesNotMatch(center, /<BrandVoteTotal board=\{board\}/);
   assert.match(index, /<BrandVoteTotal board=\{board\} key="flatrate-brand-vote-total"/);
 });
 
