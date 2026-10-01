@@ -34,7 +34,7 @@ Disabling this extension restores native Flarum sideNav without mutating tag IDs
 | Composer | `flatrate/flarum-forum-navigation` |
 | Extension ID | `flatrate-forum-navigation` |
 | Namespace | `FlatRate\ForumNavigation\` |
-| Release | `v1.4.1` |
+| Release | `v1.4.6` |
 
 ## Requirements
 
@@ -48,10 +48,10 @@ Packagist:
 ```bash
 composer require flatrate/flarum-forum-navigation:^1.4
 # or exact:
-composer require flatrate/flarum-forum-navigation:1.4.1
+composer require flatrate/flarum-forum-navigation:1.4.6
 ```
 
-Direct GitHub VCS installs may use immutable tag `v1.4.1`:
+Direct GitHub VCS installs may use immutable tag `v1.4.6`:
 
 ```json
 {
@@ -62,7 +62,7 @@ Direct GitHub VCS installs may use immutable tag `v1.4.1`:
         }
     ],
     "require": {
-        "flatrate/flarum-forum-navigation": "1.4.1"
+        "flatrate/flarum-forum-navigation": "1.4.6"
     }
 }
 ```
@@ -104,4 +104,3 @@ BASE_URL=http://127.0.0.1:8080 bash scripts/disposable-smoke.sh
 ```
 
 Provenance for the embedded manifest is recorded in `resources/navigation-runtime-manifest.provenance.json` (no runtime network dependency).
-
