@@ -29,11 +29,42 @@ test('exact positive Follow state recolors only presentation', () => {
   assert.match(less, /#c72d5d/);
 });
 
-test('Brand totals stay in sidebar and hero but are omitted from the center popup', () => {
+test('Brand totals render for PresentationNav and hero, and center-sheet CSS suppresses them', () => {
   assert.match(nav, /<BrandVoteTotal board=\{board\}/);
   assert.doesNotMatch(center, /BrandVoteTotal/);
   assert.doesNotMatch(center, /<BrandVoteTotal board=\{board\}/);
   assert.match(index, /<BrandVoteTotal board=\{board\} key="flatrate-brand-vote-total"/);
+
+  const centerTotal = less.match(
+    /\.App-titleControl \.Dropdown-menu \.FlatRatePresentationNav-brandLink \.FlatRateBrandVoteTotal\s*\{([^}]*)\}/
+  );
+  assert.ok(centerTotal, 'IndexPage center-sheet Brand total rule is missing');
+  assert.match(centerTotal[1], /display:\s*none !important/);
+  assert.doesNotMatch(centerTotal[1], /flex:\s*0 0 auto/);
+  assert.doesNotMatch(centerTotal[1], /margin-left:\s*1\.25rem/);
+
+  const centerName = less.match(
+    /\.App-titleControl \.Dropdown-menu \.FlatRatePresentationNav-brandName\s*\{([^}]*)\}/
+  );
+  assert.ok(centerName, 'IndexPage center-sheet Brand name rule is missing');
+  assert.match(centerName[1], /flex:\s*1 1 auto/);
+  assert.doesNotMatch(centerName[1], /flex:\s*0 0 10rem/);
+
+  const drawerTotal = less.match(
+    /\.App-drawer \.FlatRatePresentationNav-brandLink \.FlatRateBrandVoteTotal\s*\{([^}]*)\}/
+  );
+  assert.ok(drawerTotal, 'drawer Brand total rule is missing');
+  assert.match(drawerTotal[1], /margin-left:\s*1\.25rem/);
+  assert.doesNotMatch(drawerTotal[1], /display:\s*none/);
+
+  assert.doesNotMatch(
+    less,
+    /\.TagHero \.Hero-title \.FlatRateBrandVoteTotal\s*\{[^}]*display:\s*none/
+  );
+  assert.doesNotMatch(
+    less,
+    /\.IndexPage-nav[^{]*\.FlatRateBrandVoteTotal\s*\{[^}]*display:\s*none/
+  );
 });
 
 test('Brand hero attaches the total to the native Hero title', () => {

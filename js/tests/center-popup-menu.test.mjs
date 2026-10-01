@@ -31,3 +31,25 @@ test('center popup presents Brand boards as SelectDropdown LinkButton rows', () 
   assert.match(less, /\.App-titleControl \.Dropdown-menu \.FlatRateDiscussionBrandLink/);
   assert.match(less, /\.App-titleControl \.Dropdown-menu \.FlatRateDiscussionBrandLink\.depth-1/);
 });
+
+test('IndexPage center sheet hides PresentationNav Brand totals', () => {
+  const rule = less.match(
+    /\.App-titleControl \.Dropdown-menu \.FlatRatePresentationNav-brandLink \.FlatRateBrandVoteTotal\s*\{([^}]*)\}/
+  );
+  assert.ok(rule, 'center-sheet PresentationNav Brand total selector is missing');
+  assert.match(rule[0], /\.App-titleControl/);
+  assert.match(rule[0], /\.Dropdown-menu/);
+  assert.match(rule[0], /\.FlatRatePresentationNav/);
+  assert.match(rule[0], /\.FlatRateBrandVoteTotal/);
+  assert.match(rule[1], /display:\s*none !important/);
+});
+
+test('IndexPage center sheet Brand names do not reserve the count tab stop', () => {
+  const rule = less.match(
+    /\.App-titleControl \.Dropdown-menu \.FlatRatePresentationNav-brandName\s*\{([^}]*)\}/
+  );
+  assert.ok(rule, 'center-sheet Brand name selector is missing');
+  assert.match(rule[1], /flex:\s*1 1 auto/);
+  assert.match(rule[1], /min-width:\s*0/);
+  assert.doesNotMatch(rule[1], /10rem/);
+});

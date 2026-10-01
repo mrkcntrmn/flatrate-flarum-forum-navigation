@@ -22,10 +22,12 @@ PORT = 8773
 DEBUG_PORT = 9235
 PHONE = ((320, 553), (360, 653), (390, 757), (412, 828), (430, 845))
 BRANDS = (
-    "Acura", "Audi", "BMW", "Cadillac", "Chevrolet", "Chrysler", "Dodge",
+    "Acura", "Audi", "BMW", "Cadillac", "CDJR", "Chevrolet", "Chrysler", "Dodge",
     "Ford", "Genesis", "GMC", "Honda", "Hyundai", "Infiniti", "Jaguar",
     "Jeep", "Kia", "Lexus", "Lincoln", "Mazda", "Mercedes-Benz",
 )
+# Non-zero totals that match the rolled-back production failure class.
+CENTER_TOTALS = {"Audi": 4, "BMW": 1, "CDJR": 2}
 CORE_CSS = """
 :root { --header-color: #eaedf0; --primary-color: #e7672e; --overlay-bg: rgba(0, 0, 0, .5); }
 html, body { margin: 0; background: #15191e; color: #eaedf0; }
@@ -117,12 +119,28 @@ echo $parser->getCss();
     )
 
 
-def write_fixture(directory: Path, compiled_css: str) -> None:
-    rows = "\n".join(
-        '<li class="FlatRatePresentationNav-brand"><div class="FlatRatePresentationNav-row">'
-        f'<a class="FlatRatePresentationNav-brandLink" href="#">{name}</a></div></li>'
-        for name in BRANDS
+def brand_row(name: str, depth: int = 0) -> str:
+    total = CENTER_TOTALS.get(name)
+    total_html = ""
+    if total is not None:
+        noun = "upvote" if total == 1 else "upvotes"
+        total_html = (
+            f'<span class="FlatRateBrandVoteTotal" '
+            f'aria-label="{name} board total: {total} {noun}">{total}</span>'
+        )
+    depth_class = f" depth-{depth}" if depth else ""
+    return (
+        '<li class="FlatRatePresentationNav-brand'
+        f'{depth_class}"><div class="FlatRatePresentationNav-row">'
+        f'<a class="FlatRatePresentationNav-brandLink" href="#">'
+        f'<span class="FlatRatePresentationNav-brandName">{name}</span>'
+        f'{total_html}</a></div></li>'
     )
+
+
+def write_fixture(directory: Path, compiled_css: str) -> None:
+    rows = "\n".join(brand_row(name) for name in BRANDS)
+    rows += "\n" + brand_row("Land Rover", depth=1)
     html = f"""<!doctype html>
 <html>
 <head>
@@ -153,6 +171,26 @@ def write_fixture(directory: Path, compiled_css: str) -> None:
     </div>
     <div class="App-primaryControl"><button class="Button" type="button"></button></div>
   </div>
+</div>
+<aside class="IndexPage-nav">
+  <div class="FlatRatePresentationNav">
+    <a class="FlatRatePresentationNav-brandLink" href="#">
+      <span class="FlatRatePresentationNav-brandName">Honda</span>
+      <span class="FlatRateBrandVoteTotal" aria-label="Honda board total: 5 upvotes">5</span>
+    </a>
+  </div>
+</aside>
+<div class="App-drawer">
+  <a class="FlatRatePresentationNav-brandLink" href="#">
+    <span class="FlatRatePresentationNav-brandName">Audi</span>
+    <span class="FlatRateBrandVoteTotal" aria-label="Audi board total: 4 upvotes">4</span>
+  </a>
+</div>
+<div class="TagHero">
+  <h1 class="Hero-title">
+    Honda
+    <span class="FlatRateBrandVoteTotal" aria-label="Honda board total: 5 upvotes">5</span>
+  </h1>
 </div>
 <script>
 window.setMode = (mode, text, affixed) => {{
@@ -240,7 +278,43 @@ window.measure = () => {{
     hitMenu: !!(hit && (hit === menu || menu.contains(hit))),
     docScrollWidth: document.documentElement.scrollWidth,
     docClientWidth: document.documentElement.clientWidth,
-    rail: document.querySelector('[data-quick-rail-control]')?.dataset.quickRailControl || ''
+    rail: document.querySelector('[data-quick-rail-control]')?.dataset.quickRailControl || '',
+    ...window.totalVisibility()
+  }};
+}};
+window.totalVisibility = () => {{
+  const visible = (node) => {{
+    const style = getComputedStyle(node);
+    return style.display !== 'none' &&
+      style.visibility !== 'hidden' &&
+      node.getBoundingClientRect().width > 0;
+  }};
+  const count = (selector) => {{
+    const nodes = Array.from(document.querySelectorAll(selector));
+    return {{
+      count: nodes.length,
+      visible: nodes.filter(visible).length,
+    }};
+  }};
+  const center = count('.App-titleControl .Dropdown-menu .FlatRateBrandVoteTotal');
+  const sidebar = count('.IndexPage-nav .FlatRateBrandVoteTotal');
+  const hero = count('.TagHero .Hero-title .FlatRateBrandVoteTotal');
+  const drawer = count('.App-drawer .FlatRateBrandVoteTotal');
+  const name = document.querySelector('.App-titleControl .Dropdown-menu .FlatRatePresentationNav-brandName');
+  const child = document.querySelector('.App-titleControl .Dropdown-menu .FlatRatePresentationNav-brand.depth-1 .FlatRatePresentationNav-brandLink');
+  const drawerName = document.querySelector('.App-drawer .FlatRatePresentationNav-brandName');
+  return {{
+    centerTotalCount: center.count,
+    centerVisibleTotalCount: center.visible,
+    sidebarTotalCount: sidebar.count,
+    sidebarVisibleTotalCount: sidebar.visible,
+    heroTotalCount: hero.count,
+    heroVisibleTotalCount: hero.visible,
+    drawerTotalCount: drawer.count,
+    drawerVisibleTotalCount: drawer.visible,
+    centerNameFlex: name ? getComputedStyle(name).flex : '',
+    drawerNameFlex: drawerName ? getComputedStyle(drawerName).flex : '',
+    childPad: child ? getComputedStyle(child).paddingLeft : '',
   }};
 }};
 </script>
@@ -339,6 +413,26 @@ def judge_open(row, phone=True):
         errors.append("horizontal scroll")
     if row["visibility"] != "visible":
         errors.append(f"visibility {row['visibility']}")
+    if row.get("centerTotalCount", 0) <= 0:
+        errors.append("center total nodes missing")
+    if row.get("centerVisibleTotalCount", 1) != 0:
+        errors.append(f"visible center totals {row.get('centerVisibleTotalCount')}")
+    if row.get("sidebarTotalCount", 0) <= 0 or row.get("sidebarVisibleTotalCount", 0) <= 0:
+        errors.append(
+            f"sidebar totals {row.get('sidebarTotalCount')}/{row.get('sidebarVisibleTotalCount')}"
+        )
+    if row.get("heroTotalCount", 0) <= 0 or row.get("heroVisibleTotalCount", 0) <= 0:
+        errors.append(
+            f"hero totals {row.get('heroTotalCount')}/{row.get('heroVisibleTotalCount')}"
+        )
+    if row.get("drawerTotalCount", 0) <= 0 or row.get("drawerVisibleTotalCount", 0) <= 0:
+        errors.append(
+            f"drawer totals {row.get('drawerTotalCount')}/{row.get('drawerVisibleTotalCount')}"
+        )
+    if "10rem" in str(row.get("centerNameFlex", "")) or str(row.get("centerNameFlex", "")).startswith("0 0 160"):
+        errors.append(f"center name still reserves count column {row.get('centerNameFlex')}")
+    if row.get("childPad") != "24px":
+        errors.append(f"child indentation {row.get('childPad')}")
     return errors
 
 
@@ -568,9 +662,19 @@ def main():
         if errors:
             failed = True
         if kind in {"open", "reopen", "closed", "desktop", "page-scroll"}:
+            totals = ""
+            if kind == "open" and row["mode"] == "index":
+                totals = (
+                    f" centerTotals={row.get('centerTotalCount')} "
+                    f"visibleCenterTotals={row.get('centerVisibleTotalCount')} "
+                    f"sidebarTotalVisible={str(row.get('sidebarVisibleTotalCount', 0) > 0).lower()} "
+                    f"heroTotalVisible={str(row.get('heroVisibleTotalCount', 0) > 0).lower()} "
+                    f"drawerTotalVisible={str(row.get('drawerVisibleTotalCount', 0) > 0).lower()} "
+                    f"childPad={row.get('childPad')}"
+                )
             print(
                 f"{state} {kind} {row['mode']} {row['label']} affix={row['affix']} "
-                f"{row['innerWidth']}x{row['innerHeight']} "
+                f"{row['innerWidth']}x{row['innerHeight']}{totals} "
                 f"top={row['menuTop']:.2f} bottom={row['menuBottom']:.2f} "
                 f"left={row['menuLeft']:.2f} width={row['menuWidth']:.2f} "
                 f"height={row['menuHeight']:.2f} ratio={row['menuRatio']:.4f} "

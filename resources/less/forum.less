@@ -906,21 +906,29 @@
     padding-left: 3rem !important;
   }
 
-  /* The two mobile Brand menus share the same left-justified label/count tab
-     stop. Counts sit one tab after a fixed Brand label column instead of at
-     the far-right edge of the sheet/drawer. */
-  .App-drawer .FlatRatePresentationNav-brandName,
-  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-brandName {
+  /* Drawer keeps the label/count tab stop. The IndexPage center sheet is
+     Brand-name only: PresentationNav still emits BrandVoteTotal, and this
+     surface hides it without reserving the old count column. */
+  .App-drawer .FlatRatePresentationNav-brandName {
     flex: 0 0 10rem;
     min-width: 0;
     text-align: left;
   }
 
-  .App-drawer .FlatRatePresentationNav-brandLink .FlatRateBrandVoteTotal,
-  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-brandLink .FlatRateBrandVoteTotal {
+  .App-drawer .FlatRatePresentationNav-brandLink .FlatRateBrandVoteTotal {
     flex: 0 0 auto;
     margin-left: 1.25rem;
     padding-left: 0;
+  }
+
+  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-brandName {
+    flex: 1 1 auto;
+    min-width: 0;
+    text-align: left;
+  }
+
+  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-brandLink .FlatRateBrandVoteTotal {
+    display: none !important;
   }
   /* FORUM-NAV-UI-003: sticky quick rail above the scrolling Brand region.
      One scrollport on the center sheet. The rail does not use the Brand offset.
@@ -1038,7 +1046,8 @@
 
 
 /* FORUM-BRAND-VOTE-TOTALS-001
- * One exact-Brand total is reused in sidebar, center picker, and Brand hero.
+ * Sidebar and Brand hero render the exact-Brand total.
+ * The IndexPage center sheet suppresses that same node.
  * Lime is the default/read state; pink is a secondary accent for the exact
  * Brand's positive Follow state. The number itself is never a Follow control.
  */
@@ -1066,9 +1075,8 @@
   min-width: 0;
 }
 
-/* Brand totals use one tab-stop column instead of the far edge. This keeps
-   both the drawer tree and the center picker left-justified while placing the
-   number one visual tab to the right of the Brand label column. */
+/* Sidebar and drawer Brand totals sit after the label. The IndexPage center
+   sheet hides this node instead of reserving a count column. */
 .FlatRatePresentationNav-brandLink .FlatRateBrandVoteTotal {
   margin-left: auto;
   padding-left: 0.75rem;

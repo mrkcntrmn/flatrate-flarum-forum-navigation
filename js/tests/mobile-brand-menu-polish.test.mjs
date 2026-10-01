@@ -103,13 +103,41 @@ test('center popup is a viewport-fixed bottom-anchored 65vh sheet', () => {
   assert.doesNotMatch(less, /left: calc\(50% - 50vw\)/);
 });
 
-test('both mobile Brand menus use a left-aligned label/count tab stop and zero totals are omitted', () => {
-  assert.match(less, /\.App-drawer \.FlatRatePresentationNav-brandName/);
-  assert.match(less, /\.App-titleControl \.Dropdown-menu \.FlatRatePresentationNav-brandName/);
-  assert.match(less, /flex: 0 0 10rem/);
-  assert.match(less, /margin-left: 1\.25rem/);
+test('drawer Brand menu keeps the left-aligned label/count tab stop', () => {
+  const name = less.match(/\.App-drawer \.FlatRatePresentationNav-brandName\s*\{([^}]*)\}/);
+  assert.ok(name, 'drawer Brand name rule is missing');
+  assert.match(name[1], /flex:\s*0 0 10rem/);
+
+  const total = less.match(
+    /\.App-drawer \.FlatRatePresentationNav-brandLink \.FlatRateBrandVoteTotal\s*\{([^}]*)\}/
+  );
+  assert.ok(total, 'drawer Brand total rule is missing');
+  assert.match(total[1], /flex:\s*0 0 auto/);
+  assert.match(total[1], /margin-left:\s*1\.25rem/);
+  assert.doesNotMatch(total[1], /display:\s*none/);
+});
+
+test('IndexPage center sheet is Brand-name only and does not reserve the count tab stop', () => {
+  const name = less.match(
+    /\.App-titleControl \.Dropdown-menu \.FlatRatePresentationNav-brandName\s*\{([^}]*)\}/
+  );
+  assert.ok(name, 'center-sheet Brand name rule is missing');
+  assert.match(name[1], /flex:\s*1 1 auto/);
+  assert.doesNotMatch(name[1], /flex:\s*0 0 10rem/);
+
+  const total = less.match(
+    /\.App-titleControl \.Dropdown-menu \.FlatRatePresentationNav-brandLink \.FlatRateBrandVoteTotal\s*\{([^}]*)\}/
+  );
+  assert.ok(total, 'center-sheet Brand total rule is missing');
+  assert.match(total[1], /display:\s*none !important/);
+});
+
+test('zero Brand totals stay omitted wherever the total component is still rendered', () => {
+  assert.match(
+    less,
+    /\.FlatRateBrandVoteTotal\[aria-label\*="board total: 0 upvotes"\]\s*\{[^}]*display:\s*none !important/s
+  );
   assert.match(less, /\.FlatRateDiscussionBrandName\s*\{[^}]*flex: 0 0 10rem/s);
-  assert.match(less, /\.FlatRateBrandVoteTotal\[aria-label\*="board total: 0 upvotes"\]/);
 });
 
 test('canonical Brand hero suppresses the redundant native tag icon', () => {
