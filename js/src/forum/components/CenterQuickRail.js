@@ -10,8 +10,8 @@ import classList from 'flarum/common/utils/classList';
 import { technicianTopicsHref } from '../utils/manifest';
 import { TECHNICIAN_TOPICS_ICON } from '../utils/startNav';
 import {
-  effectiveMemberQuickRailVisible,
-  quickRailControlIds,
+  centerMenuControlIds,
+  centerMenuVersion,
 } from '../utils/quickRailVisibility';
 import { closeCenterSheetFrom, openCanonicalNewDiscussion } from '../utils/openCanonicalNewDiscussion';
 
@@ -33,13 +33,8 @@ export default class CenterQuickRail extends Component {
   view() {
     const user = app.session && app.session.user;
     const signedIn = !!user;
-    const memberVisible = signedIn && effectiveMemberQuickRailVisible({ forum: app.forum, user });
-    const ids = quickRailControlIds({ signedIn, memberVisible });
-
-    if (!ids.length) {
-      return null;
-    }
-
+    const version = centerMenuVersion({ forum: app.forum, user });
+    const ids = centerMenuControlIds({ forum: app.forum, user });
     const guest = !signedIn;
 
     return (
@@ -48,9 +43,12 @@ export default class CenterQuickRail extends Component {
           className={classList('FlatRateCenterQuickRail', {
             'FlatRateCenterQuickRail--guest': guest,
             'FlatRateCenterQuickRail--member': !guest,
+            'FlatRateCenterQuickRail--v1': version === 'v1',
+            'FlatRateCenterQuickRail--v2': version === 'v2',
           })}
           role="navigation"
           aria-label={extractText(app.translator.trans('flatrate-forum-navigation.forum.quick_rail.region'))}
+          data-center-menu-version={version}
           data-quick-rail-order={ids.join(',')}
         >
           {ids.map((id) => this.control(id, user))}
