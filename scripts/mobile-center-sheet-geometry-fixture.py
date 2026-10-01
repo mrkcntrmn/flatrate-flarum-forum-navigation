@@ -321,7 +321,7 @@ def judge_open(row, phone=True):
         errors.append(f"x {row['menuLeft']:.2f}-{row['menuRight']:.2f}")
     if abs(row["menuWidth"] - row["innerWidth"]) > 1:
         errors.append(f"width {row['menuWidth']:.2f}")
-    if not 0.49 <= row["menuRatio"] <= 0.51:
+    if not 0.64 <= row["menuRatio"] <= 0.66:
         errors.append(f"ratio {row['menuRatio']:.4f}")
     if row["scrollHeight"] <= row["clientHeight"] or row["after"] <= row["atZero"]:
         errors.append(f"scroll {row['scrollHeight']}/{row['clientHeight']} {row['atZero']}->{row['after']}")
