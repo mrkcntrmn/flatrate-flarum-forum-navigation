@@ -39,16 +39,8 @@ return [
     (new Extend\Settings())
         ->default(MainPinsFilter::SETTING_PUBLIC, '[]')
         ->default(MainPinsFilter::SETTING_MEMBER, '[]')
-        ->default(QuickRailGate::SETTING_ENABLED, '0')
-        ->default(QuickRailGate::SETTING_USER_CONTROL_ENABLED, '1')
-        ->default(QuickRailGate::SETTING_MEMBER_DEFAULT_VISIBLE, '1'),
-
-    (new Extend\User())
-        ->registerPreference(
-            QuickRailGate::PREFERENCE_VISIBLE,
-            [QuickRailGate::class, 'transformPreference'],
-            null
-        ),
+        ->default(QuickRailGate::SETTING_V2_ADMIN_VISIBLE, '0')
+        ->default(QuickRailGate::SETTING_V2_USER_VISIBLE, '0'),
 
     // Flarum 1.8.19 discussion list filter seam (filter[key]=value).
     // Plan docs mention SearchDriver (2.x naming); 1.8 uses Extend\Filter.

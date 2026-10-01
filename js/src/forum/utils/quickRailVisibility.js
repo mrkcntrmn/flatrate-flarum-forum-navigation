@@ -1,11 +1,11 @@
-export const SETTING_ENABLED = 'flatrate-forum-navigation.quick_rail_enabled';
-export const SETTING_USER_CONTROL_ENABLED = 'flatrate-forum-navigation.quick_rail_user_control_enabled';
-export const SETTING_MEMBER_DEFAULT_VISIBLE = 'flatrate-forum-navigation.quick_rail_member_default_visible';
-export const PREFERENCE_VISIBLE = 'flatrateForumNavigationQuickRailVisible';
+export const SETTING_V2_ADMIN_VISIBLE = 'flatrate-forum-navigation.center_menu_v2_admin_visible';
+export const SETTING_V2_USER_VISIBLE = 'flatrate-forum-navigation.center_menu_v2_user_visible';
 
-export const FORUM_ATTR_ENABLED = 'flatrateQuickRailEnabled';
-export const FORUM_ATTR_USER_CONTROL_ENABLED = 'flatrateQuickRailUserControlEnabled';
-export const FORUM_ATTR_MEMBER_DEFAULT_VISIBLE = 'flatrateQuickRailMemberDefaultVisible';
+export const FORUM_ATTR_V2_ADMIN_VISIBLE = 'flatrateCenterMenuV2AdminVisible';
+export const FORUM_ATTR_V2_USER_VISIBLE = 'flatrateCenterMenuV2UserVisible';
+
+export const CENTER_MENU_V1 = 'v1';
+export const CENTER_MENU_V2 = 'v2';
 
 export const MEMBER_QUICK_RAIL_ORDER = Object.freeze([
   'profile',
@@ -20,126 +20,60 @@ export function normalizeSettingBool(value, missingDefault) {
     return !!missingDefault;
   }
 
-  const explicit = normalizeExplicitPreference(value);
-  return explicit === null ? !!missingDefault : explicit;
-}
-
-export function normalizeExplicitPreference(value) {
-  if (value === null || value === undefined) {
-    return null;
-  }
-
   if (typeof value === 'string') {
     const normalized = value.trim().toLowerCase();
-    if (normalized === '' || normalized === 'null') return null;
     if (normalized === '1' || normalized === 'true') return true;
     if (normalized === '0' || normalized === 'false') return false;
-    return null;
+    return !!missingDefault;
   }
 
   if (value === true || value === 1) return true;
   if (value === false || value === 0) return false;
 
-  return null;
+  return !!missingDefault;
 }
 
-export function getQuickRailAdminConfig(forum) {
+export function getCenterMenuV2Config(forum) {
   return {
-    enabled: readForumBool(forum, FORUM_ATTR_ENABLED, false),
-    userControlEnabled: readForumBool(forum, FORUM_ATTR_USER_CONTROL_ENABLED, true),
-    memberDefaultVisible: readForumBool(forum, FORUM_ATTR_MEMBER_DEFAULT_VISIBLE, true),
+    adminVisible: readForumBool(forum, FORUM_ATTR_V2_ADMIN_VISIBLE, false),
+    userVisible: readForumBool(forum, FORUM_ATTR_V2_USER_VISIBLE, false),
   };
 }
 
-export function getExplicitQuickRailPreference(user) {
-  if (!user || typeof user.preferences !== 'function') {
-    return null;
+export function isAdminUser(user) {
+  if (!user) return false;
+
+  if (typeof user.isAdmin === 'function') {
+    return !!user.isAdmin();
   }
 
-  const preferences = user.preferences();
-  if (!preferences || typeof preferences !== 'object') {
-    return null;
+  if (typeof user.attribute === 'function') {
+    return !!user.attribute('isAdmin');
   }
 
-  if (!Object.prototype.hasOwnProperty.call(preferences, PREFERENCE_VISIBLE)) {
-    return null;
-  }
-
-  return normalizeExplicitPreference(preferences[PREFERENCE_VISIBLE]);
+  return false;
 }
 
-export function effectiveMemberQuickRailVisible({ forum, user }) {
-  const config = getQuickRailAdminConfig(forum);
-
-  if (!config.enabled) {
-    return false;
+export function centerMenuVersion({ forum, user }) {
+  if (!user) {
+    return CENTER_MENU_V1;
   }
 
-  if (!config.userControlEnabled) {
-    return config.memberDefaultVisible;
+  const config = getCenterMenuV2Config(forum);
+
+  if (isAdminUser(user)) {
+    return config.adminVisible ? CENTER_MENU_V2 : CENTER_MENU_V1;
   }
 
-  const explicit = getExplicitQuickRailPreference(user);
-  if (explicit === true || explicit === false) {
-    return explicit;
-  }
-
-  return config.memberDefaultVisible;
+  return config.userVisible ? CENTER_MENU_V2 : CENTER_MENU_V1;
 }
 
-export function shouldShowQuickRailPreferenceControl(config) {
-  return !!(config && config.enabled === true && config.userControlEnabled === true);
-}
-
-export function displayedQuickRailPreference({ explicit, memberDefaultVisible }) {
-  if (explicit === true || explicit === false) {
-    return explicit;
+export function centerMenuControlIds({ forum, user }) {
+  if (centerMenuVersion({ forum, user }) === CENTER_MENU_V2) {
+    return MEMBER_QUICK_RAIL_ORDER.slice();
   }
 
-  return !!memberDefaultVisible;
-}
-
-export function snapshotQuickRailPreference(user) {
-  const preferences = user && typeof user.preferences === 'function' ? user.preferences() : null;
-  if (!preferences || typeof preferences !== 'object') {
-    return { present: false, value: null };
-  }
-
-  if (!Object.prototype.hasOwnProperty.call(preferences, PREFERENCE_VISIBLE)) {
-    return { present: false, value: null };
-  }
-
-  return { present: true, value: preferences[PREFERENCE_VISIBLE] };
-}
-
-export function restoreQuickRailPreference(user, snapshot) {
-  if (!user || typeof user.preferences !== 'function' || !snapshot) {
-    return;
-  }
-
-  const preferences = user.preferences();
-  if (!preferences || typeof preferences !== 'object') {
-    return;
-  }
-
-  if (!snapshot.present) {
-    delete preferences[PREFERENCE_VISIBLE];
-    return;
-  }
-
-  preferences[PREFERENCE_VISIBLE] = snapshot.value;
-}
-
-export function quickRailControlIds({ signedIn, memberVisible }) {
-  if (!signedIn) {
-    return ['main'];
-  }
-
-  if (!memberVisible) {
-    return [];
-  }
-
-  return MEMBER_QUICK_RAIL_ORDER.slice();
+  return ['main'];
 }
 
 function readForumBool(forum, key, missingDefault) {

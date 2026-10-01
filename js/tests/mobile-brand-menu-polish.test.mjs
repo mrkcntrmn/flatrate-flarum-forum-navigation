@@ -83,10 +83,10 @@ test('center label itself owns the header centerline while the unclipped caret s
   assert.match(less, /overflow: visible !important/);
 });
 
-test('center popup is a viewport-fixed bottom-anchored half-screen sheet', () => {
+test('center popup is a viewport-fixed bottom-anchored 65vh sheet', () => {
   assert.match(
     less,
-    /\.App-titleControl \.Dropdown-menu\s*\{[^}]*position: fixed !important;[^}]*top: auto !important;[^}]*bottom: 0 !important;[^}]*left: 0 !important;[^}]*right: 0 !important;[^}]*width: 100vw !important;[^}]*max-width: 100vw;[^}]*height: 50dvh;[^}]*max-height: 50dvh;[^}]*overflow-x: hidden;[^}]*overflow-y: auto;/s
+    /\.App-titleControl \.Dropdown-menu\s*\{[^}]*position: fixed !important;[^}]*top: auto !important;[^}]*bottom: 0 !important;[^}]*left: 0 !important;[^}]*right: 0 !important;[^}]*width: 100vw !important;[^}]*max-width: 100vw;[^}]*height: 65dvh;[^}]*max-height: 65dvh;[^}]*overflow-x: hidden;[^}]*overflow-y: auto;/s
   );
   assert.doesNotMatch(
     less,

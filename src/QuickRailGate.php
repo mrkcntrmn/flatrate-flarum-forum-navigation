@@ -3,17 +3,15 @@
 namespace FlatRate\ForumNavigation;
 
 /**
- * Admin presentation gates and the nullable member quick-rail preference.
+ * Center-menu V2 audience gates.
  *
- * Settings normalization never reads user preferences. The member preference
- * transformer preserves null and does not treat the string "false" as true.
+ * V1 (warehouse MAIN + Brands) is the fail-closed/default presentation.
+ * Admin and signed-in user V2 visibility are intentionally independent.
  */
 final class QuickRailGate
 {
-    public const SETTING_ENABLED = 'flatrate-forum-navigation.quick_rail_enabled';
-    public const SETTING_USER_CONTROL_ENABLED = 'flatrate-forum-navigation.quick_rail_user_control_enabled';
-    public const SETTING_MEMBER_DEFAULT_VISIBLE = 'flatrate-forum-navigation.quick_rail_member_default_visible';
-    public const PREFERENCE_VISIBLE = 'flatrateForumNavigationQuickRailVisible';
+    public const SETTING_V2_ADMIN_VISIBLE = 'flatrate-forum-navigation.center_menu_v2_admin_visible';
+    public const SETTING_V2_USER_VISIBLE = 'flatrate-forum-navigation.center_menu_v2_user_visible';
 
     /**
      * @param mixed $value
@@ -24,27 +22,8 @@ final class QuickRailGate
             return $missingDefault;
         }
 
-        $normalized = self::transformPreference($value);
-
-        return $normalized === null ? $missingDefault : $normalized;
-    }
-
-    /**
-     * Nullable boolean transformer for Extend\User::registerPreference.
-     *
-     * @param mixed $value
-     */
-    public static function transformPreference($value): ?bool
-    {
-        if ($value === null) {
-            return null;
-        }
-
         if (is_string($value)) {
             $normalized = strtolower(trim($value));
-            if ($normalized === '' || $normalized === 'null') {
-                return null;
-            }
             if ($normalized === '1' || $normalized === 'true') {
                 return true;
             }
@@ -52,7 +31,7 @@ final class QuickRailGate
                 return false;
             }
 
-            return null;
+            return $missingDefault;
         }
 
         if (is_bool($value)) {
@@ -66,10 +45,8 @@ final class QuickRailGate
             if ((int) $value === 0) {
                 return false;
             }
-
-            return null;
         }
 
-        return null;
+        return $missingDefault;
     }
 }

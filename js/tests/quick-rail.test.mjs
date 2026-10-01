@@ -6,15 +6,14 @@ import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 
 import {
+  CENTER_MENU_V1,
+  CENTER_MENU_V2,
   MEMBER_QUICK_RAIL_ORDER,
-  PREFERENCE_VISIBLE,
-  displayedQuickRailPreference,
-  effectiveMemberQuickRailVisible,
-  getExplicitQuickRailPreference,
-  quickRailControlIds,
-  restoreQuickRailPreference,
-  shouldShowQuickRailPreferenceControl,
-  snapshotQuickRailPreference,
+  SETTING_V2_ADMIN_VISIBLE,
+  SETTING_V2_USER_VISIBLE,
+  centerMenuControlIds,
+  centerMenuVersion,
+  getCenterMenuV2Config,
 } from '../src/forum/utils/quickRailVisibility.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -23,17 +22,17 @@ const read = (path) => readFileSync(join(root, path), 'utf8');
 const rail = read('js/src/forum/components/CenterQuickRail.js');
 const visibility = read('js/src/forum/utils/quickRailVisibility.js');
 const settingsPage = read('js/src/forum/quickRailSettingsPage.js');
-const preferenceControl = read('js/src/forum/components/QuickRailPreferenceControl.js');
 const indexSrc = read('js/src/forum/index.js');
 const discussionSrc = read('js/src/forum/discussionCenterMenu.js');
 const composer = read('js/src/forum/utils/openCanonicalNewDiscussion.js');
 const admin = read('js/src/admin/components/QuickRailSettings.js');
+const extendPhp = read('extend.php');
 const less = read('resources/less/forum.less');
 const locale = read('resources/locale/en.yml');
 const ci = read('.github/workflows/ci.yml');
 const phpGate = read('src/QuickRailGate.php');
 
-function forum(attrs) {
+function forum(attrs = {}) {
   return {
     attribute(key) {
       return attrs[key];
@@ -41,21 +40,15 @@ function forum(attrs) {
   };
 }
 
-function userWith(preference, { present = true } = {}) {
-  const preferences = {};
-  if (present) preferences[PREFERENCE_VISIBLE] = preference;
+function user({ admin = false } = {}) {
   return {
-    preferences() {
-      return preferences;
-    },
-    savePreferences(next) {
-      Object.assign(preferences, next);
-      return Promise.resolve(this);
+    isAdmin() {
+      return admin;
     },
   };
 }
 
-test('member quick rail order is profile, messages, new discussion, technician topics, main', () => {
+test('V1 is MAIN-only and V2 keeps the exact five-action order', () => {
   assert.deepEqual(MEMBER_QUICK_RAIL_ORDER, [
     'profile',
     'messages',
@@ -63,181 +56,116 @@ test('member quick rail order is profile, messages, new discussion, technician t
     'technician_topics',
     'main',
   ]);
-  assert.deepEqual(quickRailControlIds({ signedIn: true, memberVisible: true }), [
-    'profile',
-    'messages',
-    'new_discussion',
-    'technician_topics',
-    'main',
-  ]);
-  assert.match(rail, /quickRailControlIds/);
+
+  const off = forum({
+    flatrateCenterMenuV2AdminVisible: false,
+    flatrateCenterMenuV2UserVisible: false,
+  });
+  const userOn = forum({
+    flatrateCenterMenuV2AdminVisible: false,
+    flatrateCenterMenuV2UserVisible: true,
+  });
+  const adminOn = forum({
+    flatrateCenterMenuV2AdminVisible: true,
+    flatrateCenterMenuV2UserVisible: false,
+  });
+
+  assert.deepEqual(centerMenuControlIds({ forum: off, user: null }), ['main']);
+  assert.deepEqual(centerMenuControlIds({ forum: off, user: user() }), ['main']);
+  assert.deepEqual(centerMenuControlIds({ forum: off, user: user({ admin: true }) }), ['main']);
+  assert.deepEqual(centerMenuControlIds({ forum: userOn, user: user() }), MEMBER_QUICK_RAIL_ORDER);
+  assert.deepEqual(centerMenuControlIds({ forum: adminOn, user: user({ admin: true }) }), MEMBER_QUICK_RAIL_ORDER);
+
+  assert.match(rail, /centerMenuControlIds/);
+  assert.match(rail, /centerMenuVersion/);
+  assert.match(rail, /data-center-menu-version=\{version\}/);
+  assert.match(rail, /FlatRateCenterQuickRail--v1/);
+  assert.match(rail, /FlatRateCenterQuickRail--v2/);
   assert.match(rail, /data-quick-rail-control="profile"/);
   assert.match(rail, /data-quick-rail-control="messages"/);
   assert.match(rail, /data-quick-rail-control="new_discussion"/);
   assert.match(rail, /data-quick-rail-control="technician_topics"/);
   assert.match(rail, /data-quick-rail-control="main"/);
-  assert.doesNotMatch(rail, /following/i);
-  assert.doesNotMatch(rail, /fa-star/);
-  assert.doesNotMatch(rail, /fa-play-circle/);
-  assert.doesNotMatch(rail, /START/);
-  assert.doesNotMatch(rail, /localStorage/);
-  assert.doesNotMatch(rail, /flatRateBrandUpvotes/);
-});
-
-test('guest quick rail is MAIN only and opted-out members render no wrapper', () => {
-  assert.deepEqual(quickRailControlIds({ signedIn: false, memberVisible: true }), ['main']);
-  assert.deepEqual(quickRailControlIds({ signedIn: false, memberVisible: false }), ['main']);
-  assert.deepEqual(quickRailControlIds({ signedIn: true, memberVisible: false }), []);
-  assert.match(rail, /if \(!ids\.length\)/);
-  assert.match(rail, /return null/);
-  assert.match(rail, /static isListItem = true/);
   assert.match(rail, /fas fa-warehouse/);
-  assert.match(rail, /fas fa-paper-plane/);
-  assert.match(rail, /app\.route\.user\(user\)/);
-  assert.match(rail, /avatar\(user/);
-  assert.doesNotMatch(rail, /MessagesNavButton/);
+  assert.doesNotMatch(rail, /if \(!ids\.length\)/);
+  assert.doesNotMatch(rail, /return null/);
 });
 
-test('effective member visibility truth table', () => {
-  const cases = [
-    [{ enabled: false, userControl: true, memberDefault: true, pref: undefined }, false],
-    [{ enabled: false, userControl: true, memberDefault: true, pref: true }, false],
-    [{ enabled: false, userControl: true, memberDefault: true, pref: false }, false],
-    [{ enabled: true, userControl: true, memberDefault: true, pref: undefined }, true],
-    [{ enabled: true, userControl: true, memberDefault: false, pref: undefined }, false],
-    [{ enabled: true, userControl: true, memberDefault: false, pref: true }, true],
-    [{ enabled: true, userControl: true, memberDefault: true, pref: false }, false],
-    [{ enabled: true, userControl: false, memberDefault: false, pref: true }, false],
-    [{ enabled: true, userControl: false, memberDefault: true, pref: false }, true],
-    [{ enabled: true, userControl: false, memberDefault: true, pref: undefined }, true],
-  ];
+test('audience gate matrix keeps guests on V1 and admin/user gates independent', () => {
+  for (const adminVisible of [false, true]) {
+    for (const userVisible of [false, true]) {
+      const f = forum({
+        flatrateCenterMenuV2AdminVisible: adminVisible,
+        flatrateCenterMenuV2UserVisible: userVisible,
+      });
 
-  for (const [input, expected] of cases) {
-    const present = input.pref !== undefined;
-    const result = effectiveMemberQuickRailVisible({
-      forum: forum({
-        flatrateQuickRailEnabled: input.enabled,
-        flatrateQuickRailUserControlEnabled: input.userControl,
-        flatrateQuickRailMemberDefaultVisible: input.memberDefault,
-      }),
-      user: userWith(input.pref, { present }),
-    });
-    assert.equal(result, expected, JSON.stringify(input));
+      assert.equal(centerMenuVersion({ forum: f, user: null }), CENTER_MENU_V1);
+      assert.equal(
+        centerMenuVersion({ forum: f, user: user() }),
+        userVisible ? CENTER_MENU_V2 : CENTER_MENU_V1
+      );
+      assert.equal(
+        centerMenuVersion({ forum: f, user: user({ admin: true }) }),
+        adminVisible ? CENTER_MENU_V2 : CENTER_MENU_V1
+      );
+    }
   }
 });
 
-test('null preference is distinct from false and string false is not truthy', () => {
-  assert.equal(getExplicitQuickRailPreference(userWith(null)), null);
-  assert.equal(getExplicitQuickRailPreference(userWith(false)), false);
-  assert.equal(getExplicitQuickRailPreference(userWith('false')), false);
-  assert.equal(getExplicitQuickRailPreference(userWith(undefined, { present: false })), null);
-  assert.equal(displayedQuickRailPreference({ explicit: null, memberDefaultVisible: true }), true);
-  assert.equal(displayedQuickRailPreference({ explicit: false, memberDefaultVisible: true }), false);
-  assert.equal(displayedQuickRailPreference({ explicit: true, memberDefaultVisible: false }), true);
-});
+test('V2 settings default off and use only the independent audience gates', () => {
+  assert.equal(SETTING_V2_ADMIN_VISIBLE, 'flatrate-forum-navigation.center_menu_v2_admin_visible');
+  assert.equal(SETTING_V2_USER_VISIBLE, 'flatrate-forum-navigation.center_menu_v2_user_visible');
 
-test('hidden settings control does not clear preference and failed save restores it', async () => {
-  assert.equal(shouldShowQuickRailPreferenceControl({ enabled: false, userControlEnabled: true }), false);
-  assert.equal(shouldShowQuickRailPreferenceControl({ enabled: true, userControlEnabled: false }), false);
-  assert.equal(shouldShowQuickRailPreferenceControl({ enabled: true, userControlEnabled: true }), true);
+  assert.deepEqual(getCenterMenuV2Config(forum({})), {
+    adminVisible: false,
+    userVisible: false,
+  });
+
+  assert.match(admin, /SETTING_V2_ADMIN_VISIBLE/);
+  assert.match(admin, /SETTING_V2_USER_VISIBLE/);
+  assert.match(admin, /\/settings/);
+  assert.doesNotMatch(admin, /SETTING_ENABLED/);
+  assert.doesNotMatch(admin, /SETTING_USER_CONTROL_ENABLED/);
+  assert.doesNotMatch(admin, /SETTING_MEMBER_DEFAULT_VISIBLE/);
+  assert.doesNotMatch(admin, /savePreferences/);
+
+  assert.match(phpGate, /center_menu_v2_admin_visible/);
+  assert.match(phpGate, /center_menu_v2_user_visible/);
+  assert.match(extendPhp, /SETTING_V2_ADMIN_VISIBLE, '0'/);
+  assert.match(extendPhp, /SETTING_V2_USER_VISIBLE, '0'/);
+  assert.doesNotMatch(extendPhp, /registerPreference/);
+
+  assert.match(locale, /heading: Center Menu V2/);
+  assert.match(locale, /admin_v2_label:/);
+  assert.match(locale, /user_v2_label:/);
+  assert.doesNotMatch(locale, /quick_rail_label: Show quick navigation/);
+
+  assert.doesNotMatch(settingsPage, /SettingsPage/);
   assert.doesNotMatch(settingsPage, /savePreferences/);
-  assert.match(settingsPage, /shouldShowQuickRailPreferenceControl/);
-  assert.match(preferenceControl, /savePreferences/);
-  assert.match(preferenceControl, /restoreQuickRailPreference/);
-  assert.match(preferenceControl, /\.catch/);
-
-  const user = userWith(false);
-  const snapshot = snapshotQuickRailPreference(user);
-  await user.savePreferences({ [PREFERENCE_VISIBLE]: true });
-  assert.equal(getExplicitQuickRailPreference(user), true);
-  restoreQuickRailPreference(user, snapshot);
-  assert.equal(getExplicitQuickRailPreference(user), false);
-
-  const unset = userWith(null, { present: false });
-  const unsetSnapshot = snapshotQuickRailPreference(unset);
-  await unset.savePreferences({ [PREFERENCE_VISIBLE]: false });
-  restoreQuickRailPreference(unset, unsetSnapshot);
-  assert.equal(getExplicitQuickRailPreference(unset), null);
-});
-
-test('admin and user-control toggles do not rewrite an explicit preference', () => {
-  const member = userWith(false);
-  const off = effectiveMemberQuickRailVisible({
-    forum: forum({
-      flatrateQuickRailEnabled: false,
-      flatrateQuickRailUserControlEnabled: true,
-      flatrateQuickRailMemberDefaultVisible: true,
-    }),
-    user: member,
-  });
-  const on = effectiveMemberQuickRailVisible({
-    forum: forum({
-      flatrateQuickRailEnabled: true,
-      flatrateQuickRailUserControlEnabled: true,
-      flatrateQuickRailMemberDefaultVisible: true,
-    }),
-    user: member,
-  });
-  assert.equal(off, false);
-  assert.equal(on, false);
-  assert.equal(getExplicitQuickRailPreference(member), false);
-
-  const shown = userWith(true);
-  const forced = effectiveMemberQuickRailVisible({
-    forum: forum({
-      flatrateQuickRailEnabled: true,
-      flatrateQuickRailUserControlEnabled: false,
-      flatrateQuickRailMemberDefaultVisible: false,
-    }),
-    user: shown,
-  });
-  const restored = effectiveMemberQuickRailVisible({
-    forum: forum({
-      flatrateQuickRailEnabled: true,
-      flatrateQuickRailUserControlEnabled: true,
-      flatrateQuickRailMemberDefaultVisible: false,
-    }),
-    user: shown,
-  });
-  assert.equal(forced, false);
-  assert.equal(restored, true);
-  assert.equal(getExplicitQuickRailPreference(shown), true);
+  assert.match(settingsPage, /intentionally retired/);
+  assert.doesNotMatch(visibility, /PREFERENCE_VISIBLE/);
   assert.doesNotMatch(visibility, /localStorage/);
-  assert.equal((visibility.match(/function effectiveMemberQuickRailVisible/g) || []).length, 1);
 });
 
-test('IndexPage and DiscussionPage share CenterQuickRail and the canonical composer seam', () => {
+test('IndexPage and DiscussionPage share CenterQuickRail and canonical actions', () => {
   assert.match(indexSrc, /<CenterQuickRail manifest=\{manifest\} page=\{this\} \/>/);
   assert.match(discussionSrc, /<CenterQuickRail manifest=\{manifest\} page=\{this\} \/>/);
   assert.match(indexSrc, /'flatrateQuickRail'/);
   assert.match(discussionSrc, /'flatrateQuickRail'/);
-  assert.doesNotMatch(indexSrc, /function effectiveMemberQuickRailVisible/);
-  assert.doesNotMatch(discussionSrc, /function effectiveMemberQuickRailVisible/);
   assert.match(composer, /IndexPage\.prototype\.newDiscussionAction\.call/);
   assert.match(composer, /currentTag/);
   assert.doesNotMatch(composer, /DiscussionComposer/);
   assert.doesNotMatch(composer, /new DiscussionComposer/);
   assert.match(rail, /openCanonicalNewDiscussion/);
   assert.match(rail, /closeCenterSheetFrom/);
+  assert.match(rail, /app\.route\.user\(user\)/);
+  assert.match(rail, /fas fa-paper-plane/);
+  assert.doesNotMatch(rail, /following/i);
+  assert.doesNotMatch(rail, /fa-star/);
+  assert.doesNotMatch(rail, /fa-play-circle/);
 });
 
-test('admin settings use canonical keys and do not touch member preferences', () => {
-  assert.match(admin, /SETTING_ENABLED/);
-  assert.match(admin, /SETTING_USER_CONTROL_ENABLED/);
-  assert.match(admin, /SETTING_MEMBER_DEFAULT_VISIBLE/);
-  assert.match(admin, /\/settings/);
-  assert.doesNotMatch(admin, /savePreferences/);
-  assert.doesNotMatch(admin, /PREFERENCE_VISIBLE/);
-  assert.match(phpGate, /flatrate-forum-navigation\.quick_rail_enabled/);
-  assert.match(locale, /admin:\n {4}quick_rail:/);
-  assert.match(locale, /enabled_label:/);
-  assert.match(locale, /user_control_label:/);
-  assert.match(locale, /member_default_label:/);
-  assert.match(locale, /quick_rail_label: Show quick navigation in the forum menu/);
-  assert.match(locale, /quick_rail_save_error:/);
-});
-
-test('phone sheet is a fixed bottom half-screen, scrollable, and full-width', () => {
+test('phone center sheet is viewport-fixed, 65dvh, scrollable, and full-width', () => {
   assert.match(less, /\.item-flatrateQuickRail[\s\S]*position:\s*sticky/);
   assert.match(
     less,
@@ -248,31 +176,25 @@ test('phone sheet is a fixed bottom half-screen, scrollable, and full-width', ()
   assert.match(less, /left:\s*0 !important/);
   assert.match(less, /right:\s*0 !important/);
   assert.match(less, /width:\s*100vw !important/);
-  assert.match(less, /height:\s*50dvh/);
-  assert.match(less, /max-height:\s*50dvh/);
+  assert.match(less, /height:\s*65dvh/);
+  assert.match(less, /max-height:\s*65dvh/);
   assert.match(less, /overflow-y:\s*auto/);
   assert.match(less, /overflow-x:\s*hidden/);
+  assert.doesNotMatch(less, /height:\s*50dvh/);
+  assert.doesNotMatch(less, /max-height:\s*50dvh/);
   assert.doesNotMatch(less, /transform: translateX\(-50%\) !important/);
-  assert.doesNotMatch(less, /left:\s*~"calc\(50% - 50vw\)" !important/);
-  assert.doesNotMatch(less, /max-height:\s*calc\(100dvh/);
   assert.match(less, /safe-area-inset-bottom/);
   assert.match(less, /min-width:\s*44px/);
   assert.match(less, /min-height:\s*44px/);
   assert.match(less, /:focus-visible/);
-  assert.match(less, /\.FlatRateCenterQuickRail--guest[\s\S]*justify-content:\s*center/);
+  assert.match(less, /\.FlatRateCenterQuickRail--v1[\s\S]*justify-content:\s*center/);
   assert.match(less, /justify-content:\s*space-evenly/);
   assert.match(less, /\.Dropdown-menu > \.item-allDiscussions[\s\S]*display:\s*none !important/);
   assert.match(less, /@media \(min-width: 768px\)[\s\S]*\.FlatRateCenterQuickRail/);
   assert.match(less, /min-width:\s*320px\) and \(max-width:\s*430px\)/);
-  assert.match(less, /360/);
-  assert.match(less, /390/);
-  assert.match(less, /412/);
-  for (const width of [320, 360, 390, 412, 430]) {
-    assert.ok(width >= 320 && width <= 430);
-  }
 });
 
-test('tracked admin dist is part of the reproducibility gate', () => {
+test('tracked admin and forum dist stay inside the reproducibility gate', () => {
   assert.match(ci, /js\/dist\/admin\.js js\/dist\/admin\.js\.map/);
   assert.match(ci, /js\/dist\/forum\.js js\/dist\/forum\.js\.map/);
 });
