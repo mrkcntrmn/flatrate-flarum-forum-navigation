@@ -20,6 +20,7 @@ const indexSrc = readFileSync(join(root, 'js/src/forum/index.js'), 'utf8');
 const familySrc = readFileSync(join(root, 'js/src/forum/components/BrandFamilyLinks.js'), 'utf8');
 
 test('mandatory brand taglines resolve from the package snapshot', () => {
+  assert.equal(brandTaglineByKey('aston-martin'), 'Power, Beauty and Soul');
   assert.equal(brandTaglineByKey('bmw'), 'The Ultimate Driving Machine');
   assert.equal(brandTaglineByKey('jlr'), 'Reimagine');
   assert.equal(brandTaglineByKey('jaguar'), 'Grace, Space, Pace');
@@ -30,6 +31,10 @@ test('mandatory brand taglines resolve from the package snapshot', () => {
 });
 
 test('tagline projection is Brand-only and does not invent routes', () => {
+  assert.equal(
+    resolveBrandTagline({ currentTag: { slug: () => 'aston-martin' }, manifest }),
+    'Power, Beauty and Soul'
+  );
   assert.equal(
     resolveBrandTagline({ currentTag: { slug: () => 'bmw' }, manifest }),
     'The Ultimate Driving Machine'

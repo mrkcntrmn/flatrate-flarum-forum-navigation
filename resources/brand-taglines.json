@@ -20,6 +20,13 @@
       "sourceUrl": "https://www.media.stellantis.com/it-it/alfa-romeo/press/anteprima-mondiale-della-alfa-romeo-giulia"
     },
     {
+      "key": "aston-martin",
+      "name": "Aston Martin",
+      "tagline": "Power, Beauty and Soul",
+      "provenance": "official-iconic-brand-line",
+      "sourceUrl": "https://www.astonmartin.com/en/our-world/news/2017/2/20/company"
+    },
+    {
       "key": "audi",
       "name": "Audi",
       "tagline": "Vorsprung durch Technik",
@@ -318,7 +325,5 @@
   "sourcedFrom": "closed PR #340 researched catalog; ported without taxonomy mutation",
   "jlrHierarchyControl": "BLOCKED_UNTIL_548",
   "filteredToManifestPlusPendingJlr": true,
-  "droppedFromPr340Catalog": [
-    "aston-martin"
-  ]
+  "droppedFromPr340Catalog": []
 }
