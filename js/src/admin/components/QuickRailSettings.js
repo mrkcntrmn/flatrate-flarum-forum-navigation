@@ -3,30 +3,23 @@ import Component from 'flarum/common/Component';
 import Switch from 'flarum/common/components/Switch';
 
 import {
-  SETTING_ENABLED,
-  SETTING_MEMBER_DEFAULT_VISIBLE,
-  SETTING_USER_CONTROL_ENABLED,
+  SETTING_V2_ADMIN_VISIBLE,
+  SETTING_V2_USER_VISIBLE,
   normalizeSettingBool,
 } from '../../forum/utils/quickRailVisibility';
 
 const FIELDS = [
   {
-    key: SETTING_ENABLED,
+    key: SETTING_V2_ADMIN_VISIBLE,
     missingDefault: false,
-    label: 'flatrate-forum-navigation.admin.quick_rail.enabled_label',
-    help: 'flatrate-forum-navigation.admin.quick_rail.enabled_help',
+    label: 'flatrate-forum-navigation.admin.quick_rail.admin_v2_label',
+    help: 'flatrate-forum-navigation.admin.quick_rail.admin_v2_help',
   },
   {
-    key: SETTING_USER_CONTROL_ENABLED,
-    missingDefault: true,
-    label: 'flatrate-forum-navigation.admin.quick_rail.user_control_label',
-    help: 'flatrate-forum-navigation.admin.quick_rail.user_control_help',
-  },
-  {
-    key: SETTING_MEMBER_DEFAULT_VISIBLE,
-    missingDefault: true,
-    label: 'flatrate-forum-navigation.admin.quick_rail.member_default_label',
-    help: 'flatrate-forum-navigation.admin.quick_rail.member_default_help',
+    key: SETTING_V2_USER_VISIBLE,
+    missingDefault: false,
+    label: 'flatrate-forum-navigation.admin.quick_rail.user_v2_label',
+    help: 'flatrate-forum-navigation.admin.quick_rail.user_v2_help',
   },
 ];
 
