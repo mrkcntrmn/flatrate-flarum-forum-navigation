@@ -7,8 +7,10 @@ use Flarum\Settings\SettingsRepositoryInterface;
 use FlatRate\ForumNavigation\QuickRailGate;
 
 /**
- * Non-secret presentation gates for the member quick rail.
- * Member preference stays on the current-user resource.
+ * Non-secret presentation gates for Center Menu V2.
+ *
+ * Guests always resolve to V1 in forum JS. Admin and signed-in user gates
+ * remain independent and default off.
  */
 final class QuickRailSettingsAttribute
 {
@@ -22,17 +24,13 @@ final class QuickRailSettingsAttribute
     public function __invoke(ForumSerializer $serializer): array
     {
         return [
-            'flatrateQuickRailEnabled' => QuickRailGate::normalizeSettingBool(
-                $this->settings->get(QuickRailGate::SETTING_ENABLED),
+            'flatrateCenterMenuV2AdminVisible' => QuickRailGate::normalizeSettingBool(
+                $this->settings->get(QuickRailGate::SETTING_V2_ADMIN_VISIBLE),
                 false
             ),
-            'flatrateQuickRailUserControlEnabled' => QuickRailGate::normalizeSettingBool(
-                $this->settings->get(QuickRailGate::SETTING_USER_CONTROL_ENABLED),
-                true
-            ),
-            'flatrateQuickRailMemberDefaultVisible' => QuickRailGate::normalizeSettingBool(
-                $this->settings->get(QuickRailGate::SETTING_MEMBER_DEFAULT_VISIBLE),
-                true
+            'flatrateCenterMenuV2UserVisible' => QuickRailGate::normalizeSettingBool(
+                $this->settings->get(QuickRailGate::SETTING_V2_USER_VISIBLE),
+                false
             ),
         ];
     }
