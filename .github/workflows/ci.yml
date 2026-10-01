@@ -66,6 +66,7 @@ jobs:
       - name: Verify tracked dist is reproducible
         run: git diff --exit-code -- js/dist/forum.js js/dist/forum.js.map js/dist/admin.js js/dist/admin.js.map
       - name: Static navigation contracts
+        if: always()
         run: node --test js/tests/*.test.mjs
 
   flarum-install-smoke:
