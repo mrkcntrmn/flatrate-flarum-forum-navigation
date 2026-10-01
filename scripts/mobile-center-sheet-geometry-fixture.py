@@ -303,7 +303,7 @@ async def set_viewport(ws, window_id, width, height):
 def judge_open(row, phone=True):
     errors = []
     if not phone:
-        if row["position"] == "fixed" or "50dvh" in f"{row.get('heightCss', '')}{row.get('maxHeight', '')}":
+        if row["position"] == "fixed" or "65dvh" in f"{row.get('heightCss', '')}{row.get('maxHeight', '')}":
             errors.append("phone sheet rule applied on desktop")
         if abs(row["menuWidth"] - row["innerWidth"]) <= 1 and row["innerWidth"] >= 768:
             errors.append("desktop menu is viewport width")
@@ -472,8 +472,8 @@ def main():
         "left:0 !important",
         "right:0 !important",
         "width:100vw !important",
-        "height:50dvh",
-        "max-height:50dvh",
+        "height:65dvh",
+        "max-height:65dvh",
         "overflow-x:hidden",
         "overflow-y:auto",
         "left:100%",
@@ -530,8 +530,8 @@ def main():
                 or row["laterPosition"] != "fixed"
                 or abs(row["menuBottom"] - row["innerHeight"]) > 1
                 or abs(row["laterMenuBottom"] - row["laterInnerHeight"]) > 1
-                or abs(row["menuHeight"] - (0.5 * row["innerHeight"])) > 1
-                or abs(row["laterMenuHeight"] - (0.5 * row["laterInnerHeight"])) > 1
+                or abs(row["menuHeight"] - (0.65 * row["innerHeight"])) > 1
+                or abs(row["laterMenuHeight"] - (0.65 * row["laterInnerHeight"])) > 1
                 or abs(row["menuTop"] - row["laterMenuTop"]) > 1
             )
             if anchor_broken:
@@ -562,7 +562,7 @@ def main():
                 errors.append(f"dismiss {row['dismissed']}")
         elif kind == "desktop":
             errors = judge_open(row, phone=False)
-            if "50dvh" in str(row.get("top")) or row.get("menuWidth", 0) > 400:
+            if "65dvh" in str(row.get("top")) or row.get("menuWidth", 0) > 400:
                 errors.append(f"desktop sheet {row.get('position')} {row.get('menuWidth')}")
         state = "PASS" if not errors else "FAIL " + "; ".join(errors)
         if errors:
