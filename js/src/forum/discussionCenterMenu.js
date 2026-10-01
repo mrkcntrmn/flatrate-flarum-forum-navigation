@@ -8,7 +8,6 @@ import LinkButton from 'flarum/common/components/LinkButton';
 import SelectDropdown from 'flarum/common/components/SelectDropdown';
 import ItemList from 'flarum/common/utils/ItemList';
 
-import BrandVoteTotal from './components/BrandVoteTotal';
 import CenterQuickRail from './components/CenterQuickRail';
 import {
   resolveDiscussionBoardTarget,
@@ -96,7 +95,6 @@ app.initializers.add(
             force
           >
             <span className="FlatRateDiscussionBrandName">{board.name}</span>
-            <BrandVoteTotal board={board} />
           </LinkButton>,
           -14 - index
         );
