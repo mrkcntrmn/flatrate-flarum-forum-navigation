@@ -192,9 +192,11 @@ test('discussion direct entry overrides the no-history drawer branch', () => {
   assert.match(discussionSrc, /discussionBoardBackButton\(target\)/);
 });
 
-test('board direct entry resolves the canonical Flarum Tags route param before sticky state', () => {
+test('board direct entry resolves app.currentTag, then the route param, then sticky state', () => {
+  assert.match(discussionSrc, /app\.currentTag/);
   assert.match(discussionSrc, /m\.route\.param\('tags'\)/);
-  assert.match(discussionSrc, /return String\(routeTag\)/);
+  assert.match(discussionSrc, /stickyParams/);
+  assert.doesNotMatch(discussionSrc, /current\.currentTag/);
   assert.match(discussionSrc, /resolveBoardStructuralBack/);
 });
 

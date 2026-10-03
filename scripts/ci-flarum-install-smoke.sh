@@ -195,4 +195,7 @@ if ! grep -Fq 'options.state.key' "${CORE_LINK_SOURCE}"; then
 fi
 
 echo "FLARUM_LINKBUTTON_FORCE_RERENDER_SEAM=PASS"
+
+php "${ROOT}/scripts/assert-tag-filter-resolution.php" "${SMOKE_ROOT}"
+
 echo "PRODUCTION_INSTALL=false"

@@ -18,6 +18,7 @@ import {
 import { listDiscussionBrandBoards } from './utils/discussionBrandDropdownItems';
 import { brandHref, getNavigationManifest, tagHref } from './utils/manifest';
 import { resolveBoardStructuralBack } from './utils/boardStructuralBack';
+import { resolveIndexBoardSlug } from './utils/currentBoardContext';
 import { recordOpenBoardAtTopIntent, consumeOpenBoardAtTopIntent } from './utils/boardBackIntent';
 import icon from 'flarum/common/helpers/icon';
 import { TECHNICIAN_TOPICS_ICON } from './utils/startNav';
@@ -52,40 +53,40 @@ function currentIndexRouteName() {
 
 function currentIndexBoardSlug() {
   const current = app.current;
-
-  if (
-    !current ||
-    typeof current.matches !== 'function' ||
-    !current.matches(IndexPage) ||
+  const isDiscussionPage = !!(
+    current &&
+    typeof current.matches === 'function' &&
     current.matches(DiscussionPage)
-  ) {
-    return '';
-  }
-
-  const tag = typeof current.currentTag === 'function' ? current.currentTag() : null;
-  if (tag) {
-    return typeof tag.slug === 'function' ? String(tag.slug() || '') : String(tag.slug || '');
-  }
-
-  // Flarum Tags 1.8.x writes the active board slug from the /t/:tags
-  // route into m.route before currentTag()/stickyParams are necessarily ready.
-  // Navigation renders early on direct entry, so consult the canonical route
-  // parameter before falling back to search state.
+  );
+  const isIndexPage = !!(
+    current &&
+    typeof current.matches === 'function' &&
+    current.matches(IndexPage) &&
+    !isDiscussionPage
+  );
+  const currentTag = typeof app.currentTag === 'function' ? app.currentTag() : null;
+  let routeTagParam = '';
   try {
-    const routeTag =
-      typeof m !== 'undefined' && m.route && typeof m.route.param === 'function'
-        ? m.route.param('tags')
-        : '';
-    if (routeTag) {
-      return String(routeTag);
-    }
+    routeTagParam = m.route.param('tags') || '';
   } catch (error) {
-    // Fall through to sticky search state.
+    routeTagParam = '';
   }
-
-  const sticky =
+  const stickyState =
+    app.search && app.search.state && typeof app.search.state.stickyParams === 'function'
+      ? app.search.state.stickyParams()
+      : null;
+  const stickyDirect =
     app.search && typeof app.search.stickyParams === 'function' ? app.search.stickyParams() : {};
-  return sticky && sticky.tags ? String(sticky.tags) : '';
+  const stickyTags =
+    (stickyState && stickyState.tags) || (stickyDirect && stickyDirect.tags) || '';
+
+  return resolveIndexBoardSlug({
+    isIndexPage,
+    isDiscussionPage,
+    currentTag,
+    routeTagParam,
+    stickyTags,
+  });
 }
 
 function boardMainBackButton() {

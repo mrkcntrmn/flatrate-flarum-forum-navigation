@@ -38,8 +38,8 @@ import { isCleanRootIndex, mainPinIdsFromForum } from './utils/mainLandingPins';
 
 function resolveTagHero() {
   try {
-    // Resolve at initializer time, after the flarum/tags initializer has run.
-    // flarum.core.compat may export the class directly (no __esModule/.default).
+    // Resolve inside the initializer, after flarum-tags has registered compat.
+    // A module-eval miss stays null for the rest of the page.
     const TagHeroModule = require('flarum/tags/components/TagHero');
     return TagHeroModule && TagHeroModule.default ? TagHeroModule.default : TagHeroModule;
   } catch (error) {

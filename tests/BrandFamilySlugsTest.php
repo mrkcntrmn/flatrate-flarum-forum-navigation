@@ -58,7 +58,8 @@ class BrandFamilySlugsTest extends TestCase
         $this->assertStringContainsString('parent::constrain', $src);
         $this->assertStringContainsString('BrandFamilySlugs::expandList', $src);
         $this->assertStringNotContainsString("DB::table('discussions')", $src);
-        $this->assertStringContainsString('ReplaceBrandFamilyTagFilter', $extend);
+        $this->assertStringContainsString('BrandFamilyTagFilterServiceProvider', $extend);
+        $this->assertStringNotContainsString('ReplaceBrandFamilyTagFilter', $extend);
         $this->assertStringContainsString('class_exists', $extend);
     }
 }

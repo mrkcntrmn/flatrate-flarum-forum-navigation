@@ -35,6 +35,9 @@ test('family expansion is one server filter, not client concatenation', () => {
   assert.match(filterSrc, /BrandFamilySlugs::expandList/);
   assert.doesNotMatch(filterSrc, /file_get_contents\('https?:/);
   assert.doesNotMatch(filterSrc, /curl_/);
-  assert.match(extendSrc, /ReplaceBrandFamilyTagFilter/);
+  assert.match(extendSrc, /BrandFamilyTagFilterServiceProvider/);
+  assert.match(extendSrc, /Extend\\ServiceProvider/);
+  assert.doesNotMatch(extendSrc, /ReplaceBrandFamilyTagFilter/);
+  assert.doesNotMatch(extendSrc, /addFilter\(BrandFamilyTagFilter/);
   assert.doesNotMatch(readFileSync(join(root, 'js/src/forum/index.js'), 'utf8'), /\/api\/discussions\?.*chrysler/);
 });

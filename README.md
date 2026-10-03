@@ -34,7 +34,7 @@ Disabling this extension restores native Flarum sideNav without mutating tag IDs
 | Composer | `flatrate/flarum-forum-navigation` |
 | Extension ID | `flatrate-forum-navigation` |
 | Namespace | `FlatRate\ForumNavigation\` |
-| Release | `v1.4.7` |
+| Release | `v1.4.11` |
 
 ## Requirements
 
@@ -48,10 +48,10 @@ Packagist:
 ```bash
 composer require flatrate/flarum-forum-navigation:^1.4
 # or exact:
-composer require flatrate/flarum-forum-navigation:1.4.7
+composer require flatrate/flarum-forum-navigation:1.4.11
 ```
 
-Direct GitHub VCS installs may use immutable tag `v1.4.7`:
+Direct GitHub VCS installs may use immutable tag `v1.4.11`:
 
 ```json
 {
@@ -62,7 +62,7 @@ Direct GitHub VCS installs may use immutable tag `v1.4.7`:
         }
     ],
     "require": {
-        "flatrate/flarum-forum-navigation": "1.4.7"
+        "flatrate/flarum-forum-navigation": "1.4.11"
     }
 }
 ```
