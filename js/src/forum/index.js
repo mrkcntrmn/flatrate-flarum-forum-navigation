@@ -14,9 +14,11 @@ import MainLiveChatPin from './components/MainLiveChatPin';
 import MainLandingPins from './components/MainLandingPins';
 import BrandFamilyLinks from './components/BrandFamilyLinks';
 import BrandVoteTotal from './components/BrandVoteTotal';
+import ParentBrandBanner from './components/ParentBrandBanner';
 import './discussionCenterMenu';
+import registerDiscussionPhoneChrome, { isPhoneScreen } from './discussionPhoneChrome';
 import { getNavigationManifest, pushToStartHref } from './utils/manifest';
-import { resolvePresentationTitle, TECHNICIAN_TOPICS_LABEL } from './utils/presentationTitle';
+import { resolvePresentationTitle, resolvePresentationTitleMode, TECHNICIAN_TOPICS_LABEL } from './utils/presentationTitle';
 import {
   addStartBoardPinItem,
   removeStartBoardPinItem,
@@ -31,7 +33,7 @@ import {
 import { START_NAV_ICON, START_NAV_LABEL, TECHNICIAN_TOPICS_ICON } from './utils/startNav';
 import { stripNativeTagPresentation } from './utils/stripNativeTagPresentation';
 import { resolveBrandTagline } from './utils/brandTagline';
-import { findBrandNodeBySlug } from './utils/brandNode';
+import { findBrandNodeBySlug, listDirectBrandChildren } from './utils/brandNode';
 import { isCleanRootIndex, mainPinIdsFromForum } from './utils/mainLandingPins';
 
 let TagHero;
@@ -91,6 +93,39 @@ function rootContext() {
   return { routeName, searchParams, stickyParams, currentTag };
 }
 
+function currentPresentationContext() {
+  const current = app.current;
+  const routeName =
+    (current && typeof current.get === 'function' && current.get('routeName')) ||
+    (app.current && app.current.data && app.current.data.routeName) ||
+    '';
+  const searchContext =
+    (app.search && typeof app.search.params === 'function' && app.search.params()) || {};
+  const routeContext =
+    (app.search && typeof app.search.stickyParams === 'function' && app.search.stickyParams()) || {};
+  let currentTag = null;
+  if (current && typeof current.currentTag === 'function') {
+    currentTag = current.currentTag();
+  }
+  const tagSlug = (searchContext && searchContext.tags) || (routeContext && routeContext.tags);
+  if (!currentTag && tagSlug && app.store && typeof app.store.all === 'function') {
+    currentTag = app.store.all('tags').find((tag) => {
+      const slug = typeof tag.slug === 'function' ? tag.slug() : tag.slug;
+      return slug === tagSlug;
+    }) || null;
+  }
+  const followingActive = routeName === 'following' || searchContext.onFollowing === true;
+
+  return {
+    currentTag,
+    routeName,
+    routeContext,
+    searchContext,
+    activeCoreContext: followingActive ? 'following' : '',
+    manifest: getNavigationManifest(),
+  };
+}
+
 /**
  * Flarum Tags 1.8.19 injects tags/separator/tag<ID>/moreTags through
  * IndexPage.prototype.navItems (addTagList.js). Keep that seam.
@@ -102,6 +137,8 @@ function rootContext() {
 app.initializers.add(
   'flatrate-forum-navigation',
   () => {
+    registerDiscussionPhoneChrome();
+
     // Native Latest is the authenticated MAIN default. Do not force sort=top
     // or rewrite `/` to `/?sort=latest`.
 
@@ -355,6 +392,12 @@ app.initializers.add(
       const nav = typeof items.get === 'function' ? items.get('nav') : items.items?.nav?.content;
       if (nav && nav.attrs) {
         nav.attrs.flatratePresentationTitle = true;
+        const mode = resolvePresentationTitleMode(currentPresentationContext());
+        const base = String(nav.attrs.className || '')
+          .replace(/\bFlatRatePresentationTitle--(?:root|contextual|technician)\b/g, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+        nav.attrs.className = mode ? `${base} FlatRatePresentationTitle--${mode}`.trim() : base;
       }
     });
 
@@ -367,38 +410,9 @@ app.initializers.add(
         return content;
       }
 
-      const current = app.current;
-      const routeName =
-        (current && typeof current.get === 'function' && current.get('routeName')) ||
-        (app.current && app.current.data && app.current.data.routeName) ||
-        '';
-      const searchContext =
-        (app.search && typeof app.search.params === 'function' && app.search.params()) || {};
-      const routeContext =
-        (app.search && typeof app.search.stickyParams === 'function' && app.search.stickyParams()) || {};
-      let currentTag = null;
-      if (current && typeof current.currentTag === 'function') {
-        currentTag = current.currentTag();
-      }
-      const tagSlug = (searchContext && searchContext.tags) || (routeContext && routeContext.tags);
-      if (!currentTag && tagSlug && app.store && typeof app.store.all === 'function') {
-        currentTag = app.store.all('tags').find((tag) => {
-          const slug = typeof tag.slug === 'function' ? tag.slug() : tag.slug;
-          return slug === tagSlug;
-        }) || null;
-      }
       // PageState.matches(FollowingPage) is true on IndexPage too because
       // FollowingPage extends IndexPage. Use the following route/param only.
-      const followingActive = routeName === 'following' || searchContext.onFollowing === true;
-
-      const resolved = resolvePresentationTitle({
-        currentTag,
-        routeName,
-        routeContext,
-        searchContext,
-        activeCoreContext: followingActive ? 'following' : '',
-        manifest: getNavigationManifest(),
-      });
+      const resolved = resolvePresentationTitle(currentPresentationContext());
 
       if (resolved == null) {
         return content;
@@ -449,17 +463,33 @@ app.initializers.add(
         }
 
         const tagline = resolveBrandTagline({ currentTag: tag, manifest });
+        const parentBoard = listDirectBrandChildren(board).length > 0;
+        const phoneParentBanner = parentBoard && isPhoneScreen();
         const extras = [];
 
-        if (tagline) {
+        if (phoneParentBanner) {
+          const className = String(vnode.attrs.className || '');
+          if (!className.includes('FlatRateParentBrandBannerHost')) {
+            vnode.attrs.className = `${className} FlatRateParentBrandBannerHost`.trim();
+          }
           extras.push(
-            <p className="FlatRateBrandTagline Hero-subtitle" key="flatrate-brand-tagline">
-              {tagline}
-            </p>
+            <ParentBrandBanner
+              board={board}
+              tagline={tagline}
+              extra={<BrandVoteTotal board={board} key="flatrate-brand-vote-total" />}
+              key="flatrate-parent-banner"
+            />
           );
+        } else {
+          if (tagline) {
+            extras.push(
+              <p className="FlatRateBrandTagline Hero-subtitle" key="flatrate-brand-tagline">
+                {tagline}
+              </p>
+            );
+          }
+          extras.push(<BrandFamilyLinks board={board} key="flatrate-brand-family" />);
         }
-
-        extras.push(<BrandFamilyLinks board={board} key="flatrate-brand-family" />);
 
         const content = Array.isArray(vnode.children) ? vnode.children : [vnode.children];
         let inserted = false;
@@ -492,7 +522,7 @@ app.initializers.add(
             // Keep the exact Brand total visually associated with the native
             // Hero title rather than rendering it as a separate badge row.
             const titleNode = findHeroTitle(containerChildren);
-            if (titleNode) {
+            if (titleNode && !phoneParentBanner) {
               const titleChildren = Array.isArray(titleNode.children)
                 ? titleNode.children.slice()
                 : [titleNode.children];

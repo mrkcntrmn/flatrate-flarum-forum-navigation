@@ -13,10 +13,11 @@ use FlatRate\ForumNavigation\Api\MainLandingSettingsAttribute;
 use FlatRate\ForumNavigation\Api\NavigationManifestAttribute;
 use FlatRate\ForumNavigation\Api\QuickRailSettingsAttribute;
 use FlatRate\ForumNavigation\QuickRailGate;
+use FlatRate\ForumNavigation\Extend\ReplaceBrandFamilyTagFilter;
 use FlatRate\ForumNavigation\Search\Filter\ExcludeMainPinsFilter;
 use FlatRate\ForumNavigation\Search\Filter\MainPinsFilter;
 
-return [
+$extenders = [
     (new Extend\Frontend('forum'))
         ->js(__DIR__ . '/js/dist/forum.js')
         ->css(__DIR__ . '/resources/less/forum.less')
@@ -53,3 +54,9 @@ return [
         ->attributes(MainLandingSettingsAttribute::class)
         ->attributes(QuickRailSettingsAttribute::class),
 ];
+
+if (class_exists(\Flarum\Tags\Query\TagFilterGambit::class)) {
+    $extenders[] = new ReplaceBrandFamilyTagFilter();
+}
+
+return $extenders;
