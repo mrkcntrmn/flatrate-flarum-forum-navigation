@@ -10,7 +10,8 @@ use PHPUnit\Framework\TestCase;
  * library default strictMath=false. A bare calc() is arithmetic to that
  * compiler: calc(100% - 120px) became calc(-20%), and the former caret calc
  * became calc(100.45%). Raw forum.less assertions cannot see that rewrite.
- * The title max-width still needs an escaped calc; the caret now uses a plain
+ * The title and mobile center-row geometry formulas use escaped calc strings
+ * so Less.php preserves mixed-unit browser arithmetic. The caret uses a plain
  * 100% offset after removing horizontal button padding so it is flush to the
  * centered label.
  */
@@ -23,9 +24,8 @@ class MobileTitleCompiledCssTest extends TestCase
         $parser = new Less_Parser([
             'compress' => true,
         ]);
-        // Flarum's LessCompiler does not fail the asset build on Less.php
-        // warnings. Untouched menu calc(100% - 40px) rules still evaluate to
-        // calc(60%) and emit that warning family; they are outside this fix.
+        // Match Flarum's LessCompiler behavior while treating emitted CSS as
+        // the contract under test rather than trusting raw Less source.
         $previous = null;
         $previous = set_error_handler(static function (int $severity, string $message, string $file, int $line) use (&$previous) {
             if ($severity === E_WARNING && str_contains($file, 'wikimedia/less.php')) {
@@ -39,6 +39,7 @@ class MobileTitleCompiledCssTest extends TestCase
         });
         try {
             $parser->parseFile(dirname(__DIR__) . '/resources/less/forum.less');
+            $parser->parseFile(dirname(__DIR__) . '/resources/less/discussion-center-menu.less');
             $css = $parser->getCss();
         } finally {
             restore_error_handler();
@@ -62,6 +63,13 @@ class MobileTitleCompiledCssTest extends TestCase
         );
         $this->assertStringNotContainsString('calc(-20%)', $css);
         $this->assertStringNotContainsString('calc(100.45%)', $css);
+        $this->assertStringNotContainsString('calc(60%)', $css);
+        $this->assertStringNotContainsString('calc(42.5%)', $css);
+        $this->assertSame(4, substr_count($css, 'max-width:calc(100% - 40px)'));
+        $this->assertSame(
+            4,
+            substr_count($css, 'margin-left:calc(50% - 7.5rem + var(--flatrate-mobile-nav-rail-offset')
+        );
         $this->assertMatchesRegularExpression(
             '/\.App-titleControl>\.Dropdown-toggle\{[^}]*padding-left:0 !important;[^}]*padding-right:0 !important;/',
             $css
