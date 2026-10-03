@@ -192,6 +192,14 @@ test('discussion direct entry overrides the no-history drawer branch', () => {
   assert.match(discussionSrc, /discussionBoardBackButton\(target\)/);
 });
 
+test('board direct entry resolves app.currentTag, then the route param, then sticky state', () => {
+  assert.match(discussionSrc, /app\.currentTag/);
+  assert.match(discussionSrc, /m\.route\.param\('tags'\)/);
+  assert.match(discussionSrc, /stickyParams/);
+  assert.doesNotMatch(discussionSrc, /current\.currentTag/);
+  assert.match(discussionSrc, /resolveBoardStructuralBack/);
+});
+
 test('phone swaps the scrubber for the brand picker while desktop keeps scrubber behavior', () => {
   assert.match(less, /@media \(max-width: 767px\)/);
   assert.match(less, /\.DiscussionPage-nav \.item-scrubber/);

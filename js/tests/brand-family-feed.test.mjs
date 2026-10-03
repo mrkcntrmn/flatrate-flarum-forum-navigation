@@ -9,6 +9,7 @@ import { resolveBrandFamilySlugs } from '../src/forum/utils/brandFamilyFeed.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const manifest = JSON.parse(readFileSync(join(root, 'resources/navigation-runtime-manifest.json'), 'utf8'));
+const composer = JSON.parse(readFileSync(join(root, 'composer.json'), 'utf8'));
 const filterSrc = readFileSync(join(root, 'src/Search/Filter/BrandFamilyTagFilter.php'), 'utf8');
 const extendSrc = readFileSync(join(root, 'extend.php'), 'utf8');
 
@@ -29,6 +30,7 @@ test('leaf Brand feeds and unknown slugs stay exact', () => {
 });
 
 test('family expansion is one server filter, not client concatenation', () => {
+  assert.equal(composer.require['flarum/tags'], '^1.8.8');
   assert.match(filterSrc, /parent::constrain/);
   assert.match(filterSrc, /BrandFamilySlugs::expandList/);
   assert.doesNotMatch(filterSrc, /file_get_contents\('https?:/);

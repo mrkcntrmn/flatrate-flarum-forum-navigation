@@ -13,17 +13,17 @@ test('TagHero compat is resolved inside the initializer, not at module evaluatio
   assert.ok(initializerAt > 0);
 
   const beforeInitializer = indexSrc.slice(0, initializerAt);
-  assert.match(beforeInitializer, /function resolveTagHeroCompat\(/);
+  assert.match(beforeInitializer, /function resolveTagHero\(/);
   assert.doesNotMatch(beforeInitializer, /let TagHero/);
   assert.doesNotMatch(beforeInitializer, /TagHero = null/);
 
-  const resolverStart = beforeInitializer.indexOf('function resolveTagHeroCompat(');
+  const resolverStart = beforeInitializer.indexOf('function resolveTagHero(');
   const resolver = beforeInitializer.slice(resolverStart, beforeInitializer.indexOf('\n}\n', resolverStart) + 2);
   assert.match(resolver, /require\('flarum\/tags\/components\/TagHero'\)/);
   assert.equal(beforeInitializer.replace(resolver, '').includes("require('flarum/tags/components/TagHero')"), false);
 
   const initializer = indexSrc.slice(initializerAt);
-  assert.match(initializer, /resolveTagHeroCompat\(\)/);
+  assert.match(initializer, /resolveTagHero\(\)/);
   assert.match(initializer, /extend\(TagHero\.prototype, 'view'/);
   assert.doesNotMatch(initializer, /require\('flarum\/tags\/components\/TagHero'\)/);
 });

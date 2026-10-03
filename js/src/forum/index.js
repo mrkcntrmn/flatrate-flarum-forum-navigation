@@ -36,10 +36,10 @@ import { resolveBrandTagline } from './utils/brandTagline';
 import { findBrandNodeBySlug, listDirectBrandChildren } from './utils/brandNode';
 import { isCleanRootIndex, mainPinIdsFromForum } from './utils/mainLandingPins';
 
-function resolveTagHeroCompat() {
+function resolveTagHero() {
   try {
-    // Resolve after flarum-tags has registered compat. A module-eval miss
-    // stays null for the rest of the page, so this must run from the initializer.
+    // Resolve inside the initializer, after flarum-tags has registered compat.
+    // A module-eval miss stays null for the rest of the page.
     const TagHeroModule = require('flarum/tags/components/TagHero');
     return TagHeroModule && TagHeroModule.default ? TagHeroModule.default : TagHeroModule;
   } catch (error) {
@@ -139,6 +139,8 @@ function currentPresentationContext() {
 app.initializers.add(
   'flatrate-forum-navigation',
   () => {
+    const TagHero = resolveTagHero();
+
     registerDiscussionPhoneChrome();
 
     // Native Latest is the authenticated MAIN default. Do not force sort=top
@@ -450,7 +452,6 @@ app.initializers.add(
     });
 
     // Brand hero: tagline + parent family links via TagHero when flarum-tags is present.
-    const TagHero = resolveTagHeroCompat();
     if (TagHero) {
       extend(TagHero.prototype, 'view', function (vnode) {
         const tag = this.attrs.model || this.attrs.tag;

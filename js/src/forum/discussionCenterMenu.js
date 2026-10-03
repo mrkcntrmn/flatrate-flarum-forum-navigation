@@ -65,7 +65,12 @@ function currentIndexBoardSlug() {
     !isDiscussionPage
   );
   const currentTag = typeof app.currentTag === 'function' ? app.currentTag() : null;
-  const routeTagParam = m.route.param('tags') || '';
+  let routeTagParam = '';
+  try {
+    routeTagParam = m.route.param('tags') || '';
+  } catch (error) {
+    routeTagParam = '';
+  }
   const stickyState =
     app.search && app.search.state && typeof app.search.state.stickyParams === 'function'
       ? app.search.state.stickyParams()
