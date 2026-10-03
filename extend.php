@@ -13,7 +13,7 @@ use FlatRate\ForumNavigation\Api\MainLandingSettingsAttribute;
 use FlatRate\ForumNavigation\Api\NavigationManifestAttribute;
 use FlatRate\ForumNavigation\Api\QuickRailSettingsAttribute;
 use FlatRate\ForumNavigation\QuickRailGate;
-use FlatRate\ForumNavigation\Extend\ReplaceBrandFamilyTagFilter;
+use FlatRate\ForumNavigation\Provider\BrandFamilyTagFilterServiceProvider;
 use FlatRate\ForumNavigation\Search\Filter\ExcludeMainPinsFilter;
 use FlatRate\ForumNavigation\Search\Filter\MainPinsFilter;
 
@@ -56,7 +56,8 @@ $extenders = [
 ];
 
 if (class_exists(\Flarum\Tags\Query\TagFilterGambit::class)) {
-    $extenders[] = new ReplaceBrandFamilyTagFilter();
+    $extenders[] = (new Extend\ServiceProvider())
+        ->register(BrandFamilyTagFilterServiceProvider::class);
 }
 
 return $extenders;

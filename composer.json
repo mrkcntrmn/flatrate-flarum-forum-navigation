@@ -20,6 +20,7 @@
         "flarum/core": "^1.8.19"
     },
     "require-dev": {
+        "flarum/tags": "^1.8.0",
         "phpunit/phpunit": "^9.6"
     },
     "autoload": {

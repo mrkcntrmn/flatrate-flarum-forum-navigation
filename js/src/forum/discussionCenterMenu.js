@@ -18,6 +18,7 @@ import {
 import { listDiscussionBrandBoards } from './utils/discussionBrandDropdownItems';
 import { brandHref, getNavigationManifest, tagHref } from './utils/manifest';
 import { resolveBoardStructuralBack } from './utils/boardStructuralBack';
+import { resolveIndexBoardSlug } from './utils/currentBoardContext';
 import { recordOpenBoardAtTopIntent, consumeOpenBoardAtTopIntent } from './utils/boardBackIntent';
 import icon from 'flarum/common/helpers/icon';
 import { TECHNICIAN_TOPICS_ICON } from './utils/startNav';
@@ -52,24 +53,35 @@ function currentIndexRouteName() {
 
 function currentIndexBoardSlug() {
   const current = app.current;
-
-  if (
-    !current ||
-    typeof current.matches !== 'function' ||
-    !current.matches(IndexPage) ||
+  const isDiscussionPage = !!(
+    current &&
+    typeof current.matches === 'function' &&
     current.matches(DiscussionPage)
-  ) {
-    return '';
-  }
-
-  const tag = typeof current.currentTag === 'function' ? current.currentTag() : null;
-  if (tag) {
-    return typeof tag.slug === 'function' ? String(tag.slug() || '') : String(tag.slug || '');
-  }
-
-  const sticky =
+  );
+  const isIndexPage = !!(
+    current &&
+    typeof current.matches === 'function' &&
+    current.matches(IndexPage) &&
+    !isDiscussionPage
+  );
+  const currentTag = typeof app.currentTag === 'function' ? app.currentTag() : null;
+  const routeTagParam = m.route.param('tags') || '';
+  const stickyState =
+    app.search && app.search.state && typeof app.search.state.stickyParams === 'function'
+      ? app.search.state.stickyParams()
+      : null;
+  const stickyDirect =
     app.search && typeof app.search.stickyParams === 'function' ? app.search.stickyParams() : {};
-  return sticky && sticky.tags ? String(sticky.tags) : '';
+  const stickyTags =
+    (stickyState && stickyState.tags) || (stickyDirect && stickyDirect.tags) || '';
+
+  return resolveIndexBoardSlug({
+    isIndexPage,
+    isDiscussionPage,
+    currentTag,
+    routeTagParam,
+    stickyTags,
+  });
 }
 
 function boardMainBackButton() {

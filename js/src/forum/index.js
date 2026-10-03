@@ -36,13 +36,15 @@ import { resolveBrandTagline } from './utils/brandTagline';
 import { findBrandNodeBySlug, listDirectBrandChildren } from './utils/brandNode';
 import { isCleanRootIndex, mainPinIdsFromForum } from './utils/mainLandingPins';
 
-let TagHero;
-try {
-  // flarum.core.compat may export the class directly (no __esModule/.default).
-  const TagHeroModule = require('flarum/tags/components/TagHero');
-  TagHero = TagHeroModule && TagHeroModule.default ? TagHeroModule.default : TagHeroModule;
-} catch (error) {
-  TagHero = null;
+function resolveTagHeroCompat() {
+  try {
+    // Resolve after flarum-tags has registered compat. A module-eval miss
+    // stays null for the rest of the page, so this must run from the initializer.
+    const TagHeroModule = require('flarum/tags/components/TagHero');
+    return TagHeroModule && TagHeroModule.default ? TagHeroModule.default : TagHeroModule;
+  } catch (error) {
+    return null;
+  }
 }
 
 function hideDrawerAfterLinkClick(event) {
@@ -448,6 +450,7 @@ app.initializers.add(
     });
 
     // Brand hero: tagline + parent family links via TagHero when flarum-tags is present.
+    const TagHero = resolveTagHeroCompat();
     if (TagHero) {
       extend(TagHero.prototype, 'view', function (vnode) {
         const tag = this.attrs.model || this.attrs.tag;
