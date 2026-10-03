@@ -135,8 +135,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cd "${FLARUM_ROOT}"
-          nohup php -S 127.0.0.1:8094 -t public public/index.php             >/tmp/v1411-flarum-server.log 2>&1 &
+          cd "${FLARUM_ROOT}/public"
+          nohup php -S 127.0.0.1:8094 index.php >/tmp/v1411-flarum-server.log 2>&1 &
           echo $! >/tmp/v1411-flarum-server.pid
 
           for attempt in $(seq 1 60); do
