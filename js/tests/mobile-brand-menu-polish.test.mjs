@@ -90,6 +90,17 @@ test('mobile Follow is star-only while preserving the FoF SubscriptionButton mut
   assert.match(less, /width: 44px !important/);
 });
 
+test('Technician Topics wrench sits outside the centered text width', () => {
+  const wrench = less.match(
+    /\.App-titleControl\.FlatRatePresentationTitle--technician > \.Dropdown-toggle > \.icon\.fa-wrench,[\s\S]*?\{([\s\S]*?)\n  \}/
+  );
+  assert.ok(wrench, 'technician wrench rule is missing');
+  assert.match(wrench[1], /position: absolute !important/);
+  assert.match(wrench[1], /right: 100%/);
+  assert.match(wrench[1], /top: 50%/);
+  assert.match(wrench[1], /transform: translateY\(-50%\)/);
+});
+
 test('center label itself owns the header centerline while the unclipped caret sits outside its width', () => {
   assert.match(less, /\.App-titleControl > \.Dropdown-toggle\s*\{[^}]*position: relative/s);
   assert.match(less, /\.Dropdown-toggle \.Button-caret\s*\{[^}]*position: absolute !important/s);
