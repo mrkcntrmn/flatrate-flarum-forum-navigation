@@ -1,0 +1,177 @@
+name: v1.4.11 disposable phone matrix
+
+on:
+  push:
+    branches:
+      - test/forum-nav-context-001-v1411-disposable-r1
+
+jobs:
+  disposable-phone-matrix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: flarum
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -uroot -proot"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+
+    env:
+      SOURCE_CANDIDATE_SHA: aa9ce058daee1e2f63a9c976237406a879472676
+      BASE_URL: http://127.0.0.1:8094
+      DISPOSABLE_ADMIN_USERNAME: admin
+      DISPOSABLE_ADMIN_PASSWORD: DisposablePass123!
+      FLARUM_ROOT: /tmp/flarum-nav-v1411
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Bind harness to exact source candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          git cat-file -e "${SOURCE_CANDIDATE_SHA}^{commit}"
+          git diff --name-only "${SOURCE_CANDIDATE_SHA}" HEAD | tee /tmp/harness-diff.txt
+          unexpected="$(
+            grep -Ev '^(.github/workflows/v1411-disposable-phone-matrix.yml|scripts/v1411-disposable-phone-matrix.py)$' /tmp/harness-diff.txt || true
+          )"
+          if [[ -n "${unexpected}" ]]; then
+            echo "SOURCE_BINDING=FAIL"
+            echo "${unexpected}"
+            exit 1
+          fi
+          echo "SOURCE_CANDIDATE_SHA=${SOURCE_CANDIDATE_SHA}"
+          echo "SOURCE_BINDING=PASS"
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer:v2
+          coverage: none
+          extensions: curl, dom, fileinfo, gd, intl, mbstring, openssl, pdo_mysql, tokenizer, xml, xmlwriter, zip
+
+      - uses: browser-actions/setup-chrome@v2
+        with:
+          chrome-version: stable
+
+      - name: Install Python browser dependency
+        run: python3 -m pip install --disable-pip-version-check websockets==12.0
+
+      - name: Install disposable Flarum 1.8.19
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "${FLARUM_ROOT}"
+
+          composer create-project             "flarum/flarum:1.8.19"             "${FLARUM_ROOT}"             --no-interaction             --no-install
+
+          cd "${FLARUM_ROOT}"
+          rm -f composer.lock
+          composer require "flarum/core:1.8.19" --no-update --no-interaction
+
+          php "${GITHUB_WORKSPACE}/scripts/ci-composer-advisory-policy.php" apply composer.json
+          php "${GITHUB_WORKSPACE}/scripts/ci-composer-advisory-policy.php" verify composer.json
+
+          composer update --no-interaction --prefer-dist --no-audit
+
+          composer config repositories.flatrate-forum-navigation path "${GITHUB_WORKSPACE}"
+          composer require             "flatrate/flarum-forum-navigation:*@dev"             --no-interaction             --prefer-dist             --no-audit
+
+          installed_core="$(
+            composer show flarum/core --format=json |
+              php -r '$j=json_decode(stream_get_contents(STDIN), true); $v=$j["versions"][0] ?? ""; echo preg_replace("/^v/", "", (string)$v);'
+          )"
+          test "${installed_core}" = "1.8.19"
+          composer show flarum/tags | grep -F 'versions'
+          composer show flatrate/flarum-forum-navigation >/dev/null
+
+      - name: Install and enable disposable forum
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "${FLARUM_ROOT}"
+
+          cat > install.yml <<'YAML'
+          debug: true
+          baseUrl: http://127.0.0.1:8094
+          databaseConfiguration:
+            driver: mysql
+            host: 127.0.0.1
+            port: 3306
+            database: flarum
+            username: root
+            password: root
+            prefix: ''
+          adminUser:
+            username: admin
+            password: DisposablePass123!
+            email: admin@example.invalid
+          settings:
+            forum_title: FORUM-NAV-CONTEXT-001 v1.4.11 Disposable
+          YAML
+
+          php flarum install -f install.yml --no-interaction
+          php flarum extension:enable flarum-tags
+          php flarum extension:enable flatrate-forum-navigation
+          php flarum assets:publish
+          php flarum cache:clear
+          php flarum info | tee /tmp/flarum-info.txt
+
+          grep -F 'Flarum core: 1.8.19' /tmp/flarum-info.txt
+          grep -F 'flarum-tags' /tmp/flarum-info.txt
+          grep -F 'flatrate-forum-navigation' /tmp/flarum-info.txt
+
+      - name: Start disposable HTTP runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "${FLARUM_ROOT}"
+          nohup php -S 127.0.0.1:8094 -t public public/index.php             >/tmp/v1411-flarum-server.log 2>&1 &
+          echo $! >/tmp/v1411-flarum-server.pid
+
+          for attempt in $(seq 1 60); do
+            if curl -fsS "${BASE_URL}/api" >/tmp/v1411-api.json; then
+              echo "DISPOSABLE_HTTP_READY=PASS"
+              exit 0
+            fi
+            sleep 1
+          done
+
+          cat /tmp/v1411-flarum-server.log || true
+          echo "DISPOSABLE_HTTP_READY=FAIL"
+          exit 1
+
+      - name: Run v1.4.10 failure-case matrix
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/v1411-disposable-phone-matrix.py
+
+      - name: Print disposable result
+        if: always()
+        shell: bash
+        run: |
+          echo "SOURCE_CANDIDATE_SHA=${SOURCE_CANDIDATE_SHA}"
+          cat /tmp/v1411-matrix-results.json 2>/dev/null || true
+          tail -n 200 /tmp/v1411-flarum-server.log 2>/dev/null || true
+          echo "PRODUCTION_DEPLOYED=false"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v1411-disposable-phone-matrix
+          path: |
+            /tmp/v1411-matrix-results.json
+            /tmp/flarum-info.txt
+            /tmp/v1411-flarum-server.log
+          if-no-files-found: warn
