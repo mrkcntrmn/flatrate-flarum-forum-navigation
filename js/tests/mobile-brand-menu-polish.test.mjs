@@ -43,7 +43,7 @@ test('center-menu MAIN is transparent and shares the centered Brand column', () 
   assert.match(less, /\.App-titleControl \.Dropdown-menu \.item-allDiscussions > a/);
   assert.match(less, /background: transparent !important/);
   assert.match(less, /width: 15rem/);
-  assert.match(less, /max-width: ~"calc\\(100% - 40px\\)";/);
+  assert.match(less, /max-width: ~"calc\(100% - 40px\)";/);
   assert.match(less, /justify-content: flex-start/);
   assert.match(less, /text-align: left/);
   assert.match(less, /\.FlatRateDiscussionPicker-home/);
@@ -52,7 +52,7 @@ test('center-menu MAIN is transparent and shares the centered Brand column', () 
 test('center-menu brands use a centered left-aligned column with consistent child indentation', () => {
   assert.match(less, /\.App-titleControl \.Dropdown-menu \.FlatRatePresentationNav-brandLink/);
   assert.match(less, /width: 15rem/);
-  assert.match(less, /max-width: ~"calc\\(100% - 40px\\)";/);
+  assert.match(less, /max-width: ~"calc\(100% - 40px\)";/);
   assert.match(less, /flatrate-mobile-nav-rail-offset/);
   assert.match(less, /margin-right: auto/);
   assert.match(less, /justify-content: flex-start/);
