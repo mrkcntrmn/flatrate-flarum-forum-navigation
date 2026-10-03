@@ -5,11 +5,12 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 
-import { resolvePresentationTitle, PICK_A_BRAND } from '../src/forum/utils/presentationTitle.js';
+import { resolvePresentationTitle, resolvePresentationTitleMode, PICK_A_BRAND } from '../src/forum/utils/presentationTitle.js';
 import { isNativeTagItemKey, stripNativeTagPresentation } from '../src/forum/utils/stripNativeTagPresentation.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const indexSrc = readFileSync(join(root, 'js/src/forum/index.js'), 'utf8');
+const manifest = JSON.parse(readFileSync(join(root, 'resources/navigation-runtime-manifest.json'), 'utf8'));
 
 function tag(slug, name) {
   return { slug: () => slug, name: () => name };
@@ -64,17 +65,25 @@ test('SelectDropdown override is annotation-scoped', () => {
   assert.doesNotMatch(indexSrc, /isPickABrand/);
 });
 
-test('title matrix uses tag data and explicit aliases', () => {
+test('title matrix uses the manifest Brand name and explicit aliases', () => {
   assert.equal(resolvePresentationTitle({ routeName: 'index' }), PICK_A_BRAND);
   assert.equal(resolvePresentationTitle({ routeName: 'index', searchContext: { sort: 'newest' } }), PICK_A_BRAND);
-  assert.equal(resolvePresentationTitle({ currentTag: tag('nissan', 'Nissan') }), PICK_A_BRAND);
+  assert.equal(resolvePresentationTitleMode({ routeName: 'index' }), 'root');
+  assert.equal(resolvePresentationTitle({ currentTag: tag('gm', 'ignored'), manifest }), 'GM');
+  assert.equal(resolvePresentationTitle({ currentTag: tag('volkswagen', 'ignored'), manifest }), 'Volkswagen');
+  assert.equal(resolvePresentationTitle({ currentTag: tag('chevrolet', 'ignored'), manifest }), 'Chevrolet');
+  assert.equal(resolvePresentationTitle({ currentTag: tag('cdjr', 'ignored'), manifest }), 'CDJR');
+  assert.equal(resolvePresentationTitle({ currentTag: tag('jlr', 'ignored'), manifest }), 'JLR');
+  assert.equal(resolvePresentationTitle({ currentTag: tag('jeep', 'ignored'), manifest }), 'Jeep');
+  assert.equal(resolvePresentationTitleMode({ currentTag: tag('volkswagen', 'ignored'), manifest }), 'contextual');
   assert.equal(resolvePresentationTitle({ currentTag: tag('gm', 'GM') }), PICK_A_BRAND);
-  assert.equal(resolvePresentationTitle({ currentTag: tag('chevrolet', 'Chevrolet') }), PICK_A_BRAND);
-  assert.equal(resolvePresentationTitle({ currentTag: tag('cdjr', 'CDJR') }), PICK_A_BRAND);
-  assert.equal(resolvePresentationTitle({ currentTag: tag('jeep', 'Jeep') }), PICK_A_BRAND);
   assert.equal(
-    resolvePresentationTitle({ currentTag: tag('general-shop-discussion', 'General Shop Discussion') }),
+    resolvePresentationTitle({ currentTag: tag('general-shop-discussion', 'General Shop Discussion'), manifest }),
     'Technician Topics'
+  );
+  assert.equal(
+    resolvePresentationTitleMode({ currentTag: tag('general-shop-discussion', 'General Shop Discussion') }),
+    'technician'
   );
   assert.equal(resolvePresentationTitle({ currentTag: tag('start-here', 'Start Here') }), PICK_A_BRAND);
   assert.equal(resolvePresentationTitle({ currentTag: tag('start-here', 'Push to Start') }), PICK_A_BRAND);

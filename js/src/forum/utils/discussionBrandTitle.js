@@ -1,7 +1,6 @@
 import { PICK_A_BRAND } from './presentationTitle.js';
 
 export const TECHNICIAN_TOPICS_SLUG = 'general-shop-discussion';
-export const TECHNICIAN_TOPICS_DISPLAY = '🔧';
 export const TECHNICIAN_TOPICS_A11Y_LABEL = 'Technician Topics';
 
 function tagSlug(tag) {
@@ -132,7 +131,8 @@ function isTechnicianTopicsTarget(target) {
 
 /**
  * Visible center-control label for a discussion.
- * Uses owning-board semantics (not Brand-only). Technician Topics renders as 🔧.
+ * Uses owning-board semantics (not Brand-only). Technician Topics uses the
+ * literal label; the wrench is a separate Font Awesome icon, not this string.
  * Fallback when no valid owning board exists: FlatRate.wiki / FLATRATE.WIKI.
  */
 export function resolveDiscussionBrandTitle({ discussion = null, manifest = null } = {}) {
@@ -142,10 +142,14 @@ export function resolveDiscussionBrandTitle({ discussion = null, manifest = null
   }
 
   if (isTechnicianTopicsTarget(target)) {
-    return TECHNICIAN_TOPICS_DISPLAY;
+    return TECHNICIAN_TOPICS_A11Y_LABEL;
   }
 
   return String(target.name || PICK_A_BRAND);
+}
+
+export function discussionCenterUsesTechnicianIcon(target) {
+  return isTechnicianTopicsTarget(target);
 }
 
 /**

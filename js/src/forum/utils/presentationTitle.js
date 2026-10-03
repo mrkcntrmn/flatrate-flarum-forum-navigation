@@ -71,6 +71,8 @@ export function resolvePresentationTitle({
   if (slug) {
     if (slug === TECHNICIAN_TOPICS_SLUG) return TECHNICIAN_TOPICS_LABEL;
     if (slug === START_HERE_SLUG) return PICK_A_BRAND;
+    const brandName = canonicalBrandName(manifest, slug);
+    if (brandName) return brandName;
     return PICK_A_BRAND;
   }
 
@@ -79,4 +81,38 @@ export function resolvePresentationTitle({
   }
 
   return null;
+}
+
+function canonicalBrandName(manifest, slug) {
+  const needle = String(slug || '');
+  if (!needle || !manifest || !Array.isArray(manifest.groups)) return null;
+
+  const brands = manifest.groups.find((group) => group && group.mode === 'tree' && group.id === 'brands');
+  let found = null;
+
+  function visit(board) {
+    if (!board || found) return;
+    if (String(board.slug || '') === needle) {
+      found = board;
+      return;
+    }
+    (board.children || []).forEach(visit);
+  }
+
+  (brands?.boards || []).forEach(visit);
+  const name = found && found.name ? String(found.name) : '';
+  return name || null;
+}
+
+/**
+ * CSS mode for the IndexPage center control.
+ * root keeps the FLATRATE.WIKI mask. contextual and technician use DOM text.
+ * null leaves core SelectDropdown labeling in place.
+ */
+export function resolvePresentationTitleMode(context = {}) {
+  const title = resolvePresentationTitle(context);
+  if (title == null) return null;
+  if (title === TECHNICIAN_TOPICS_LABEL) return 'technician';
+  if (title === PICK_A_BRAND) return 'root';
+  return 'contextual';
 }

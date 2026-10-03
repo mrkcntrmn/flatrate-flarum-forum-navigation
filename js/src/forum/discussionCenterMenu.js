@@ -10,14 +10,17 @@ import ItemList from 'flarum/common/utils/ItemList';
 
 import CenterQuickRail from './components/CenterQuickRail';
 import {
+  discussionCenterUsesTechnicianIcon,
   resolveDiscussionBoardTarget,
   resolveDiscussionBrandAccessibleLabel,
   resolveDiscussionBrandTitle,
 } from './utils/discussionBrandTitle';
 import { listDiscussionBrandBoards } from './utils/discussionBrandDropdownItems';
 import { brandHref, getNavigationManifest, tagHref } from './utils/manifest';
-import { PICK_A_BRAND } from './utils/presentationTitle';
+import { resolveBoardStructuralBack } from './utils/boardStructuralBack';
 import { recordOpenBoardAtTopIntent, consumeOpenBoardAtTopIntent } from './utils/boardBackIntent';
+import icon from 'flarum/common/helpers/icon';
+import { TECHNICIAN_TOPICS_ICON } from './utils/startNav';
 
 function currentDiscussionBoardTarget() {
   const current = app.current;
@@ -39,6 +42,46 @@ function currentDiscussionBoardTarget() {
     discussion,
     manifest: getNavigationManifest(),
   });
+}
+
+function currentIndexRouteName() {
+  const current = app.current;
+  if (!current || typeof current.get !== 'function') return '';
+  return String(current.get('routeName') || '');
+}
+
+function currentIndexBoardSlug() {
+  const current = app.current;
+
+  if (
+    !current ||
+    typeof current.matches !== 'function' ||
+    !current.matches(IndexPage) ||
+    current.matches(DiscussionPage)
+  ) {
+    return '';
+  }
+
+  const tag = typeof current.currentTag === 'function' ? current.currentTag() : null;
+  if (tag) {
+    return typeof tag.slug === 'function' ? String(tag.slug() || '') : String(tag.slug || '');
+  }
+
+  const sticky =
+    app.search && typeof app.search.stickyParams === 'function' ? app.search.stickyParams() : {};
+  return sticky && sticky.tags ? String(sticky.tags) : '';
+}
+
+function boardMainBackButton() {
+  return (
+    <LinkButton
+      className="Button Navigation-back Button--icon FlatRateBoardBackToMain"
+      href="/"
+      icon="fas fa-chevron-left"
+      aria-label="Back to MAIN"
+      force
+    />
+  );
 }
 
 function discussionBoardBackButton(target) {
@@ -70,11 +113,16 @@ app.initializers.add(
         return;
       }
 
+      const boardTarget = resolveDiscussionBoardTarget({
+        discussion: this.discussion,
+        manifest,
+      });
       const visibleTitle = resolveDiscussionBrandTitle({ discussion: this.discussion, manifest });
       const accessibleLabel = resolveDiscussionBrandAccessibleLabel({
         discussion: this.discussion,
         manifest,
       });
+      const technicianTitle = discussionCenterUsesTechnicianIcon(boardTarget);
 
       const pickerItems = new ItemList();
       pickerItems.add(
@@ -108,7 +156,7 @@ app.initializers.add(
         'flatrateDiscussionBrandPicker',
         <SelectDropdown
           buttonClassName="Button"
-          className="App-titleControl FlatRateDiscussionBrandPicker"
+          className={`App-titleControl FlatRateDiscussionBrandPicker ${technicianTitle ? 'FlatRatePresentationTitle--technician' : 'FlatRatePresentationTitle--contextual'}`}
           accessibleToggleLabel={accessibleLabel}
           defaultLabel={visibleTitle}
         >
@@ -124,22 +172,55 @@ app.initializers.add(
     // invoke Flarum app-history back helpers — the board route is the destination.
     override(Navigation.prototype, 'getBackButton', function (original) {
       const target = currentDiscussionBoardTarget();
-
-      if (!target) {
-        return original();
+      if (target) {
+        return discussionBoardBackButton(target);
       }
 
-      return discussionBoardBackButton(target);
+      const boardBack = resolveBoardStructuralBack({
+        slug: currentIndexBoardSlug(),
+        routeName: currentIndexRouteName(),
+        manifest: getNavigationManifest(),
+      });
+      if (boardBack) {
+        return boardMainBackButton();
+      }
+
+      return original();
     });
 
     override(Navigation.prototype, 'getDrawerButton', function (original) {
       const target = currentDiscussionBoardTarget();
-
-      if (!target) {
-        return original();
+      if (target) {
+        return discussionBoardBackButton(target);
       }
 
-      return discussionBoardBackButton(target);
+      const boardBack = resolveBoardStructuralBack({
+        slug: currentIndexBoardSlug(),
+        routeName: currentIndexRouteName(),
+        manifest: getNavigationManifest(),
+      });
+      if (boardBack) {
+        return boardMainBackButton();
+      }
+
+      return original();
+    });
+
+    override(SelectDropdown.prototype, 'getButtonContent', function (original, children) {
+      const content = original(children);
+      const className = String((this.attrs && this.attrs.className) || '');
+      if (!className.includes('FlatRateDiscussionBrandPicker') || !className.includes('FlatRatePresentationTitle--technician')) {
+        return content;
+      }
+
+      const next = Array.isArray(content) ? content.slice() : [content];
+      const hasWrench = next.some((node) =>
+        String((node && node.attrs && node.attrs.className) || '').includes('fa-wrench')
+      );
+      if (!hasWrench) {
+        next.unshift(icon(TECHNICIAN_TOPICS_ICON));
+      }
+      return next;
     });
 
     // Custom board-arrow: one-shot open-board-at-top intent. Native Back keeps
