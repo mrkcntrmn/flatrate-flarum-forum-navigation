@@ -7,6 +7,7 @@ import test from 'node:test';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const less = readFileSync(join(root, 'resources/less/forum.less'), 'utf8');
+const discussionLess = readFileSync(join(root, 'resources/less/discussion-center-menu.less'), 'utf8');
 
 test('mobile new-discussion plus uses the primary pink accent', () => {
   assert.match(less, /\.IndexPage \.FlatRateInlineNewDiscussion/);
@@ -42,7 +43,7 @@ test('center-menu MAIN is transparent and shares the centered Brand column', () 
   assert.match(less, /\.App-titleControl \.Dropdown-menu \.item-allDiscussions > a/);
   assert.match(less, /background: transparent !important/);
   assert.match(less, /width: 15rem/);
-  assert.match(less, /max-width: calc\(100% - 40px\)/);
+  assert.match(less, /max-width: ~"calc\(100% - 40px\)";/);
   assert.match(less, /justify-content: flex-start/);
   assert.match(less, /text-align: left/);
   assert.match(less, /\.FlatRateDiscussionPicker-home/);
@@ -51,7 +52,7 @@ test('center-menu MAIN is transparent and shares the centered Brand column', () 
 test('center-menu brands use a centered left-aligned column with consistent child indentation', () => {
   assert.match(less, /\.App-titleControl \.Dropdown-menu \.FlatRatePresentationNav-brandLink/);
   assert.match(less, /width: 15rem/);
-  assert.match(less, /max-width: calc\(100% - 40px\)/);
+  assert.match(less, /max-width: ~"calc\(100% - 40px\)";/);
   assert.match(less, /flatrate-mobile-nav-rail-offset/);
   assert.match(less, /margin-right: auto/);
   assert.match(less, /justify-content: flex-start/);
@@ -64,6 +65,22 @@ test('center-menu brands use a centered left-aligned column with consistent chil
   assert.match(less, /display: none !important/);
 });
 
+
+test('mobile center-row calc geometry stays escaped for Less.php', () => {
+  const forumMax = less.match(/max-width: ~"calc\(100% - 40px\)";/g) ?? [];
+  const forumMargin = less.match(/margin-left: ~"calc\(50% - 7\.5rem \+ var\(--flatrate-mobile-nav-rail-offset, 0rem\)\)";/g) ?? [];
+  const discussionMax = discussionLess.match(/max-width: ~"calc\(100% - 40px\)";/g) ?? [];
+  const discussionMargin = discussionLess.match(/margin-left: ~"calc\(50% - 7\.5rem \+ var\(--flatrate-mobile-nav-rail-offset, 0\.75rem\)\)";/g) ?? [];
+
+  assert.equal(forumMax.length, 3);
+  assert.equal(forumMargin.length, 3);
+  assert.equal(discussionMax.length, 1);
+  assert.equal(discussionMargin.length, 1);
+  assert.doesNotMatch(less, /max-width: calc\(100% - 40px\);/);
+  assert.doesNotMatch(less, /margin-left: calc\(50% - 7\.5rem/);
+  assert.doesNotMatch(discussionLess, /max-width: calc\(100% - 40px\);/);
+  assert.doesNotMatch(discussionLess, /margin-left: calc\(50% - 7\.5rem/);
+});
 
 test('mobile Follow is star-only while preserving the FoF SubscriptionButton mutation surface', () => {
   assert.match(less, /\.IndexPage-nav \.SubscriptionButton \.Button-label/);
