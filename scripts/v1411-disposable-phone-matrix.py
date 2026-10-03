@@ -407,8 +407,27 @@ async def browser_matrix():
                 result = await evaluate(
                     ws,
                     """(() => {
-                      const label = document.querySelector('.App-titleControl .Button-label');
+                      const titleControl = document.querySelector('.App-titleControl');
+                      const toggleEl = titleControl && titleControl.querySelector(':scope > .Dropdown-toggle');
+                      const label = titleControl && titleControl.querySelector('.Button-label');
+                      const wrenchEl = titleControl && titleControl.querySelector('.fa-wrench');
+                      const caretEl = titleControl && titleControl.querySelector('.Button-caret');
                       const lr = label.getBoundingClientRect();
+                      const rect = (el) => {
+                        if (!el) return null;
+                        const r = el.getBoundingClientRect();
+                        return {left:r.left,right:r.right,width:r.width,top:r.top,height:r.height};
+                      };
+                      const style = (el) => {
+                        if (!el) return null;
+                        const s = getComputedStyle(el);
+                        return {
+                          position:s.position,display:s.display,width:s.width,maxWidth:s.maxWidth,
+                          left:s.left,right:s.right,marginLeft:s.marginLeft,marginRight:s.marginRight,
+                          paddingLeft:s.paddingLeft,paddingRight:s.paddingRight,
+                          transform:s.transform,boxSizing:s.boxSizing
+                        };
+                      };
                       const back = document.querySelector('.App-backControl a');
                       const banner = document.querySelector('.FlatRateParentBrandBanner');
                       const toggle = document.querySelector('.FlatRateParentBrandBanner-toggle');
@@ -420,6 +439,24 @@ async def browser_matrix():
                         width: window.innerWidth,
                         label: label.innerText.trim(),
                         labelDelta: ((lr.left + lr.right) / 2) - (window.innerWidth / 2),
+                        geometry: {
+                          title: rect(titleControl),
+                          toggle: rect(toggleEl),
+                          label: rect(label),
+                          wrench: rect(wrenchEl),
+                          caret: rect(caretEl),
+                          titleStyle: style(titleControl),
+                          toggleStyle: style(toggleEl),
+                          labelStyle: style(label),
+                          wrenchStyle: style(wrenchEl),
+                          caretStyle: style(caretEl),
+                          children: toggleEl ? [...toggleEl.children].map((el) => ({
+                            tag: el.tagName,
+                            className: el.className,
+                            rect: rect(el),
+                            style: style(el)
+                          })) : []
+                        },
                         backPath: back ? new URL(back.href, location.href).pathname : null,
                         hamburger: !!document.querySelector('.App-backControl .Navigation-drawer'),
                         wrench: !!document.querySelector('.App-titleControl .fa-wrench'),
@@ -464,7 +501,9 @@ async def browser_matrix():
                     fail(f"Technician Topics wrench missing at {width}px")
                 if abs(float(row["labelDelta"])) > 1:
                     fail(
-                        f"Technician Topics center delta {row['labelDelta']}px at {width}px"
+                        "Technician Topics center delta "
+                        f"{row['labelDelta']}px at {width}px geometry="
+                        + json.dumps(row.get("geometry"), sort_keys=True)
                     )
                 tech_rows.append(
                     {
