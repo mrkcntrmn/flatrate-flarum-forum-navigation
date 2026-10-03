@@ -67,6 +67,22 @@ function currentIndexBoardSlug() {
     return typeof tag.slug === 'function' ? String(tag.slug() || '') : String(tag.slug || '');
   }
 
+  // Flarum Tags 1.8.x writes the active board slug from the /t/:tags
+  // route into m.route before currentTag()/stickyParams are necessarily ready.
+  // Navigation renders early on direct entry, so consult the canonical route
+  // parameter before falling back to search state.
+  try {
+    const routeTag =
+      typeof m !== 'undefined' && m.route && typeof m.route.param === 'function'
+        ? m.route.param('tags')
+        : '';
+    if (routeTag) {
+      return String(routeTag);
+    }
+  } catch (error) {
+    // Fall through to sticky search state.
+  }
+
   const sticky =
     app.search && typeof app.search.stickyParams === 'function' ? app.search.stickyParams() : {};
   return sticky && sticky.tags ? String(sticky.tags) : '';

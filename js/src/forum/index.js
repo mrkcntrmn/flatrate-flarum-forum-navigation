@@ -36,13 +36,15 @@ import { resolveBrandTagline } from './utils/brandTagline';
 import { findBrandNodeBySlug, listDirectBrandChildren } from './utils/brandNode';
 import { isCleanRootIndex, mainPinIdsFromForum } from './utils/mainLandingPins';
 
-let TagHero;
-try {
-  // flarum.core.compat may export the class directly (no __esModule/.default).
-  const TagHeroModule = require('flarum/tags/components/TagHero');
-  TagHero = TagHeroModule && TagHeroModule.default ? TagHeroModule.default : TagHeroModule;
-} catch (error) {
-  TagHero = null;
+function resolveTagHero() {
+  try {
+    // Resolve at initializer time, after the flarum/tags initializer has run.
+    // flarum.core.compat may export the class directly (no __esModule/.default).
+    const TagHeroModule = require('flarum/tags/components/TagHero');
+    return TagHeroModule && TagHeroModule.default ? TagHeroModule.default : TagHeroModule;
+  } catch (error) {
+    return null;
+  }
 }
 
 function hideDrawerAfterLinkClick(event) {
@@ -137,6 +139,8 @@ function currentPresentationContext() {
 app.initializers.add(
   'flatrate-forum-navigation',
   () => {
+    const TagHero = resolveTagHero();
+
     registerDiscussionPhoneChrome();
 
     // Native Latest is the authenticated MAIN default. Do not force sort=top

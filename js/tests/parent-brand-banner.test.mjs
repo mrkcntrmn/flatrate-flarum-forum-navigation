@@ -13,6 +13,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const manifest = JSON.parse(readFileSync(join(root, 'resources/navigation-runtime-manifest.json'), 'utf8'));
 const bannerSrc = readFileSync(join(root, 'js/src/forum/components/ParentBrandBanner.js'), 'utf8');
 const linksSrc = readFileSync(join(root, 'js/src/forum/components/BrandFamilyLinks.js'), 'utf8');
+const indexSrc = readFileSync(join(root, 'js/src/forum/index.js'), 'utf8');
 
 test('CDJR collapsed banner keeps the tagline and child links without the parent name or total', () => {
   const board = findBrandNodeBySlug(manifest, 'cdjr');
@@ -65,4 +66,12 @@ test('child links and the chevron do not share a click handler', () => {
   assert.match(linksSrc, /<Link/);
   assert.doesNotMatch(linksSrc, /expanded = !/);
   assert.match(bannerSrc, /stopPropagation/);
+});
+
+
+test('TagHero is resolved inside the post-tags initializer rather than at bundle evaluation time', () => {
+  assert.match(indexSrc, /function resolveTagHero\(\)/);
+  assert.match(indexSrc, /const TagHero = resolveTagHero\(\);/);
+  assert.match(indexSrc, /require\('flarum\/tags\/components\/TagHero'\)/);
+  assert.doesNotMatch(indexSrc, /let TagHero;\s*try \{/);
 });

@@ -192,6 +192,12 @@ test('discussion direct entry overrides the no-history drawer branch', () => {
   assert.match(discussionSrc, /discussionBoardBackButton\(target\)/);
 });
 
+test('board direct entry resolves the canonical Flarum Tags route param before sticky state', () => {
+  assert.match(discussionSrc, /m\.route\.param\('tags'\)/);
+  assert.match(discussionSrc, /return String\(routeTag\)/);
+  assert.match(discussionSrc, /resolveBoardStructuralBack/);
+});
+
 test('phone swaps the scrubber for the brand picker while desktop keeps scrubber behavior', () => {
   assert.match(less, /@media \(max-width: 767px\)/);
   assert.match(less, /\.DiscussionPage-nav \.item-scrubber/);

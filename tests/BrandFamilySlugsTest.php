@@ -52,7 +52,9 @@ class BrandFamilySlugsTest extends TestCase
     {
         $src = file_get_contents(dirname(__DIR__) . '/src/Search/Filter/BrandFamilyTagFilter.php');
         $extend = file_get_contents(dirname(__DIR__) . '/extend.php');
+        $composer = json_decode((string) file_get_contents(dirname(__DIR__) . '/composer.json'), true);
 
+        $this->assertSame('^1.8.8', $composer['require']['flarum/tags'] ?? null);
         $this->assertStringContainsString('parent::constrain', $src);
         $this->assertStringContainsString('BrandFamilySlugs::expandList', $src);
         $this->assertStringNotContainsString("DB::table('discussions')", $src);
