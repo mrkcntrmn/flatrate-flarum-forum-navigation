@@ -392,7 +392,9 @@ async def browser_matrix():
                         "width": width,
                         "height": 800,
                         "deviceScaleFactor": 1,
-                        "mobile": False,
+                        "mobile": True,
+                        "screenWidth": width,
+                        "screenHeight": 800,
                     },
                 )
                 await cdp(ws, "Page.navigate", {"url": f"{BASE_URL}{path}"})
@@ -437,8 +439,9 @@ async def browser_matrix():
                       }));
                       return {
                         width: window.innerWidth,
+                        clientWidth: document.documentElement.clientWidth,
                         label: label.innerText.trim(),
-                        labelDelta: ((lr.left + lr.right) / 2) - (window.innerWidth / 2),
+                        labelDelta: ((lr.left + lr.right) / 2) - (document.documentElement.clientWidth / 2),
                         geometry: {
                           title: rect(titleControl),
                           toggle: rect(toggleEl),
@@ -476,8 +479,11 @@ async def browser_matrix():
                       };
                     })()""",
                 )
-                if result["width"] != width:
-                    fail(f"{path} viewport mismatch wanted={width} got={result['width']}")
+                if result["clientWidth"] != width:
+                    fail(
+                        f"{path} layout viewport mismatch wanted={width} "
+                        f"clientWidth={result['clientWidth']} innerWidth={result['width']}"
+                    )
                 if result["label"] != expected_label:
                     fail(
                         f"{path} title mismatch wanted={expected_label!r} got={result['label']!r}"
