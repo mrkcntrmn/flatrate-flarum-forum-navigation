@@ -15,21 +15,51 @@
     display: none !important;
   }
 
+  /* The star is positioned with the core mobile primary-control contract.
+     Do not reserve a filled tile in the discussion nav body. */
   .DiscussionPage-nav .item-flatrateDiscussionFollow {
-    display: flex !important;
-    align-items: center;
-    min-width: 44px;
-    min-height: 44px;
+    display: block !important;
+    width: 0;
+    height: 0;
+    margin: 0 !important;
+    padding: 0;
+    overflow: visible;
   }
 
   .DiscussionHero.FlatRateDiscussionHero--collapsed .DiscussionHero-items > li:not(.item-title):not(.item-flatrateHeroToggle) {
     display: none !important;
   }
 
-  .DiscussionHero .FlatRateDiscussionHero-toggle,
-  .DiscussionPage-nav .FlatRateDiscussionFollowStar {
+  .DiscussionPage-nav .FlatRateDiscussionFollowStar.App-primaryControl,
+  .DiscussionPage-nav .FlatRateDiscussionFollowStar.App-primaryControl:hover,
+  .DiscussionPage-nav .FlatRateDiscussionFollowStar.App-primaryControl:active,
+  .DiscussionPage-nav .FlatRateDiscussionFollowStar.App-primaryControl:focus {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 0;
+    border-radius: 0;
+    color: var(--header-control-color) !important;
+    width: 40px;
+    height: var(--header-height-phone);
     min-width: 44px;
     min-height: 44px;
+    padding: 0 !important;
+  }
+
+  .DiscussionPage-nav .FlatRateDiscussionFollowStar.App-primaryControl .Button-icon {
+    display: block;
+    float: none;
+    width: auto;
+    margin: 0;
+    font-size: 20px;
+    line-height: 1;
+  }
+
+  .DiscussionPage-nav .FlatRateDiscussionFollowStar.App-primaryControl:focus-visible,
+  .DiscussionHero .FlatRateDiscussionHero-toggle:focus-visible,
+  .FlatRateDiscussionActions .Dropdown-toggle:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
   }
 
   .DiscussionHero .DiscussionHero-items {
@@ -40,17 +70,68 @@
 
   .DiscussionHero .item-title {
     order: 1;
-    width: auto;
+    flex: 0 0 100%;
+    width: 100%;
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .DiscussionHero .DiscussionHero-title {
+    display: block;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 
   .DiscussionHero .item-flatrateHeroToggle {
     order: 2;
+    flex: 0 0 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
   }
 
-  .DiscussionHero .item-flatrateHeroSecondary,
-  .DiscussionHero .DiscussionHero-items > li:not(.item-title):not(.item-flatrateHeroToggle) {
+  .DiscussionHero .FlatRateDiscussionHero-toggle {
+    margin-left: auto;
+    margin-right: auto;
+    min-width: 44px;
+    min-height: 44px;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 0;
+  }
+
+  .DiscussionHero .DiscussionHero-items > li:not(.item-title):not(.item-flatrateHeroToggle):not(.item-flatrateHeroSecondary) {
     order: 3;
+    flex: 0 0 100%;
     width: 100%;
+    text-align: center;
+  }
+
+  .DiscussionHero .item-flatrateHeroSecondary {
+    order: 4;
+    flex: 0 0 100%;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .FlatRateDiscussionActions {
+    display: flex;
+    justify-content: flex-end;
+    width: auto;
+    margin-left: auto;
+  }
+
+  .FlatRateDiscussionActions .Dropdown-toggle {
+    min-width: 44px;
+    min-height: 44px;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 0;
   }
 
   .TagHero.FlatRateParentBrandBannerHost .Hero-title {
@@ -107,7 +188,7 @@
   justify-content: flex-start;
   width: 15rem;
   max-width: ~"calc(100% - 40px)";
-  margin-left: ~"calc(50% - 7.5rem + var(--flatrate-mobile-nav-rail-offset, 0.75rem))";
+  margin-left: ~"calc(50% - 7.5rem + var(--flatrate-mobile-nav-rail-offset, 0rem))";
   margin-right: auto;
   padding-left: 0;
   padding-right: 0;

@@ -24,7 +24,7 @@ export default class DiscussionFollowStar extends Component {
 
     return (
       <Button
-        className={`Button Button--icon FlatRateDiscussionFollowStar ${presentation.followed ? 'FlatRateDiscussionFollowStar--followed' : 'FlatRateDiscussionFollowStar--outline'}`}
+        className={`Button Button--icon Button--flat App-primaryControl FlatRateDiscussionFollowStar ${presentation.followed ? 'FlatRateDiscussionFollowStar--followed' : 'FlatRateDiscussionFollowStar--outline'}`}
         icon={presentation.icon}
         aria-label={presentation.label}
         aria-pressed={presentation.followed ? 'true' : 'false'}

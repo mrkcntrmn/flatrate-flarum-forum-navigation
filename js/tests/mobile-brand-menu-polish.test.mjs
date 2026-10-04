@@ -53,7 +53,10 @@ test('center-menu brands use a centered left-aligned column with consistent chil
   assert.match(less, /\.App-titleControl \.Dropdown-menu \.FlatRatePresentationNav-brandLink/);
   assert.match(less, /width: 15rem/);
   assert.match(less, /max-width: ~"calc\(100% - 40px\)";/);
-  assert.match(less, /flatrate-mobile-nav-rail-offset/);
+  assert.match(less, /--flatrate-mobile-nav-rail-offset:\s*0rem;/);
+  assert.doesNotMatch(less, /--flatrate-mobile-nav-rail-offset:\s*0\.75rem/);
+  assert.doesNotMatch(discussionLess, /--flatrate-mobile-nav-rail-offset,\s*0\.75rem/);
+  assert.match(discussionLess, /--flatrate-mobile-nav-rail-offset,\s*0rem/);
   assert.match(less, /margin-right: auto/);
   assert.match(less, /justify-content: flex-start/);
   assert.match(less, /text-align: left/);
@@ -63,6 +66,8 @@ test('center-menu brands use a centered left-aligned column with consistent chil
   assert.match(less, /padding-left: 3rem !important/);
   assert.match(less, /\.FlatRatePresentationNav-brandLink \.icon/);
   assert.match(less, /display: none !important/);
+  assert.match(less, /\.FlatRateCenterQuickRail\s*\{[^}]*justify-content: space-evenly/s);
+  assert.match(less, /\.FlatRateCenterQuickRail--guest,\s*\.FlatRateCenterQuickRail--v1\s*\{[^}]*justify-content: center/s);
 });
 
 
@@ -70,7 +75,7 @@ test('mobile center-row calc geometry stays escaped for Less.php', () => {
   const forumMax = less.match(/max-width: ~"calc\(100% - 40px\)";/g) ?? [];
   const forumMargin = less.match(/margin-left: ~"calc\(50% - 7\.5rem \+ var\(--flatrate-mobile-nav-rail-offset, 0rem\)\)";/g) ?? [];
   const discussionMax = discussionLess.match(/max-width: ~"calc\(100% - 40px\)";/g) ?? [];
-  const discussionMargin = discussionLess.match(/margin-left: ~"calc\(50% - 7\.5rem \+ var\(--flatrate-mobile-nav-rail-offset, 0\.75rem\)\)";/g) ?? [];
+  const discussionMargin = discussionLess.match(/margin-left: ~"calc\(50% - 7\.5rem \+ var\(--flatrate-mobile-nav-rail-offset, 0rem\)\)";/g) ?? [];
 
   assert.equal(forumMax.length, 3);
   assert.equal(forumMargin.length, 3);
