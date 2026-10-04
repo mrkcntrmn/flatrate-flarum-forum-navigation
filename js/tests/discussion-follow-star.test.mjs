@@ -10,6 +10,7 @@ import {
   discussionFollowStarPresentation,
   nextDiscussionFollowSubscription,
 } from '../src/forum/utils/discussionFollowState.js';
+import { discussionOverflowItems } from '../src/forum/utils/discussionOverflowItems.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const starSrc = readFileSync(join(root, 'js/src/forum/components/DiscussionFollowStar.js'), 'utf8');
@@ -72,4 +73,28 @@ test('mobile hero no longer configures notifications and reuses canonical contro
   assert.doesNotMatch(chromeSrc, /SUBSCRIPTION_CHOICES/);
   assert.doesNotMatch(chromeSrc, /includeNotifications/);
   assert.doesNotMatch(chromeSrc, /FlatRateDiscussionNotifications/);
+});
+
+test('mobile hero overflow removes the canonical subscription control', () => {
+  assert.match(actionsSrc, /DiscussionControls\.controls/);
+  assert.match(actionsSrc, /\.remove\(['"]subscription['"]\)/);
+  assert.match(actionsSrc, /discussionOverflowItems/);
+  assert.match(actionsSrc, /Dropdown/);
+  assert.match(actionsSrc, /fas fa-ellipsis-v/);
+  assert.doesNotMatch(actionsSrc, /!== ['"]Follow['"]/);
+  assert.doesNotMatch(actionsSrc, /renameDiscussion/);
+  assert.doesNotMatch(actionsSrc, /deleteDiscussion/);
+
+  const userSeparator = { itemName: 'userSeparator' };
+  const rename = { itemName: 'rename' };
+  const tags = { itemName: 'tags' };
+  const moderationSeparator = { itemName: 'moderationSeparator' };
+  const hide = { itemName: 'hide' };
+  const destructiveSeparator = { itemName: 'destructiveSeparator' };
+
+  assert.deepEqual(discussionOverflowItems([userSeparator]), []);
+  assert.deepEqual(
+    discussionOverflowItems([userSeparator, rename, tags, moderationSeparator, hide, destructiveSeparator]),
+    [rename, tags, moderationSeparator, hide]
+  );
 });
