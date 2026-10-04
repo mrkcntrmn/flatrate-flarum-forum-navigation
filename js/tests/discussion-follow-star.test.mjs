@@ -14,7 +14,7 @@ import {
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const starSrc = readFileSync(join(root, 'js/src/forum/components/DiscussionFollowStar.js'), 'utf8');
 const chromeSrc = readFileSync(join(root, 'js/src/forum/discussionPhoneChrome.js'), 'utf8');
-const secondarySrc = readFileSync(join(root, 'js/src/forum/components/DiscussionHeroSecondaryActions.js'), 'utf8');
+const actionsSrc = readFileSync(join(root, 'js/src/forum/components/DiscussionHeroActionsMenu.js'), 'utf8');
 const less = readFileSync(join(root, 'resources/less/discussion-center-menu.less'), 'utf8');
 
 test('member follow star uses canonical subscription transitions', () => {
@@ -30,21 +30,46 @@ test('member follow star uses canonical subscription transitions', () => {
   assert.doesNotMatch(starSrc, /localStorage/);
 });
 
-test('guests do not get a mutation star and phone hides the large menu only', () => {
+test('guests do not get a mutation star and phone removes native header controls', () => {
   assert.equal(canMutateDiscussionFollow(null), false);
   assert.equal(canMutateDiscussionFollow(undefined), false);
   assert.equal(canMutateDiscussionFollow({ id: 1 }), true);
   assert.match(chromeSrc, /removeItem\(items, 'subscription'\)/);
   assert.match(chromeSrc, /removeItem\(items, 'controls'\)/);
   assert.match(chromeSrc, /isPhoneScreen\(\)/);
+  assert.match(chromeSrc, /canMutateDiscussionFollow/);
   assert.match(less, /@media \(max-width: 767px\)[\s\S]*\.DiscussionPage-nav \.item-subscription/);
+  assert.match(less, /@media \(max-width: 767px\)[\s\S]*\.DiscussionPage-nav \.item-controls/);
   assert.match(less, /@media \(min-width: 768px\)[\s\S]*\.item-flatrateDiscussionFollow/);
 });
 
-test('ignore stays reachable in expanded discussion details and controls are canonical', () => {
-  assert.match(secondarySrc, /Ignore discussion/);
-  assert.match(secondarySrc, /discussion\.save\(\{ subscription: choice\.value \}\)/);
-  assert.match(secondarySrc, /DiscussionControls\.controls/);
-  assert.doesNotMatch(secondarySrc, /renameDiscussion/);
-  assert.doesNotMatch(secondarySrc, /deleteDiscussion/);
+test('phone Follow star uses the mobile primary-control slot without a text button', () => {
+  assert.match(starSrc, /Button Button--icon Button--flat App-primaryControl FlatRateDiscussionFollowStar/);
+  assert.match(starSrc, /aria-label=\{presentation\.label\}/);
+  assert.match(starSrc, /aria-pressed=\{presentation\.followed \? 'true' : 'false'\}/);
+  assert.match(starSrc, /discussion\.save\(\{ subscription: next \}\)/);
+  assert.doesNotMatch(starSrc, />\s*Follow\s*</);
+  assert.doesNotMatch(starSrc, /Button--primary/);
+  assert.match(less, /\.FlatRateDiscussionFollowStar\.App-primaryControl/);
+  assert.match(less, /background: transparent !important/);
+  assert.match(less, /@media \(min-width: 768px\)[\s\S]*\.item-flatrateDiscussionFollow[\s\S]*display: none !important/);
+});
+
+test('mobile hero no longer configures notifications and reuses canonical controls', () => {
+  assert.match(actionsSrc, /DiscussionControls\.controls/);
+  assert.match(actionsSrc, /Dropdown/);
+  assert.match(actionsSrc, /fas fa-ellipsis-v/);
+  assert.doesNotMatch(actionsSrc, /Discussion actions/);
+  assert.doesNotMatch(actionsSrc, /FlatRateDiscussionActions-label/);
+  assert.doesNotMatch(actionsSrc, /FlatRateDiscussionActions-list/);
+  assert.doesNotMatch(actionsSrc, /renameDiscussion/);
+  assert.doesNotMatch(actionsSrc, /deleteDiscussion/);
+  assert.doesNotMatch(actionsSrc, /Notifications/);
+  assert.doesNotMatch(actionsSrc, /Not following/);
+  assert.doesNotMatch(actionsSrc, /Ignore discussion/);
+  assert.doesNotMatch(actionsSrc, /SUBSCRIPTION_CHOICES/);
+  assert.doesNotMatch(actionsSrc, /discussion\.save\(\{ subscription: choice\.value \}\)/);
+  assert.doesNotMatch(chromeSrc, /SUBSCRIPTION_CHOICES/);
+  assert.doesNotMatch(chromeSrc, /includeNotifications/);
+  assert.doesNotMatch(chromeSrc, /FlatRateDiscussionNotifications/);
 });

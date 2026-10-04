@@ -633,9 +633,10 @@
      Flarum supplies `far fa-comments`; overriding its glyph with the Font
      Awesome 5 Free solid warehouse codepoint is visually equivalent to
      `fas fa-warehouse` without changing the shared desktop/hamburger vnode. */
-  /* Shift the common MAIN + Brand rail right as ONE unit (not per-row offsets). */
+  /* Center the common Brand column under the warehouse quick-rail control.
+     Labels stay left-aligned inside that column; child indentation is padding. */
   .App-titleControl .Dropdown-menu {
-    --flatrate-mobile-nav-rail-offset: 0.75rem;
+    --flatrate-mobile-nav-rail-offset: 0rem;
   }
 
   .App-titleControl .Dropdown-menu .item-allDiscussions > a {

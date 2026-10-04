@@ -5,7 +5,7 @@ import DiscussionHero from 'flarum/forum/components/DiscussionHero';
 import DiscussionPage from 'flarum/forum/components/DiscussionPage';
 
 import DiscussionFollowStar from './components/DiscussionFollowStar';
-import DiscussionHeroSecondaryActions from './components/DiscussionHeroSecondaryActions';
+import DiscussionHeroActionsMenu from './components/DiscussionHeroActionsMenu';
 import { canMutateDiscussionFollow } from './utils/discussionFollowState';
 
 export const DISCUSSION_HERO_DETAILS_ID = 'FlatRateDiscussionHero-details';
@@ -42,9 +42,9 @@ function findHeroList(vnode) {
 }
 
 /**
- * Phone discussion chrome: Follow star, no header ellipsis, no large Follow
- * dropdown, and a collapsed hero that hides existing ItemList additions
- * without replacing DiscussionHero.items().
+ * Phone discussion chrome: header Follow star, no native controls dropdown,
+ * no large Follow button, and a collapsed hero that hides existing ItemList
+ * additions without replacing DiscussionHero.items().
  */
 export default function registerDiscussionPhoneChrome() {
   extend(DiscussionPage.prototype, 'sidebarItems', function (items) {
@@ -71,7 +71,7 @@ export default function registerDiscussionPhoneChrome() {
     items.add(
       'flatrateHeroToggle',
       <Button
-        className="Button Button--icon FlatRateDiscussionHero-toggle"
+        className="Button Button--icon Button--flat FlatRateDiscussionHero-toggle"
         icon={expanded ? 'fas fa-chevron-up' : 'fas fa-chevron-down'}
         aria-expanded={expanded ? 'true' : 'false'}
         aria-controls={DISCUSSION_HERO_DETAILS_ID}
@@ -86,10 +86,9 @@ export default function registerDiscussionPhoneChrome() {
 
     items.add(
       'flatrateHeroSecondary',
-      <DiscussionHeroSecondaryActions
+      <DiscussionHeroActionsMenu
         discussion={this.attrs.discussion}
         context={app.current}
-        includeNotifications={!!(app.session && app.session.user)}
       />,
       -10
     );
