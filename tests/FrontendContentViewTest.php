@@ -62,26 +62,27 @@ class FrontendContentViewTest extends TestCase
             $extend
         );
     }
-    public function testMaintenanceBannerIsDismissibleAndVersioned(): void
+    public function testMaintenanceBannerUsesSettingsDrivenRuntimeShell(): void
     {
         $root = dirname(__DIR__);
         $view = (string) file_get_contents($root . '/resources/views/frontend/content.blade.php');
         $less = (string) file_get_contents($root . '/resources/less/forum.less');
+        $runtime = (string) file_get_contents($root . '/js/src/forum/maintenanceBanner.js');
 
         $this->assertStringContainsString('id="flatrate-maintenance-banner"', $view);
         $this->assertStringContainsString('FlatRateMaintenanceBanner-copy', $view);
-        $this->assertStringContainsString('FLATRATE.WIKI is undergoing maintenance.', $view);
-        $this->assertStringContainsString('FlatRateMaintenanceBanner-schedule', $view);
-        $this->assertStringContainsString('9/24/26 4:00 PM', $view);
-        $this->assertStringContainsString('flatrate:maintenance-banner:2026-09-24-1600', $view);
-        $this->assertStringContainsString("window.localStorage.setItem(storageKey, 'dismissed')", $view);
-        $this->assertStringContainsString("drawer.parentNode.insertBefore(banner, drawer.nextSibling)", $view);
+        $this->assertStringNotContainsString('9/24/26 4:00 PM', $view);
+        $this->assertStringNotContainsString('flatrate:maintenance-banner:2026-09-24-1600', $view);
         $this->assertStringContainsString('aria-label="Dismiss maintenance announcement"', $view);
         $this->assertStringContainsString('data-nosnippet', $view);
 
+        $this->assertStringContainsString('flatrateMaintenanceBanner', $runtime);
+        $this->assertStringContainsString("window.localStorage.setItem(storageKey, 'dismissed')", $runtime);
+        $this->assertStringContainsString("drawer.parentNode.insertBefore(banner, drawer.nextSibling)", $runtime);
+
         $this->assertStringContainsString('.FlatRateMaintenanceBanner {', $less);
-        $this->assertStringContainsString('background: #c62828;', $less);
-        $this->assertStringContainsString('color: #fff;', $less);
+        $this->assertStringContainsString('var(--flatrate-maintenance-bg, #c62828)', $less);
+        $this->assertStringContainsString('var(--flatrate-maintenance-fg, #fff)', $less);
         $this->assertStringContainsString('.FlatRateMaintenanceBanner-dismiss', $less);
     }
 
