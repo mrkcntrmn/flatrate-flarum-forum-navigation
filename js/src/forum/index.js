@@ -13,6 +13,7 @@ import StartBoardPin from './components/StartBoardPin';
 import MainLiveChatPin from './components/MainLiveChatPin';
 import BrandLivePin from './components/BrandLivePin';
 import MainLandingPins from './components/MainLandingPins';
+import { applyMaintenanceBanner } from './maintenanceBanner';
 import BrandFamilyLinks from './components/BrandFamilyLinks';
 import BrandVoteTotal from './components/BrandVoteTotal';
 import ParentBrandBanner from './components/ParentBrandBanner';
@@ -149,7 +150,9 @@ function currentPresentationContext() {
 app.initializers.add(
   'flatrate-forum-navigation',
   () => {
-    applyMaintenanceBanner(app);\n\n    const TagHero = resolveTagHero();
+    applyMaintenanceBanner(app);
+
+    const TagHero = resolveTagHero();
 
     app.flatRateBoardRoutes = {
       hrefForBoardKey(boardKey) {
