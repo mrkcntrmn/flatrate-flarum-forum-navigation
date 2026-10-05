@@ -4,6 +4,7 @@ import Link from 'flarum/common/components/Link';
 import icon from 'flarum/common/helpers/icon';
 
 import {
+  formatLiveCountPresentation,
   getLiveMainProvider,
   isLiveMainProviderAvailable,
   resolveMainLiveHref,
@@ -33,6 +34,11 @@ export default class MainLiveChatPin extends Component {
               <span>PUBLIC</span>
               <i className="fas fa-globe FlatRateMainLiveChat-globe" />
               <span>LIVE</span>
+              {liveCount !== null ? (
+                <span className="FlatRateMainLiveChat-count" aria-label={countInfo.ariaLabel}>
+                  {liveCount}
+                </span>
+              ) : null}
               <span className="FlatRateMainLiveChat-icon">
                 {icon('fas fa-comments')}
               </span>
