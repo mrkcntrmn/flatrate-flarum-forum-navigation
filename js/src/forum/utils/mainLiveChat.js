@@ -89,22 +89,19 @@ export function resolveMainLiveHref(provider) {
 }
 
 /**
- * Distinguish count unavailable (null) from valid zero.
- * unknown => "LIVE" (no invented zero)
- * 0 => "0 LIVE"
- * N => "N LIVE"
+ * Positive counts are visible. Zero and unknown both render as LIVE
+ * with no digit, so a resolved 0 is not shown as "LIVE 0".
  */
-export function formatLiveCountPresentation(count) {
-  if (count === null || count === undefined) {
-    return {
-      text: 'LIVE',
-      ariaLabel: 'Live presence count unavailable',
-      known: false,
-    };
-  }
-
+export function visibleLiveCount(count) {
+  if (count === null || count === undefined) return null;
   const value = Number(count);
-  if (!Number.isFinite(value) || value < 0) {
+  if (!Number.isFinite(value) || value <= 0) return null;
+  return Math.floor(value);
+}
+
+export function formatLiveCountPresentation(count) {
+  const n = visibleLiveCount(count);
+  if (n == null) {
     return {
       text: 'LIVE',
       ariaLabel: 'Live presence count unavailable',
@@ -112,7 +109,6 @@ export function formatLiveCountPresentation(count) {
     };
   }
 
-  const n = Math.floor(value);
   return {
     text: `${n} LIVE`,
     ariaLabel: `${n} members live`,
