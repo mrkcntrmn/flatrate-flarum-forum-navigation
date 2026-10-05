@@ -38,10 +38,9 @@ import { hrefForBoardKey as boardHrefForKey } from './utils/boardRoutes';
 import { findBrandNodeBySlug, listDirectBrandChildren } from './utils/brandNode';
 import {
   addBrandLiveItem,
-  currentBrandBoard,
   getLiveBoardProvider,
+  prepareBrandLiveMount,
   removeBrandLiveItem,
-  shouldShowBrandLive,
 } from './utils/brandLivePin';
 import { isCleanRootIndex, mainPinIdsFromForum } from './utils/mainLandingPins';
 
@@ -262,20 +261,20 @@ app.initializers.add(
       }
 
       const manifest = getNavigationManifest();
-      const brandBoard = currentBrandBoard({ currentTag, manifest });
-      if (
-        shouldShowBrandLive({
-          signedIn,
-          routeName,
-          searchParams,
-          stickyParams,
-          currentTag,
-          page,
-          manifest,
-          provider: getLiveBoardProvider(app),
-        })
-      ) {
-        addBrandLiveItem(items, <BrandLivePin board={brandBoard} />);
+      const brandMount = prepareBrandLiveMount({
+        page: this,
+        currentTag,
+        searchParams,
+        stickyParams,
+        store: app.store,
+        signedIn,
+        routeName,
+        pageNumber: page,
+        manifest,
+        provider: getLiveBoardProvider(app),
+      });
+      if (brandMount.show && brandMount.board) {
+        addBrandLiveItem(items, <BrandLivePin board={brandMount.board} />);
       } else {
         removeBrandLiveItem(items);
       }

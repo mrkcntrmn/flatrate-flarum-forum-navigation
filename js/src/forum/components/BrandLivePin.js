@@ -2,7 +2,7 @@ import app from 'flarum/forum/app';
 import Component from 'flarum/common/Component';
 
 import LiveBoardPin from './LiveBoardPin';
-import { getLiveBoardProvider } from '../utils/brandLivePin';
+import { activateBrandLive, getLiveBoardProvider } from '../utils/brandLivePin';
 
 /**
  * One synthetic Live row on the current canonical Brand board.
@@ -27,10 +27,7 @@ export default class BrandLivePin extends Component {
   }
 
   activate() {
-    const board = this.board();
-    const provider = this.provider();
-    if (!board?.boardKey || !provider || typeof provider.activate !== 'function') return;
-    Promise.resolve(provider.activate(board.boardKey)).catch(() => {});
+    activateBrandLive(this.board(), this.provider());
   }
 
   deactivate() {
