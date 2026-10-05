@@ -77,9 +77,10 @@ final class MaintenanceBannerSettings
 
         $message = trim($value);
 
-        // Admin UI limits this to 280 characters. Reject unexpectedly large
-        // provider/config values instead of projecting them into public chrome.
-        if (strlen($message) > 1120) {
+        // Enforce the same public boundary as the admin UI. If mbstring is
+        // unavailable, byte length is the conservative fallback.
+        $length = function_exists('mb_strlen') ? mb_strlen($message, 'UTF-8') : strlen($message);
+        if ($length > 280) {
             return '';
         }
 
