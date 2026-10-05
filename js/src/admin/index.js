@@ -18,7 +18,7 @@ app.initializers.add('flatrate-forum-navigation-admin', () => {
               </p>
               <MainLandingPinnedDiscussions />
             </div>
-            <QuickRailSettings />
+            <MaintenanceBannerSettings />\n            <QuickRailSettings />
           </div>
         );
       }
