@@ -1,6 +1,6 @@
 {{-- Derived from flarum/core v1.8.19 framework/core/views/frontend/content.blade.php.
      FlatRate changes add data-nosnippet to non-content fallback chrome and
-     a temporary sitewide maintenance announcement. Keep #flarum-content
+     a settings-driven sitewide maintenance announcement. Keep #flarum-content
      untouched so server-rendered discussion content remains snippet-eligible. --}}
 
 <div
@@ -13,12 +13,7 @@
 >
     <div class="container FlatRateMaintenanceBanner-inner">
         <div class="FlatRateMaintenanceBanner-message">
-            <div class="FlatRateMaintenanceBanner-copy">
-                FLATRATE.WIKI is undergoing maintenance.
-            </div>
-            <div class="FlatRateMaintenanceBanner-schedule">
-                9/24/26 4:00 PM
-            </div>
+            <div class="FlatRateMaintenanceBanner-copy"></div>
         </div>
         <button
             type="button"
@@ -28,51 +23,6 @@
         >&times;</button>
     </div>
 </div>
-
-<script>
-    (function () {
-        var banner = document.getElementById('flatrate-maintenance-banner');
-        if (!banner) {
-            return;
-        }
-
-        var storageKey = 'flatrate:maintenance-banner:2026-09-24-1600';
-        var dismissed = false;
-
-        try {
-            dismissed = window.localStorage.getItem(storageKey) === 'dismissed';
-        } catch (error) {
-            dismissed = false;
-        }
-
-        if (dismissed) {
-            banner.remove();
-            return;
-        }
-
-        var drawer = document.getElementById('drawer');
-        if (drawer && drawer.parentNode) {
-            drawer.parentNode.insertBefore(banner, drawer.nextSibling);
-        }
-
-        banner.hidden = false;
-
-        var dismissButton = banner.querySelector('.FlatRateMaintenanceBanner-dismiss');
-        if (!dismissButton) {
-            return;
-        }
-
-        dismissButton.addEventListener('click', function () {
-            try {
-                window.localStorage.setItem(storageKey, 'dismissed');
-            } catch (error) {
-                // Storage can be unavailable in hardened/private browsing modes.
-            }
-
-            banner.remove();
-        });
-    })();
-</script>
 
 <div id="flarum-loading" style="display: none" data-nosnippet>
     {{ $translator->trans('core.views.content.loading_text') }}

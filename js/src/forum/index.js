@@ -1,4 +1,5 @@
 import app from 'flarum/forum/app';
+import ForumApplication from 'flarum/forum/ForumApplication';
 import { extend, override } from 'flarum/common/extend';
 import IndexPage from 'flarum/forum/components/IndexPage';
 import HeaderSecondary from 'flarum/forum/components/HeaderSecondary';
@@ -13,6 +14,7 @@ import StartBoardPin from './components/StartBoardPin';
 import MainLiveChatPin from './components/MainLiveChatPin';
 import BrandLivePin from './components/BrandLivePin';
 import MainLandingPins from './components/MainLandingPins';
+import { applyMaintenanceBanner } from './maintenanceBanner';
 import BrandFamilyLinks from './components/BrandFamilyLinks';
 import BrandVoteTotal from './components/BrandVoteTotal';
 import ParentBrandBanner from './components/ParentBrandBanner';
@@ -147,6 +149,12 @@ function currentPresentationContext() {
 app.initializers.add(
   'flatrate-forum-navigation',
   () => {
+    // Flarum assigns app.forum after initializers return, then calls mount.
+    // Applying here used to see a missing forum model and delete the shell.
+    extend(ForumApplication.prototype, 'mount', function () {
+      applyMaintenanceBanner(app);
+    });
+
     const TagHero = resolveTagHero();
 
     app.flatRateBoardRoutes = {
