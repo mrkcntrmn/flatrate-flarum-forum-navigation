@@ -33,6 +33,7 @@ test('maintenance banner public runtime is settings-driven and dismissible', () 
   assert.match(forum, /flatrateMaintenanceBanner/);
   assert.match(forum, /textContent = config\.message/);
   assert.match(forum, /localStorage\.setItem\(storageKey, 'dismissed'\)/);
+  assert.match(forumIndex, /extend\(ForumApplication\.prototype, 'mount'/);
   assert.match(forumIndex, /applyMaintenanceBanner\(app\)/);
   assert.match(forumDist, /flatrateMaintenanceBanner/);
 });

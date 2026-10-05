@@ -1,4 +1,5 @@
 import app from 'flarum/forum/app';
+import ForumApplication from 'flarum/forum/ForumApplication';
 import { extend, override } from 'flarum/common/extend';
 import IndexPage from 'flarum/forum/components/IndexPage';
 import HeaderSecondary from 'flarum/forum/components/HeaderSecondary';
@@ -150,7 +151,11 @@ function currentPresentationContext() {
 app.initializers.add(
   'flatrate-forum-navigation',
   () => {
-    applyMaintenanceBanner(app);
+    // Flarum assigns app.forum after initializers return, then calls mount.
+    // Applying here used to see a missing forum model and delete the shell.
+    extend(ForumApplication.prototype, 'mount', function () {
+      applyMaintenanceBanner(app);
+    });
 
     const TagHero = resolveTagHero();
 
