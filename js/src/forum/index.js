@@ -149,7 +149,7 @@ function currentPresentationContext() {
 app.initializers.add(
   'flatrate-forum-navigation',
   () => {
-    const TagHero = resolveTagHero();
+    applyMaintenanceBanner(app);\n\n    const TagHero = resolveTagHero();
 
     app.flatRateBoardRoutes = {
       hrefForBoardKey(boardKey) {
