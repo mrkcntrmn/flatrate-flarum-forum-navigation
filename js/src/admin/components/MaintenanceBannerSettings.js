@@ -151,6 +151,7 @@ export default class MaintenanceBannerSettings extends Component {
         body,
       })
       .then(() => {
+        app.data.settings = app.data.settings || {};
         Object.assign(app.data.settings, body);
         this.message = message;
         this.color = color;
