@@ -14,6 +14,19 @@ FlatRate.wiki presentation navigation for Flarum 1.8.x (`flarum/core` ^1.8.19).
 - Leaves General Live on its durable `/live/community-general-live` identity
 - Embeds a generated navigation runtime manifest asset; does not read the main wiki repo at runtime
 - Keeps Flarum's built-in loader/error fallback UX, while marking non-content fallback chrome `data-nosnippet` so it cannot displace technician discussion text in Google snippets
+- Provides an admin-managed site-wide maintenance banner with enable/disable, plain-text message, approved color selection, and versioned local dismissal
+
+## Maintenance banner
+
+The extension admin page owns the operational maintenance notice. The banner no longer requires a source edit for routine status changes.
+
+- **Enable maintenance banner** controls public visibility.
+- **Status message** is plain text and limited to 280 characters in the admin UI.
+- **Banner color** is restricted to the approved red/orange/yellow/blue/green/pink palette.
+- Every successful save rotates a non-secret dismissal revision so a changed notice can reappear to clients that dismissed the prior revision.
+- Missing settings preserve the currently deployed compatibility defaults: enabled, `FLATRATE.WIKI is undergoing maintenance.`, red, and dismissal revision `2026-09-24-1600`.
+- A blank or invalid public message fails closed and does not render.
+- The public forum serializer exposes only presentation-safe banner state; admin capability is not serialized.
 
 ## Hard boundaries
 
