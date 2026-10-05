@@ -1,7 +1,5 @@
 import app from 'flarum/forum/app';
 import Component from 'flarum/common/Component';
-import Link from 'flarum/common/components/Link';
-import icon from 'flarum/common/helpers/icon';
 
 import {
   formatLiveCountPresentation,
@@ -9,6 +7,7 @@ import {
   isLiveMainProviderAvailable,
   resolveMainLiveHref,
 } from '../utils/mainLiveChat';
+import LiveBoardPin from './LiveBoardPin';
 
 /**
  * Synthetic locked General Live row for authenticated MAIN.
@@ -37,32 +36,16 @@ export default class MainLiveChatPin extends Component {
       rawCount = null;
     }
     const countInfo = formatLiveCountPresentation(rawCount);
-    const liveCount = countInfo.known ? String(Math.floor(Number(rawCount))) : null;
+    const liveCount = countInfo.known ? Math.floor(Number(rawCount)) : null;
 
     return (
-      <div className="FlatRateMainLiveChat" data-flatrate-main-live="true">
-        <div className="FlatRateMainLiveChat-row">
-          <Link
-            className="FlatRateMainLiveChat-link"
-            href={href}
-            aria-label="Open Public Live chat"
-          >
-            <span className="FlatRateMainLiveChat-status" aria-hidden="true">
-              <span>PUBLIC</span>
-              <i className="fas fa-globe FlatRateMainLiveChat-globe" />
-              <span>LIVE</span>
-              {liveCount !== null ? (
-                <span className="FlatRateMainLiveChat-count" aria-label={countInfo.ariaLabel}>
-                  {liveCount}
-                </span>
-              ) : null}
-              <span className="FlatRateMainLiveChat-icon">
-                {icon('fas fa-comments')}
-              </span>
-            </span>
-          </Link>
-        </div>
-      </div>
+      <LiveBoardPin
+        href={href}
+        count={liveCount}
+        countLabel={countInfo.ariaLabel}
+        ariaLabel="Open Public Live chat"
+        marker="main"
+      />
     );
   }
 }

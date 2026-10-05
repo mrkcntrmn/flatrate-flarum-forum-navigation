@@ -11,6 +11,7 @@ import CenterQuickRail from './components/CenterQuickRail';
 import './quickRailSettingsPage';
 import StartBoardPin from './components/StartBoardPin';
 import MainLiveChatPin from './components/MainLiveChatPin';
+import BrandLivePin from './components/BrandLivePin';
 import MainLandingPins from './components/MainLandingPins';
 import BrandFamilyLinks from './components/BrandFamilyLinks';
 import BrandVoteTotal from './components/BrandVoteTotal';
@@ -33,7 +34,15 @@ import {
 import { START_NAV_ICON, START_NAV_LABEL, TECHNICIAN_TOPICS_ICON } from './utils/startNav';
 import { stripNativeTagPresentation } from './utils/stripNativeTagPresentation';
 import { resolveBrandTagline } from './utils/brandTagline';
+import { hrefForBoardKey as boardHrefForKey } from './utils/boardRoutes';
 import { findBrandNodeBySlug, listDirectBrandChildren } from './utils/brandNode';
+import {
+  addBrandLiveItem,
+  currentBrandBoard,
+  getLiveBoardProvider,
+  removeBrandLiveItem,
+  shouldShowBrandLive,
+} from './utils/brandLivePin';
 import { isCleanRootIndex, mainPinIdsFromForum } from './utils/mainLandingPins';
 
 function resolveTagHero() {
@@ -141,6 +150,17 @@ app.initializers.add(
   () => {
     const TagHero = resolveTagHero();
 
+    app.flatRateBoardRoutes = {
+      hrefForBoardKey(boardKey) {
+        return boardHrefForKey(boardKey, {
+          manifest: getNavigationManifest(),
+          routeTag(slug) {
+            return app.route('tag', { tags: slug });
+          },
+        });
+      },
+    };
+
     registerDiscussionPhoneChrome();
 
     // Native Latest is the authenticated MAIN default. Do not force sort=top
@@ -239,6 +259,25 @@ app.initializers.add(
         addMainLiveChatItem(items, <MainLiveChatPin />);
       } else {
         removeMainLiveChatItem(items);
+      }
+
+      const manifest = getNavigationManifest();
+      const brandBoard = currentBrandBoard({ currentTag, manifest });
+      if (
+        shouldShowBrandLive({
+          signedIn,
+          routeName,
+          searchParams,
+          stickyParams,
+          currentTag,
+          page,
+          manifest,
+          provider: getLiveBoardProvider(app),
+        })
+      ) {
+        addBrandLiveItem(items, <BrandLivePin board={brandBoard} />);
+      } else {
+        removeBrandLiveItem(items);
       }
 
       // Signed-in START pin (independent of discussion MAIN pins).
