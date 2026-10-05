@@ -25,6 +25,7 @@ import {
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const pinSrc = readFileSync(join(root, 'js/src/forum/components/MainLiveChatPin.js'), 'utf8');
+const livePinSrc = readFileSync(join(root, 'js/src/forum/components/LiveBoardPin.js'), 'utf8');
 const utilSrc = readFileSync(join(root, 'js/src/forum/utils/mainLiveChat.js'), 'utf8');
 const indexSrc = readFileSync(join(root, 'js/src/forum/index.js'), 'utf8');
 const less = readFileSync(join(root, 'resources/less/forum.less'), 'utf8');
@@ -185,20 +186,22 @@ test('canonical Messages href from provider; fallback canonical; reject non-Mess
 });
 
 test('component renders only the centered Public Live treatment and provider-owned href', () => {
+  assert.match(livePinSrc, /Open Public Live chat|ariaLabel/);
   assert.match(pinSrc, /Open Public Live chat/);
-  assert.match(pinSrc, />PUBLIC</);
-  assert.match(pinSrc, /fas fa-globe/);
-  assert.match(pinSrc, />LIVE</);
-  assert.match(pinSrc, /fas fa-comments/);
+  assert.match(livePinSrc, />PUBLIC</);
+  assert.match(livePinSrc, /fas fa-globe/);
+  assert.match(livePinSrc, />LIVE</);
+  assert.match(livePinSrc, /fas fa-comments/);
   assert.doesNotMatch(pinSrc, /FlatRate\.wiki/);
+  assert.doesNotMatch(livePinSrc, /FlatRate\.wiki/);
   assert.doesNotMatch(pinSrc, /role="switch"/);
   assert.doesNotMatch(pinSrc, /aria-checked/);
   assert.doesNotMatch(pinSrc, /setUserLive/);
   assert.match(pinSrc, /liveCount/);
   assert.match(pinSrc, /formatLiveCountPresentation/);
-  assert.match(pinSrc, /FlatRateMainLiveChat-count/);
-  assert.match(pinSrc, /FlatRateMainLiveChat/);
-  assert.match(pinSrc, /data-flatrate-main-live="true"/);
+  assert.match(livePinSrc, /FlatRateMainLiveChat-count/);
+  assert.match(livePinSrc, /FlatRateMainLiveChat/);
+  assert.match(livePinSrc, /data-flatrate-main-live="true"/);
   assert.doesNotMatch(pinSrc, /flatrateLiveRealtime/);
   assert.doesNotMatch(pinSrc, /Centrifuge/);
   assert.doesNotMatch(pinSrc, /presence-stats/);
