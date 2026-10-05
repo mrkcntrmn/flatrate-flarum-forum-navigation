@@ -1,6 +1,7 @@
 import app from 'flarum/admin/app';
 import ExtensionPage from 'flarum/admin/components/ExtensionPage';
 import MainLandingPinnedDiscussions from './components/MainLandingPinnedDiscussions';
+import MaintenanceBannerSettings from './components/MaintenanceBannerSettings';
 import QuickRailSettings from './components/QuickRailSettings';
 
 app.initializers.add('flatrate-forum-navigation-admin', () => {
@@ -18,7 +19,8 @@ app.initializers.add('flatrate-forum-navigation-admin', () => {
               </p>
               <MainLandingPinnedDiscussions />
             </div>
-            <MaintenanceBannerSettings />\n            <QuickRailSettings />
+            <MaintenanceBannerSettings />
+            <QuickRailSettings />
           </div>
         );
       }
