@@ -216,10 +216,25 @@ test('index wires Live before START/pins and fails closed on public MAIN', () =>
   assert.doesNotMatch(pinSrc, /OFFLINE/);
 });
 
-test('presentation CSS targets mobile 360-class and 44px toggle without discussion metadata', () => {
+test('presentation CSS keeps the General Live row compact with title left and lime status right', () => {
   assert.match(less, /\.FlatRateMainLiveChat\b/);
   assert.match(less, /\.FlatRateMainLiveChat-row\b/);
-  assert.match(less, /\.FlatRateMainLiveChat-toggle\b/);
+  assert.match(
+    less,
+    /\.FlatRateMainLiveChat-body\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\) auto;/
+  );
+  assert.match(
+    less,
+    /\.FlatRateMainLiveChat-title\s*\{[\s\S]*?justify-self:\s*start;[\s\S]*?text-transform:\s*uppercase;/
+  );
+  assert.match(
+    less,
+    /\.FlatRateMainLiveChat-meta\s*\{[\s\S]*?justify-self:\s*end;[\s\S]*?color:\s*#66ff00;[\s\S]*?text-align:\s*right;/
+  );
+  assert.match(
+    less,
+    /\.FlatRateMainLiveChat-toggle\s*\{[\s\S]*?display:\s*none !important;/
+  );
   assert.match(less, /min-height: 44px/);
   assert.match(less, /@media \(max-width: 420px\)/);
   assert.doesNotMatch(less, /FlatRateMainLiveChat-timestamp/);
