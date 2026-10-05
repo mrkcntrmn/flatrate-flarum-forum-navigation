@@ -194,7 +194,9 @@ test('component renders only the centered Public Live treatment and provider-own
   assert.doesNotMatch(pinSrc, /role="switch"/);
   assert.doesNotMatch(pinSrc, /aria-checked/);
   assert.doesNotMatch(pinSrc, /setUserLive/);
-  assert.doesNotMatch(pinSrc, /liveCount/);
+  assert.match(pinSrc, /liveCount/);
+  assert.match(pinSrc, /formatLiveCountPresentation/);
+  assert.match(pinSrc, /FlatRateMainLiveChat-count/);
   assert.match(pinSrc, /FlatRateMainLiveChat/);
   assert.match(pinSrc, /data-flatrate-main-live="true"/);
   assert.doesNotMatch(pinSrc, /flatrateLiveRealtime/);
@@ -219,13 +221,13 @@ test('index wires Live before START/pins and fails closed on public MAIN', () =>
   assert.doesNotMatch(pinSrc, /OFFLINE/);
 });
 
-test('presentation CSS centers only PUBLIC globe LIVE chat icon in lime', () => {
+test('presentation CSS centers PUBLIC globe LIVE count chat icon in lime', () => {
   assert.match(less, /\.FlatRateMainLiveChat\b/);
   assert.match(less, /\.FlatRateMainLiveChat-link\s*\{[\s\S]*?justify-content:\s*center;[\s\S]*?color:\s*#66ff00;/);
   assert.match(less, /\.FlatRateMainLiveChat-status\s*\{[\s\S]*?justify-content:\s*center;[\s\S]*?color:\s*#66ff00;[\s\S]*?text-align:\s*center;/);
   assert.match(less, /\.FlatRateMainLiveChat-globe,[\s\S]*?color:\s*#66ff00;/);
   assert.doesNotMatch(less, /FlatRateMainLiveChat-title/);
-  assert.doesNotMatch(less, /FlatRateMainLiveChat-count/);
+  assert.match(less, /\.FlatRateMainLiveChat-count\s*\{[\s\S]*?color:\s*#66ff00;/);
   assert.doesNotMatch(less, /FlatRateMainLiveChat-toggle/);
   assert.doesNotMatch(less, /FlatRateMainLiveChat-timestamp/);
   assert.doesNotMatch(less, /FlatRateMainLiveChat-votes/);
