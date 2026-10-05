@@ -184,14 +184,17 @@ test('canonical Messages href from provider; fallback canonical; reject non-Mess
   assert.equal(resolveMainLiveHref(null), CANONICAL_MAIN_LIVE_HREF);
 });
 
-test('component wires accessibility, toggle isolation, and provider-only contract', () => {
-  assert.match(pinSrc, /Open FlatRate\.wiki General Live/);
-  assert.match(pinSrc, /Keep me live while browsing/);
-  assert.match(pinSrc, /role="switch"/);
-  assert.match(pinSrc, /aria-checked/);
-  assert.match(pinSrc, /stopPropagation/);
-  assert.match(pinSrc, /preventDefault/);
-  assert.match(pinSrc, /setUserLive/);
+test('component renders only the centered Public Live treatment and provider-owned href', () => {
+  assert.match(pinSrc, /Open Public Live chat/);
+  assert.match(pinSrc, />PUBLIC</);
+  assert.match(pinSrc, /fas fa-globe/);
+  assert.match(pinSrc, />LIVE</);
+  assert.match(pinSrc, /fas fa-comments/);
+  assert.doesNotMatch(pinSrc, /FlatRate\.wiki/);
+  assert.doesNotMatch(pinSrc, /role="switch"/);
+  assert.doesNotMatch(pinSrc, /aria-checked/);
+  assert.doesNotMatch(pinSrc, /setUserLive/);
+  assert.doesNotMatch(pinSrc, /liveCount/);
   assert.match(pinSrc, /FlatRateMainLiveChat/);
   assert.match(pinSrc, /data-flatrate-main-live="true"/);
   assert.doesNotMatch(pinSrc, /flatrateLiveRealtime/);
@@ -216,27 +219,14 @@ test('index wires Live before START/pins and fails closed on public MAIN', () =>
   assert.doesNotMatch(pinSrc, /OFFLINE/);
 });
 
-test('presentation CSS keeps the General Live row compact with title left and lime status right', () => {
+test('presentation CSS centers only PUBLIC globe LIVE chat icon in lime', () => {
   assert.match(less, /\.FlatRateMainLiveChat\b/);
-  assert.match(less, /\.FlatRateMainLiveChat-row\b/);
-  assert.match(
-    less,
-    /\.FlatRateMainLiveChat-body\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\) auto;/
-  );
-  assert.match(
-    less,
-    /\.FlatRateMainLiveChat-title\s*\{[\s\S]*?justify-self:\s*start;[\s\S]*?text-transform:\s*uppercase;/
-  );
-  assert.match(
-    less,
-    /\.FlatRateMainLiveChat-meta\s*\{[\s\S]*?justify-self:\s*end;[\s\S]*?color:\s*#66ff00;[\s\S]*?text-align:\s*right;/
-  );
-  assert.match(
-    less,
-    /\.FlatRateMainLiveChat-toggle\s*\{[\s\S]*?display:\s*none !important;/
-  );
-  assert.match(less, /min-height: 44px/);
-  assert.match(less, /@media \(max-width: 420px\)/);
+  assert.match(less, /\.FlatRateMainLiveChat-link\s*\{[\s\S]*?justify-content:\s*center;[\s\S]*?color:\s*#66ff00;/);
+  assert.match(less, /\.FlatRateMainLiveChat-status\s*\{[\s\S]*?justify-content:\s*center;[\s\S]*?color:\s*#66ff00;[\s\S]*?text-align:\s*center;/);
+  assert.match(less, /\.FlatRateMainLiveChat-globe,[\s\S]*?color:\s*#66ff00;/);
+  assert.doesNotMatch(less, /FlatRateMainLiveChat-title/);
+  assert.doesNotMatch(less, /FlatRateMainLiveChat-count/);
+  assert.doesNotMatch(less, /FlatRateMainLiveChat-toggle/);
   assert.doesNotMatch(less, /FlatRateMainLiveChat-timestamp/);
   assert.doesNotMatch(less, /FlatRateMainLiveChat-votes/);
   assert.doesNotMatch(less, /FlatRateMainLiveChat-replies/);
