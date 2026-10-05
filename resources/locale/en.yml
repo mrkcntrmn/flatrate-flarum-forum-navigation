@@ -1,5 +1,18 @@
 flatrate-forum-navigation:
   admin:
+    maintenance_banner:
+      heading: Maintenance Banner
+      intro_help: Control the site-wide status notice without publishing a new extension release. Saving rotates the dismissal revision so the updated notice can appear again.
+      enabled_label: Enable maintenance banner
+      message_label: Status message
+      message_help: Plain text only, up to {max} characters. A blank message cannot be enabled.
+      color_label: Banner color
+      color_help: Choose an approved high-contrast presentation color. FLATRATE.WIKI Pink uses the brand accent.
+      save_button: Save changes
+      save_success: Maintenance banner settings saved.
+      save_error: Could not save maintenance banner settings.
+      message_required: Enter a status message before enabling the banner.
+      message_too_long: Keep the status message at {max} characters or fewer.
     quick_rail:
       heading: Center Menu V2
       intro_help: V1 is the warehouse MAIN menu and remains the default. These independent switches expose V2 only to the selected signed-in audience. Public guests always stay on V1.
