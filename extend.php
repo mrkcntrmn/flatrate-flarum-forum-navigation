@@ -41,7 +41,7 @@ $extenders = [
         ->default(MainPinsFilter::SETTING_PUBLIC, '[]')
         ->default(MainPinsFilter::SETTING_MEMBER, '[]')
         ->default(QuickRailGate::SETTING_V2_ADMIN_VISIBLE, '0')
-        ->default(QuickRailGate::SETTING_V2_USER_VISIBLE, '0'),
+        ->default(QuickRailGate::SETTING_V2_USER_VISIBLE, '0')\n        ->default(MaintenanceBannerSettings::SETTING_ENABLED, '1')\n        ->default(MaintenanceBannerSettings::SETTING_MESSAGE, MaintenanceBannerSettings::DEFAULT_MESSAGE)\n        ->default(MaintenanceBannerSettings::SETTING_COLOR, MaintenanceBannerSettings::DEFAULT_COLOR)\n        ->default(MaintenanceBannerSettings::SETTING_REVISION, MaintenanceBannerSettings::DEFAULT_REVISION),
 
     // Flarum 1.8.19 discussion list filter seam (filter[key]=value).
     // Plan docs mention SearchDriver (2.x naming); 1.8 uses Extend\Filter.
