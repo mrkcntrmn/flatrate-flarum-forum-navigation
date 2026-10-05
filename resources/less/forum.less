@@ -1,8 +1,8 @@
 .FlatRateMaintenanceBanner {
   box-sizing: border-box;
   width: 100%;
-  background: #c62828;
-  color: #fff;
+  background: var(--flatrate-maintenance-bg, #c62828);
+  color: var(--flatrate-maintenance-fg, #fff);
   position: relative;
   z-index: 100;
 }
@@ -22,22 +22,15 @@
 }
 
 .FlatRateMaintenanceBanner-message {
-  color: #fff;
+  color: var(--flatrate-maintenance-fg, #fff);
   font-size: 14px;
   font-weight: 600;
   line-height: 1.4;
   text-align: center;
 }
 
-.FlatRateMaintenanceBanner-copy,
-.FlatRateMaintenanceBanner-schedule {
+.FlatRateMaintenanceBanner-copy {
   display: block;
-}
-
-.FlatRateMaintenanceBanner-schedule {
-  margin-top: 0.15rem;
-  font-weight: 500;
-  opacity: 0.95;
 }
 
 .FlatRateMaintenanceBanner-dismiss {
@@ -50,7 +43,7 @@
   border: 0;
   border-radius: 4px;
   background: transparent;
-  color: #fff;
+  color: var(--flatrate-maintenance-fg, #fff);
   font: inherit;
   font-size: 24px;
   font-weight: 400;
@@ -64,9 +57,9 @@
 .FlatRateMaintenanceBanner-dismiss:hover,
 .FlatRateMaintenanceBanner-dismiss:focus-visible {
   background: rgba(255, 255, 255, 0.14);
-  color: #fff;
+  color: var(--flatrate-maintenance-fg, #fff);
   opacity: 1;
-  outline: 2px solid #fff;
+  outline: 2px solid var(--flatrate-maintenance-fg, #fff);
   outline-offset: -3px;
 }
 
