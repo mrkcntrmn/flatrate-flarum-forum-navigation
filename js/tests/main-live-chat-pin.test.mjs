@@ -152,16 +152,16 @@ test('single injection: repeated add keeps exactly one Live row', () => {
   assert.equal(list.items[MAIN_LIVE_CHAT_ITEM], undefined);
 });
 
-test('count presentation: positive, valid zero, unknown (no invented zero)', () => {
+test('count presentation: positive counts show, zero and unknown omit the digit', () => {
   assert.deepEqual(formatLiveCountPresentation(4), {
     text: '4 LIVE',
     ariaLabel: '4 members live',
     known: true,
   });
   assert.deepEqual(formatLiveCountPresentation(0), {
-    text: '0 LIVE',
-    ariaLabel: '0 members live',
-    known: true,
+    text: 'LIVE',
+    ariaLabel: 'Live presence count unavailable',
+    known: false,
   });
   assert.deepEqual(formatLiveCountPresentation(null), {
     text: 'LIVE',
