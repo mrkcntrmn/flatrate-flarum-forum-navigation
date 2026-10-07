@@ -1072,3 +1072,42 @@
   font-size: 0.72em;
   vertical-align: baseline;
 }
+
+/* MAIN notifications plane. Scoped so brand Follow and discussion star keep
+   their existing primary-control rules. */
+.FlatRateMainNotifications.App-primaryControl {
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+}
+
+.FlatRateMainNotifications .FlatRateMainNotifications-plane {
+  color: #ffffff;
+  font-size: 20px;
+  line-height: 44px;
+}
+
+.FlatRateMainNotifications--unread .FlatRateMainNotifications-plane {
+  color: #84cc16;
+}
+
+.FlatRateMainNotifications-badge {
+  position: absolute;
+  top: 4px;
+  right: 0;
+  min-width: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #c72d5d;
+  color: #ffffff;
+  font-size: 11px;
+  line-height: 16px;
+  text-align: center;
+}
+
+.FlatRateMainNotifications:focus-visible {
+  outline: 2px solid #84cc16;
+  outline-offset: 2px;
+}

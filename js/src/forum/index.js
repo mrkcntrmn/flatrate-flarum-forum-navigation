@@ -45,6 +45,8 @@ import {
   removeBrandLiveItem,
 } from './utils/brandLivePin';
 import { isCleanRootIndex, mainPinIdsFromForum } from './utils/mainLandingPins';
+import { shouldShowMainNotifications } from './utils/mainNotifications';
+import MainNotificationsButton from './components/MainNotificationsButton';
 
 function resolveTagHero() {
   try {
@@ -435,6 +437,31 @@ app.initializers.add(
         </div>,
         -20
       );
+    });
+
+    // MAIN top-right paper plane. Brand follow and discussion Follow stay on
+    // their own primary-control seams; this item is clean-root only.
+    extend(IndexPage.prototype, 'sidebarItems', function (items) {
+      if (items.items && items.items.flatrateMainNotifications) {
+        items.remove('flatrateMainNotifications');
+      }
+      const { routeName, searchParams, stickyParams, currentTag } = rootContext();
+      if (!shouldShowMainNotifications({
+        signedIn: !!(app.session && app.session.user),
+        isIndexPage: true,
+        isDiscussionPage: false,
+        isMessagesRoute: false,
+        isNotificationsRoute: false,
+        pathname: currentPathname(),
+        routeName,
+        searchParams,
+        stickyParams,
+        currentTag,
+        page: currentPageNumber(),
+      })) {
+        return;
+      }
+      items.add('flatrateMainNotifications', <MainNotificationsButton />, 200);
     });
 
     // Annotate only the IndexPage title-control SelectDropdown.
