@@ -13,6 +13,7 @@ export const PLANE_TARGET_PX = 44;
  */
 export function shouldShowMainNotifications(context = {}) {
   if (!context.signedIn) return false;
+  if (context.notificationsAvailable !== true) return false;
   if (!context.isIndexPage || context.isDiscussionPage) return false;
   if (context.isMessagesRoute || context.isNotificationsRoute) return false;
   return isCleanRootIndex({

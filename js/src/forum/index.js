@@ -448,6 +448,7 @@ app.initializers.add(
       const { routeName, searchParams, stickyParams, currentTag } = rootContext();
       if (!shouldShowMainNotifications({
         signedIn: !!(app.session && app.session.user),
+        notificationsAvailable: !!(app.forum && app.forum.attribute && app.forum.attribute('flatrate-messaging-ui.notifications_available') === true),
         isIndexPage: true,
         isDiscussionPage: false,
         isMessagesRoute: false,

@@ -5,6 +5,7 @@ import { badgeText, planePresentation, shouldShowMainNotifications } from '../sr
 
 const main = {
   signedIn: true,
+  notificationsAvailable: true,
   isIndexPage: true,
   isDiscussionPage: false,
   pathname: '/',
@@ -15,9 +16,12 @@ const main = {
   page: 1,
 };
 
-test('signed-in MAIN shows the plane and guests do not', () => {
+test('signed-in MAIN shows the plane only when the safe availability boolean is true', () => {
   assert.equal(shouldShowMainNotifications(main), true);
   assert.equal(shouldShowMainNotifications({ ...main, signedIn: false }), false);
+  assert.equal(shouldShowMainNotifications({ ...main, notificationsAvailable: false }), false);
+  assert.equal(shouldShowMainNotifications({ ...main, notificationsAvailable: undefined }), false);
+  assert.equal(shouldShowMainNotifications({ ...main, notificationsAvailable: 'true' }), false);
 });
 
 test('brand, technician, start, following, discussion, messages, and notifications stay clear', () => {
