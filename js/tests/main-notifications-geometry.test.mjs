@@ -47,13 +47,13 @@ test('idle plane contrast: white and lime stay legible on the white forum header
   const button = selectorBody('.FlatRateMainNotifications.App-primaryControl');
   const idlePlane = selectorBody('.FlatRateMainNotifications .FlatRateMainNotifications-plane');
   const unreadPlane = selectorBody('.FlatRateMainNotifications--unread .FlatRateMainNotifications-plane');
-  const background = button.match(/background-color:\\s*(#[a-f0-9]{6})/i)?.[1];
-  const white = idlePlane.match(/color:\\s*(#[a-f0-9]{6})/i)?.[1];
-  const lime = unreadPlane.match(/color:\\s*(#[a-f0-9]{6})/i)?.[1];
+  const background = button.match(/background-color:\s*(#[a-f0-9]{6})/i)?.[1];
+  const white = idlePlane.match(/color:\s*(#[a-f0-9]{6})/i)?.[1];
+  const lime = unreadPlane.match(/color:\s*(#[a-f0-9]{6})/i)?.[1];
   assert.ok(background, 'Notifications button needs a dark contrast surface');
   assert.equal(white?.toLowerCase(), '#ffffff');
   assert.equal(lime?.toLowerCase(), '#84cc16');
-  assert.match(button, /border-radius:\\s*50%/);
+  assert.match(button, /border-radius:\s*50%/);
   assert.ok(contrast(white, background) >= 4.5, 'idle white plane needs 4.5:1 visual contrast');
   assert.ok(contrast(lime, background) >= 4.5, 'unread lime plane needs 4.5:1 visual contrast');
   assert.ok(contrast(background, '#ffffff') >= 4.5, 'dark button must contrast with white header');
