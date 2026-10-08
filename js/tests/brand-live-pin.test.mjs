@@ -255,8 +255,8 @@ test('brand tag falls back to route params and app.store when the page method is
 
 
 test('Brand Live pin uses canonical name above same PUBLIC Live count hierarchy', () => {
-  assert.match(brandPinSrc, /title=\\{\\`\\$\\{name\\} Live\\`\\}/);
-  assert.match(brandPinSrc, /const name = board\\.name/);
+  assert.ok(brandPinSrc.includes('title={`${name} Live`}'));
+  assert.match(brandPinSrc, /const name = board\.name/);
   assert.match(livePinSrc, /FlatRateMainLiveChat-title/);
   assert.match(livePinSrc, /FlatRateMainLiveChat-status/);
   assert.doesNotMatch(livePinSrc, /fas fa-comments/);
