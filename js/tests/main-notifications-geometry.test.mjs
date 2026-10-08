@@ -23,10 +23,12 @@ test('plane target stays 44px at the required phone widths', () => {
 });
 
 function selectorBody(selector) {
-  const escaped = selector.replace(/[.*+?^$\\{}()|[\]\\]/g, '\\$&');
-  const match = less.match(new RegExp(escaped + '\\s*\\{([^}]*)\\}'));
-  assert.ok(match, 'missing CSS selector: ' + selector);
-  return match[1];
+  const start = less.indexOf(selector + ' {');
+  assert.ok(start >= 0, 'missing CSS selector: ' + selector);
+  const open = less.indexOf('{', start);
+  const close = less.indexOf('}', open + 1);
+  assert.ok(close > open, 'unclosed selector: ' + selector);
+  return less.slice(open + 1, close);
 }
 
 function luminance(hex) {
