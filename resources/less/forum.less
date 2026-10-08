@@ -1072,3 +1072,52 @@
   font-size: 0.72em;
   vertical-align: baseline;
 }
+
+/* MAIN notifications plane. Scoped so brand Follow and discussion star keep
+   their existing primary-control rules. */
+.FlatRateMainNotifications.App-primaryControl {
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  /* The forum header is white. Preserve the owner-approved white idle plane
+     but give both idle white and unread lime a contrasting, bounded surface. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 0;
+  border-radius: 50%;
+  background-color: #252b34 !important;
+}
+
+.FlatRateMainNotifications .FlatRateMainNotifications-plane {
+  color: #ffffff;
+  font-size: 20px;
+  line-height: 1;
+  margin: 0;
+}
+
+.FlatRateMainNotifications--unread .FlatRateMainNotifications-plane {
+  color: #84cc16;
+}
+
+.FlatRateMainNotifications-badge {
+  position: absolute;
+  top: 4px;
+  right: 0;
+  min-width: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #c72d5d;
+  color: #ffffff;
+  font-size: 11px;
+  line-height: 16px;
+  text-align: center;
+}
+
+.FlatRateMainNotifications:focus-visible {
+  outline: 2px solid #84cc16;
+  outline-offset: 2px;
+}
