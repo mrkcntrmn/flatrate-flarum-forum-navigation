@@ -34,3 +34,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "build: refresh v1.4.17 Live preview dist [skip ci]"
           git push origin HEAD:refs/heads/release/forum-live-header-unify-001-v1417-preview
+
+# Rerun after updating historical bubble-icon test assertion.
