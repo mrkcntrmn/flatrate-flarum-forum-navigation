@@ -191,7 +191,8 @@ test('component renders only the centered Public Live treatment and provider-own
   assert.match(livePinSrc, />PUBLIC</);
   assert.match(livePinSrc, /fas fa-globe/);
   assert.match(livePinSrc, />LIVE</);
-  assert.match(livePinSrc, /fas fa-comments/);
+  assert.doesNotMatch(livePinSrc, /fas fa-comments/);
+  assert.match(livePinSrc, /FlatRateMainLiveChat-title/);
   assert.doesNotMatch(pinSrc, /FlatRate\.wiki/);
   assert.doesNotMatch(livePinSrc, /FlatRate\.wiki/);
   assert.doesNotMatch(pinSrc, /role="switch"/);
