@@ -11,6 +11,18 @@ export const PLANE_TARGET_PX = 44;
  * Discussion, Messages, and Notifications fail closed through the canonical
  * clean-root helper plus explicit page guards.
  */
+/**
+ * Messaging UI owns actor-effective availability. Navigation only reads the
+ * published boolean. A missing publisher fails closed and does not inspect
+ * rollout settings or the beta marker.
+ */
+export function actorNotificationsAvailable(app) {
+  const state = app && app.flatrateNotificationState;
+  if (!state || state.available !== true) return false;
+  if (!app.session || !app.session.user) return false;
+  return true;
+}
+
 export function shouldShowMainNotifications(context = {}) {
   if (!context.signedIn) return false;
   if (context.notificationsAvailable !== true) return false;

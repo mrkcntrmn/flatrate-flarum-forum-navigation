@@ -1,17 +1,9 @@
 import app from 'flarum/forum/app';
-import { planePresentation } from '../utils/mainNotifications';
-
-const NOTIFICATIONS_AVAILABLE = 'flatrate-messaging-ui.notifications_available';
-
-function notificationsAvailable() {
-  const forum = app.forum;
-  if (!forum || typeof forum.attribute !== 'function') return false;
-  return forum.attribute(NOTIFICATIONS_AVAILABLE) === true;
-}
+import { actorNotificationsAvailable, planePresentation } from '../utils/mainNotifications';
 
 export default class MainNotificationsButton {
   view() {
-    if (!app.session || !app.session.user || !notificationsAvailable()) {
+    if (!actorNotificationsAvailable(app)) {
       return null;
     }
     const badge = app.flatrateNotifications && typeof app.flatrateNotifications.badge === 'function'

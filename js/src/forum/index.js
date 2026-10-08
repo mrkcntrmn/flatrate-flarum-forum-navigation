@@ -45,7 +45,7 @@ import {
   removeBrandLiveItem,
 } from './utils/brandLivePin';
 import { isCleanRootIndex, mainPinIdsFromForum } from './utils/mainLandingPins';
-import { shouldShowMainNotifications } from './utils/mainNotifications';
+import { actorNotificationsAvailable, shouldShowMainNotifications } from './utils/mainNotifications';
 import MainNotificationsButton from './components/MainNotificationsButton';
 
 function resolveTagHero() {
@@ -448,7 +448,7 @@ app.initializers.add(
       const { routeName, searchParams, stickyParams, currentTag } = rootContext();
       if (!shouldShowMainNotifications({
         signedIn: !!(app.session && app.session.user),
-        notificationsAvailable: !!(app.forum && app.forum.attribute && app.forum.attribute('flatrate-messaging-ui.notifications_available') === true),
+        notificationsAvailable: actorNotificationsAvailable(app),
         isIndexPage: true,
         isDiscussionPage: false,
         isMessagesRoute: false,
