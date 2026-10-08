@@ -17,6 +17,8 @@ import {
 } from '../src/forum/utils/brandLivePin.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
+const brandPinSrc = readFileSync(join(root, 'js/src/forum/components/BrandLivePin.js'), 'utf8');
+const livePinSrc = readFileSync(join(root, 'js/src/forum/components/LiveBoardPin.js'), 'utf8');
 const manifest = JSON.parse(readFileSync(join(root, 'resources/navigation-runtime-manifest.json'), 'utf8'));
 
 function tag(slug) {
@@ -249,4 +251,13 @@ test('brand tag falls back to route params and app.store when the page method is
   assert.equal(items.items.flatrateBrandLive, undefined);
   activateBrandLive(closed.board, live);
   assert.deepEqual(live.calls, []);
+});
+
+
+test('Brand Live pin uses canonical name above same PUBLIC Live count hierarchy', () => {
+  assert.match(brandPinSrc, /title=\\{\\`\\$\\{name\\} Live\\`\\}/);
+  assert.match(brandPinSrc, /const name = board\\.name/);
+  assert.match(livePinSrc, /FlatRateMainLiveChat-title/);
+  assert.match(livePinSrc, /FlatRateMainLiveChat-status/);
+  assert.doesNotMatch(livePinSrc, /fas fa-comments/);
 });
