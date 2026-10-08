@@ -1081,12 +1081,22 @@
   height: 44px;
   min-height: 44px;
   padding: 0;
+  /* The forum header is white. Preserve the owner-approved white idle plane
+     but give both idle white and unread lime a contrasting, bounded surface. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 0;
+  border-radius: 50%;
+  background-color: #252b34 !important;
 }
 
 .FlatRateMainNotifications .FlatRateMainNotifications-plane {
   color: #ffffff;
   font-size: 20px;
-  line-height: 44px;
+  line-height: 1;
+  margin: 0;
 }
 
 .FlatRateMainNotifications--unread .FlatRateMainNotifications-plane {
