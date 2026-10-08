@@ -228,8 +228,12 @@ test('presentation CSS centers PUBLIC globe LIVE count chat icon in lime', () =>
   assert.match(less, /\.FlatRateMainLiveChat\b/);
   assert.match(less, /\.FlatRateMainLiveChat-link\s*\{[\s\S]*?justify-content:\s*center;[\s\S]*?color:\s*#66ff00;/);
   assert.match(less, /\.FlatRateMainLiveChat-status\s*\{[\s\S]*?justify-content:\s*center;[\s\S]*?color:\s*#66ff00;[\s\S]*?text-align:\s*center;/);
-  assert.match(less, /\.FlatRateMainLiveChat-globe,[\s\S]*?color:\s*#66ff00;/);
-  assert.doesNotMatch(less, /FlatRateMainLiveChat-title/);
+  assert.match(less, /\.FlatRateMainLiveChat-globe\s*\{[\s\S]*color:\s*#66ff00/);
+  assert.match(less, /\.FlatRateMainLiveChat-title\s*\{[\s\S]*color:\s*var\(--text-color\)/);
+  assert.match(less, /\.FlatRateMainLiveChat-heading\s*\{[\s\S]*flex-direction:\s*column/);
+  assert.match(livePinSrc, /FlatRateMainLiveChat-title/);
+  assert.ok(pinSrc.includes('title="FLATRATE.WIKI"'));
+  assert.doesNotMatch(livePinSrc, /fas fa-comments/);
   assert.match(less, /\.FlatRateMainLiveChat-count\s*\{[\s\S]*?color:\s*#66ff00;/);
   assert.doesNotMatch(less, /FlatRateMainLiveChat-toggle/);
   assert.doesNotMatch(less, /FlatRateMainLiveChat-timestamp/);
