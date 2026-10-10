@@ -259,5 +259,6 @@ test('Brand Live pin uses canonical name above same PUBLIC Live count hierarchy'
   assert.match(brandPinSrc, /const name = board\.name/);
   assert.match(livePinSrc, /FlatRateMainLiveChat-title/);
   assert.match(livePinSrc, /FlatRateMainLiveChat-status/);
-  assert.doesNotMatch(livePinSrc, /fas fa-comments/);
+  assert.match(livePinSrc, /fas fa-comments/);
+  assert.match(livePinSrc, /aria-hidden="true"/);
 });

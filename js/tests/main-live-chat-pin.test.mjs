@@ -191,7 +191,8 @@ test('component renders only the centered Public Live treatment and provider-own
   assert.match(livePinSrc, />PUBLIC</);
   assert.match(livePinSrc, /fas fa-globe/);
   assert.match(livePinSrc, />LIVE</);
-  assert.doesNotMatch(livePinSrc, /fas fa-comments/);
+  assert.match(livePinSrc, /fas fa-comments/);
+  assert.match(livePinSrc, /aria-hidden="true"/);
   assert.match(livePinSrc, /FlatRateMainLiveChat-title/);
   assert.doesNotMatch(pinSrc, /FlatRate\.wiki/);
   assert.doesNotMatch(livePinSrc, /FlatRate\.wiki/);
@@ -225,16 +226,33 @@ test('index wires Live before START/pins and fails closed on public MAIN', () =>
   assert.doesNotMatch(pinSrc, /OFFLINE/);
 });
 
-test('presentation CSS centers PUBLIC globe LIVE count chat icon in lime', () => {
+test('presentation CSS anchors the lime globe to the card center', () => {
   assert.match(less, /\.FlatRateMainLiveChat\b/);
   assert.match(less, /\.FlatRateMainLiveChat-link\s*\{[\s\S]*?justify-content:\s*center;[\s\S]*?color:\s*#66ff00;/);
-  assert.match(less, /\.FlatRateMainLiveChat-status\s*\{[\s\S]*?justify-content:\s*center;[\s\S]*?color:\s*#66ff00;[\s\S]*?text-align:\s*center;/);
-  assert.match(less, /\.FlatRateMainLiveChat-globe\s*\{[\s\S]*color:\s*#66ff00/);
-  assert.match(less, /\.FlatRateMainLiveChat-title\s*\{[\s\S]*color:\s*var\(--text-color\)/);
-  assert.match(less, /\.FlatRateMainLiveChat-heading\s*\{[\s\S]*flex-direction:\s*column/);
+  const status = less.match(/\.FlatRateMainLiveChat-status\s*\{([^}]*)\}/);
+  assert.ok(status, 'status rule missing');
+  assert.match(status[1], /display:\s*block/);
+  assert.doesNotMatch(status[1], /display:\s*(inline-)?flex/);
+  assert.match(status[1], /width:\s*100%/);
+  assert.match(status[1], /font-size:\s*16px/);
+  assert.match(status[1], /font-weight:\s*400/);
+  assert.doesNotMatch(status[1], /font-weight:\s*700/);
+  assert.doesNotMatch(status[1], /letter-spacing:\s*0\.02em/);
+  const globe = less.match(/\.FlatRateMainLiveChat-globe\s*\{([^}]*)\}/);
+  assert.ok(globe, 'globe rule missing');
+  assert.match(globe[1], /position:\s*absolute/);
+  assert.match(globe[1], /left:\s*50%/);
+  assert.match(globe[1], /translateX\(-50%\)/);
+  assert.match(globe[1], /color:\s*#66ff00/);
+  assert.match(less, /\.FlatRateMainLiveChat-title\s*\{[\s\S]*color:\s*#ffffff/);
+  assert.match(less, /\.FlatRateMainLiveChat-title\s*\{[\s\S]*font-size:\s*16px/);
+  assert.match(less, /\.FlatRateMainLiveChat-titleGroup\s*\{[\s\S]*inline-flex/);
   assert.match(livePinSrc, /FlatRateMainLiveChat-title/);
+  assert.match(livePinSrc, /fas fa-comments/);
+  const globeAt = livePinSrc.indexOf('FlatRateMainLiveChat-globe');
+  const liveAt = livePinSrc.indexOf('FlatRateMainLiveChat-live');
+  assert.ok(globeAt > -1 && liveAt > globeAt, 'globe must not sit inside the LIVE flex slot');
   assert.ok(pinSrc.includes('title="FLATRATE.WIKI"'));
-  assert.doesNotMatch(livePinSrc, /fas fa-comments/);
   assert.match(less, /\.FlatRateMainLiveChat-count\s*\{[\s\S]*?color:\s*#66ff00;/);
   assert.doesNotMatch(less, /FlatRateMainLiveChat-toggle/);
   assert.doesNotMatch(less, /FlatRateMainLiveChat-timestamp/);

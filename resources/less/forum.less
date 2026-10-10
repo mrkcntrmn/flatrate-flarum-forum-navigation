@@ -81,7 +81,12 @@
   }
 }
 
-/* Synthetic locked General Live row on authenticated MAIN (not a Discussion). */
+/* Synthetic locked General Live row on authenticated MAIN (not a Discussion).
+   The globe is positioned against the full-width status band, which is the
+   card's content width. left: 50% plus translateX(-50%) keeps the globe on
+   the card centerline. PUBLIC and LIVE are absolute side slots, so an
+   unequal label width cannot move the globe.
+   Node tests cannot measure CSS pixels. Browser geometry at 353, 360, 390, 412, and desktop is still required. */
 .FlatRateMainLiveChat {
   box-sizing: border-box;
   width: 100%;
@@ -89,6 +94,7 @@
 }
 
 .FlatRateMainLiveChat-row {
+  position: relative;
   width: 100%;
   min-height: 72px;
   box-sizing: border-box;
@@ -100,6 +106,7 @@
 
 .FlatRateMainLiveChat-link {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
@@ -120,53 +127,107 @@
 
 .FlatRateMainLiveChat-heading {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
   width: 100%;
   min-width: 0;
   text-align: center;
 }
 
+.FlatRateMainLiveChat-titleGroup {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  max-width: 100%;
+  min-width: 0;
+}
+
 .FlatRateMainLiveChat-title {
   display: block;
+  min-width: 0;
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: var(--text-color);
-  font-size: 18px;
-  font-weight: 600;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 400;
   line-height: 1.2;
+  letter-spacing: normal;
+}
+
+.FlatRateMainLiveChat-bubbles {
+  flex: 0 0 auto;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1;
 }
 
 .FlatRateMainLiveChat-status {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  min-width: 0;
+  position: relative;
+  display: block;
+  align-self: stretch;
+  width: 100%;
+  min-height: 1.2em;
+  margin-top: 4px;
   color: #66ff00;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 400;
   line-height: 1.2;
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
   text-align: center;
   white-space: nowrap;
 }
 
+.FlatRateMainLiveChat-public,
+.FlatRateMainLiveChat-live {
+  position: absolute;
+  top: 50%;
+  color: #66ff00;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: normal;
+  white-space: nowrap;
+}
+
+.FlatRateMainLiveChat-public {
+  position: absolute;
+  right: ~"calc(50% + 0.5em + 0.35rem)";
+  transform: translateY(-50%);
+}
+
+.FlatRateMainLiveChat-live {
+  position: absolute;
+  left: ~"calc(50% + 0.5em + 0.35rem)";
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transform: translateY(-50%);
+}
+
 .FlatRateMainLiveChat-count {
   color: #66ff00;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: normal;
   font-variant-numeric: tabular-nums;
 }
 
 .FlatRateMainLiveChat-globe {
+  position: absolute;
+  left: 50%;
+  top: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: #66ff00;
+  font-size: 16px;
   line-height: 1;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(-50%);
 }
 
 /* HOME-only pinned START board shortcut (not a Discussion model row). */
@@ -343,6 +404,13 @@
    navigation extension has projected a Brand tagline, suppress the native tag
    icon so Audi/BMW/etc. do not repeat a car glyph beside the Brand name. */
 .TagHero:has(.FlatRateBrandTagline) .Hero-title .icon {
+  display: none !important;
+}
+
+/* Brand tag pages only. The center menu already names the Brand, so the
+   native Hero title (for example "Audi" plus its old hero total) is removed.
+   Generic TagHero and DiscussionHero headings are not matched. */
+.TagHero.FlatRateBrandHero .Hero-title {
   display: none !important;
 }
 
@@ -1026,8 +1094,8 @@
 
 
 /* FORUM-BRAND-VOTE-TOTALS-001
- * Sidebar and Brand hero render the exact-Brand total.
- * The IndexPage center sheet suppresses that same node.
+ * Sidebar and navigation render the exact-Brand total.
+ * The Brand hero does not. The IndexPage center sheet suppresses the nav node.
  * Lime is the default/read state; pink is a secondary accent for the exact
  * Brand's positive Follow state. The number itself is never a Follow control.
  */
@@ -1086,12 +1154,6 @@
    now omits zero totals everywhere this Brand-total component is reused. */
 .FlatRateBrandVoteTotal[aria-label*="board total: 0 upvotes"] {
   display: none !important;
-}
-
-.TagHero .Hero-title .FlatRateBrandVoteTotal {
-  margin-left: 0.5rem;
-  font-size: 0.72em;
-  vertical-align: baseline;
 }
 
 /* MAIN notifications plane. Scoped so brand Follow and discussion star keep
