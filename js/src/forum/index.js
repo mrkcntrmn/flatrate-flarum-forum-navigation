@@ -16,7 +16,6 @@ import BrandLivePin from './components/BrandLivePin';
 import MainLandingPins from './components/MainLandingPins';
 import { applyMaintenanceBanner } from './maintenanceBanner';
 import BrandFamilyLinks from './components/BrandFamilyLinks';
-import BrandVoteTotal from './components/BrandVoteTotal';
 import ParentBrandBanner from './components/ParentBrandBanner';
 import './discussionCenterMenu';
 import registerDiscussionPhoneChrome, { isPhoneScreen } from './discussionPhoneChrome';
@@ -544,6 +543,33 @@ app.initializers.add(
         const parentBoard = listDirectBrandChildren(board).length > 0;
         const phoneParentBanner = parentBoard && isPhoneScreen();
         const extras = [];
+        const heroClass = String(vnode.attrs.className || '');
+        if (!heroClass.includes('FlatRateBrandHero')) {
+          vnode.attrs.className = `${heroClass} FlatRateBrandHero`.trim();
+        }
+
+        // Brand tag pages only. Drop the native Hero title (and any total that
+        // used to sit inside it). Taglines, family links, and non-Brand heroes
+        // stay. Hero-subtitle does not match this class check.
+        const omitNativeBrandHeroTitle = (nodes) => {
+          const list = Array.isArray(nodes) ? nodes : [nodes];
+          const kept = [];
+          for (const node of list) {
+            if (!node || typeof node !== 'object') {
+              kept.push(node);
+              continue;
+            }
+            const nodeClass = node.attrs ? String(node.attrs.className || '') : '';
+            if (nodeClass.includes('Hero-title')) {
+              continue;
+            }
+            if (node.children && (nodeClass.includes('containerNarrow') || nodeClass.includes('container'))) {
+              node.children = omitNativeBrandHeroTitle(node.children);
+            }
+            kept.push(node);
+          }
+          return kept;
+        };
 
         if (phoneParentBanner) {
           const className = String(vnode.attrs.className || '');
@@ -554,7 +580,6 @@ app.initializers.add(
             <ParentBrandBanner
               board={board}
               tagline={tagline}
-              extra={<BrandVoteTotal board={board} key="flatrate-brand-vote-total" />}
               key="flatrate-parent-banner"
             />
           );
@@ -575,40 +600,9 @@ app.initializers.add(
           const child = content[i];
           const className = child && child.attrs && String(child.attrs.className || '');
           if (className.includes('container')) {
-            const containerChildren = Array.isArray(child.children)
-              ? child.children.slice()
-              : [child.children];
-
-            // Flarum TagHero nests the title under `.containerNarrow`.
-            // Walk one level of wrappers so the total stays on the Hero title.
-            const findHeroTitle = (nodes) => {
-              const list = Array.isArray(nodes) ? nodes : [nodes];
-              for (const node of list) {
-                if (!node || !node.attrs) continue;
-                const nodeClass = String(node.attrs.className || '');
-                if (nodeClass.includes('Hero-title')) {
-                  return node;
-                }
-                if (nodeClass.includes('containerNarrow') || nodeClass.includes('container')) {
-                  const nested = findHeroTitle(node.children);
-                  if (nested) return nested;
-                }
-              }
-              return null;
-            };
-
-            // Keep the exact Brand total visually associated with the native
-            // Hero title rather than rendering it as a separate badge row.
-            const titleNode = findHeroTitle(containerChildren);
-            if (titleNode && !phoneParentBanner) {
-              const titleChildren = Array.isArray(titleNode.children)
-                ? titleNode.children.slice()
-                : [titleNode.children];
-              titleChildren.push(
-                <BrandVoteTotal board={board} key="flatrate-brand-vote-total" />
-              );
-              titleNode.children = titleChildren;
-            }
+            const containerChildren = omitNativeBrandHeroTitle(
+              Array.isArray(child.children) ? child.children.slice() : [child.children]
+            );
 
             const narrow = containerChildren.find((node) => {
               const nodeClass = node && node.attrs && String(node.attrs.className || '');
@@ -622,8 +616,8 @@ app.initializers.add(
               narrow.children = narrowChildren;
             } else {
               containerChildren.push(...extras.filter(Boolean));
-              child.children = containerChildren;
             }
+            child.children = containerChildren;
             inserted = true;
             break;
           }

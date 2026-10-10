@@ -29,11 +29,13 @@ test('exact positive Follow state recolors only presentation', () => {
   assert.match(less, /#c72d5d/);
 });
 
-test('Brand totals render for PresentationNav and hero, and center-sheet CSS suppresses them', () => {
+test('Brand totals render for PresentationNav and stay off the Brand hero', () => {
   assert.match(nav, /<BrandVoteTotal board=\{board\}/);
   assert.doesNotMatch(center, /BrandVoteTotal/);
   assert.doesNotMatch(center, /<BrandVoteTotal board=\{board\}/);
-  assert.match(index, /<BrandVoteTotal board=\{board\} key="flatrate-brand-vote-total"/);
+  assert.match(component, /class BrandVoteTotal/);
+  assert.doesNotMatch(index, /<BrandVoteTotal/);
+  assert.doesNotMatch(index, /flatrate-brand-vote-total/);
 
   const centerTotal = less.match(
     /\.App-titleControl \.Dropdown-menu \.FlatRatePresentationNav-brandLink \.FlatRateBrandVoteTotal\s*\{([^}]*)\}/
@@ -67,13 +69,16 @@ test('Brand totals render for PresentationNav and hero, and center-sheet CSS sup
   );
 });
 
-test('Brand hero attaches the total to the native Hero title', () => {
-  assert.match(index, /findHeroTitle/);
+test('Brand tag heroes drop the native title and do not host the upvote total', () => {
+  assert.match(index, /omitNativeBrandHeroTitle/);
+  assert.match(index, /FlatRateBrandHero/);
   assert.match(index, /containerNarrow/);
   assert.match(index, /nodeClass\.includes\('Hero-title'\)/);
-  assert.match(index, /titleChildren\.push/);
-  assert.match(index, /flatrate-brand-vote-total/);
-  assert.match(less, /\.TagHero \.Hero-title \.FlatRateBrandVoteTotal/);
+  assert.doesNotMatch(index, /titleChildren\.push/);
+  assert.doesNotMatch(index, /flatrate-brand-vote-total/);
+  assert.match(less, /\.TagHero\.FlatRateBrandHero \.Hero-title\s*\{[^}]*display:\s*none !important/);
+  assert.doesNotMatch(less, /\.TagHero \.Hero-title \.FlatRateBrandVoteTotal/);
+  assert.doesNotMatch(less, /\.DiscussionHero-title\s*\{[^}]*display:\s*none/);
   // Compat may export the class directly; bare `.default` leaves TagHero undefined.
   assert.match(
     index,
