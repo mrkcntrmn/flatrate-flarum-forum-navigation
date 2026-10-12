@@ -6,6 +6,7 @@ import DiscussionPage from 'flarum/forum/components/DiscussionPage';
 
 import DiscussionFollowStar from './components/DiscussionFollowStar';
 import DiscussionHeroActionsMenu from './components/DiscussionHeroActionsMenu';
+import DiscussionJumpToTop from './components/DiscussionJumpToTop';
 import { canMutateDiscussionFollow } from './utils/discussionFollowState';
 
 export const DISCUSSION_HERO_DETAILS_ID = 'FlatRateDiscussionHero-details';
@@ -48,6 +49,15 @@ function findHeroList(vnode) {
  */
 export default function registerDiscussionPhoneChrome() {
   extend(DiscussionPage.prototype, 'sidebarItems', function (items) {
+    // The vote extension's aggregate remains available on discussion cards;
+    // remove only its redundant standalone control at the top of a discussion.
+    removeItem(items, 'flatRateDiscussionVote');
+
+    if (items.items && items.items.flatrateJumpToTop) {
+      items.remove('flatrateJumpToTop');
+    }
+    items.add('flatrateJumpToTop', <DiscussionJumpToTop />, 90);
+
     if (!isPhoneScreen()) return;
 
     removeItem(items, 'controls');
