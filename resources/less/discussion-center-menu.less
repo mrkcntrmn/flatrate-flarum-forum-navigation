@@ -134,8 +134,10 @@
     border: 0;
   }
 
-  .TagHero.FlatRateParentBrandBannerHost .Hero-title {
-    display: none;
+  /* The mobile center control already names the current Brand. Keep the
+     banner's tagline and family links, but do not repeat the Brand name. */
+  .TagHero.FlatRateBrandHero .Hero-title {
+    display: none !important;
   }
 
   .FlatRateParentBrandBanner-row {
