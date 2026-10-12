@@ -18,6 +18,7 @@ import { applyMaintenanceBanner } from './maintenanceBanner';
 import BrandFamilyLinks from './components/BrandFamilyLinks';
 import ParentBrandBanner from './components/ParentBrandBanner';
 import './discussionCenterMenu';
+import registerCompactDiscussionActivity from './compactDiscussionActivity';
 import registerDiscussionPhoneChrome, { isPhoneScreen } from './discussionPhoneChrome';
 import { getNavigationManifest, pushToStartHref } from './utils/manifest';
 import { resolvePresentationTitle, resolvePresentationTitleMode, TECHNICIAN_TOPICS_LABEL } from './utils/presentationTitle';
@@ -170,6 +171,7 @@ app.initializers.add(
     };
 
     registerDiscussionPhoneChrome();
+    registerCompactDiscussionActivity();
 
     // Native Latest is the authenticated MAIN default. Do not force sort=top
     // or rewrite `/` to `/?sort=latest`.
