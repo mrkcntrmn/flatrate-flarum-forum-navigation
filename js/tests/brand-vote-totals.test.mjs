@@ -69,14 +69,14 @@ test('Brand totals render for PresentationNav and stay off the Brand hero', () =
   );
 });
 
-test('Brand tag heroes drop the native title and do not host the upvote total', () => {
-  assert.match(index, /omitNativeBrandHeroTitle/);
+test('Brand tag heroes retain the title summary and do not host the upvote total', () => {
+  assert.doesNotMatch(index, /omitNativeBrandHeroTitle/);
   assert.match(index, /FlatRateBrandHero/);
   assert.match(index, /containerNarrow/);
-  assert.match(index, /nodeClass\.includes\('Hero-title'\)/);
   assert.doesNotMatch(index, /titleChildren\.push/);
   assert.doesNotMatch(index, /flatrate-brand-vote-total/);
-  assert.match(less, /\.TagHero\.FlatRateBrandHero \.Hero-title\s*\{[^}]*display:\s*none !important/);
+  assert.doesNotMatch(less, /\.TagHero\.FlatRateBrandHero \.Hero-title\s*\{[^}]*display:\s*none !important/);
+  assert.match(less, /\.Hero\.FlatRateBoardHero \.Hero-title\s*\{/);
   assert.doesNotMatch(less, /\.TagHero \.Hero-title \.FlatRateBrandVoteTotal/);
   assert.doesNotMatch(less, /\.DiscussionHero-title\s*\{[^}]*display:\s*none/);
   // Compat may export the class directly; bare `.default` leaves TagHero undefined.

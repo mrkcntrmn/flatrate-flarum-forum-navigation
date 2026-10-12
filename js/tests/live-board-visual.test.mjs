@@ -39,17 +39,19 @@ test('MAIN Live keeps FLATRATE.WIKI and a decorative chat icon after the title',
   assert.match(livePinSrc, /FlatRateMainLiveChat-bubbles" aria-hidden="true"/);
   assert.match(less, /\.FlatRateMainLiveChat-title\s*\{[^}]*font-size:\s*16px/);
   assert.match(less, /\.FlatRateMainLiveChat-title\s*\{[^}]*color:\s*#ffffff/);
-  assert.match(less, /\.FlatRateMainLiveChat-bubbles\s*\{[^}]*color:\s*#ffffff/);
+  assert.match(less, /\.FlatRateMainLiveChat-bubbles\s*\{[^}]*color:\s*#c72d5d/);
+  assert.match(less, /\.FlatRateMainLiveChat-link:hover \.FlatRateMainLiveChat-bubbles/);
 });
 
-test('Audi Live and BMW Live use the brand name, not a second hero title', () => {
+test('Audi Live and BMW Live use the brand name while board heroes retain a collapsed summary', () => {
   const audi = findBrandNodeBySlug(manifest, 'audi');
   const bmw = findBrandNodeBySlug(manifest, 'bmw');
   assert.equal(`${audi.name} Live`, 'Audi Live');
   assert.equal(`${bmw.name} Live`, 'BMW Live');
   assert.match(brandPinSrc, /title=\{`\$\{name\} Live`\}/);
   assert.match(brandPinSrc, /ariaLabel=\{`Open \$\{name\} Public Live chat`\}/);
-  assert.match(indexSrc, /omitNativeBrandHeroTitle/);
+  assert.doesNotMatch(indexSrc, /omitNativeBrandHeroTitle/);
+  assert.match(indexSrc, /registerBoardHeroDisclosure\(TagHero\)/);
   assert.match(indexSrc, /FlatRateBrandHero/);
   assert.doesNotMatch(indexSrc, /BrandVoteTotal/);
   assert.match(voteTotalSrc, /class BrandVoteTotal/);
