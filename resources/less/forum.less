@@ -81,7 +81,12 @@
   }
 }
 
-/* Synthetic locked General Live row on authenticated MAIN (not a Discussion). */
+/* Synthetic locked General Live row on authenticated MAIN (not a Discussion).
+   The globe is positioned against the full-width status band, which is the
+   card's content width. left: 50% plus translateX(-50%) keeps the globe on
+   the card centerline. PUBLIC and LIVE are absolute side slots, so an
+   unequal label width cannot move the globe.
+   Node tests cannot measure CSS pixels. Browser geometry at 353, 360, 390, 412, and desktop is still required. */
 .FlatRateMainLiveChat {
   box-sizing: border-box;
   width: 100%;
@@ -89,10 +94,11 @@
 }
 
 .FlatRateMainLiveChat-row {
+  position: relative;
   width: 100%;
-  min-height: 56px;
+  min-height: 72px;
   box-sizing: border-box;
-  padding: 6px 8px;
+  padding: 8px;
   background: var(--control-bg);
   border: 1px solid var(--control-bg);
   border-radius: var(--border-radius);
@@ -100,11 +106,12 @@
 
 .FlatRateMainLiveChat-link {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
   min-width: 0;
-  min-height: 44px;
+  min-height: 54px;
   text-decoration: none;
   color: #66ff00;
 }
@@ -118,34 +125,114 @@
   outline-offset: -3px;
 }
 
-.FlatRateMainLiveChat-status {
+.FlatRateMainLiveChat-heading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  text-align: center;
+}
+
+.FlatRateMainLiveChat-titleGroup {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
+  gap: 0.35rem;
+  max-width: 100%;
   min-width: 0;
+}
+
+.FlatRateMainLiveChat-title {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: normal;
+}
+
+.FlatRateMainLiveChat-bubbles {
+  flex: 0 0 auto;
+  color: #c72d5d;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.FlatRateMainLiveChat-link:hover .FlatRateMainLiveChat-bubbles,
+.FlatRateMainLiveChat-link:focus-visible .FlatRateMainLiveChat-bubbles {
+  color: #c72d5d;
+}
+
+.FlatRateMainLiveChat-status {
+  position: relative;
+  display: block;
+  align-self: stretch;
+  width: 100%;
+  min-height: 1.2em;
+  margin-top: 4px;
   color: #66ff00;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 400;
   line-height: 1.2;
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
   text-align: center;
   white-space: nowrap;
 }
 
+.FlatRateMainLiveChat-public,
+.FlatRateMainLiveChat-live {
+  position: absolute;
+  top: 50%;
+  color: #66ff00;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: normal;
+  white-space: nowrap;
+}
+
+.FlatRateMainLiveChat-public {
+  position: absolute;
+  right: ~"calc(50% + 0.5em + 0.35rem)";
+  transform: translateY(-50%);
+}
+
+.FlatRateMainLiveChat-live {
+  position: absolute;
+  left: ~"calc(50% + 0.5em + 0.35rem)";
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transform: translateY(-50%);
+}
+
 .FlatRateMainLiveChat-count {
   color: #66ff00;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: normal;
   font-variant-numeric: tabular-nums;
 }
 
-.FlatRateMainLiveChat-globe,
-.FlatRateMainLiveChat-icon,
-.FlatRateMainLiveChat-icon .icon {
+.FlatRateMainLiveChat-globe {
+  position: absolute;
+  left: 50%;
+  top: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: #66ff00;
+  font-size: 16px;
   line-height: 1;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(-50%);
 }
 
 /* HOME-only pinned START board shortcut (not a Discussion model row). */
@@ -323,6 +410,83 @@
    icon so Audi/BMW/etc. do not repeat a car glyph beside the Brand name. */
 .TagHero:has(.FlatRateBrandTagline) .Hero-title .icon {
   display: none !important;
+}
+
+/* MAIN and every tag/board banner share one title-first disclosure. Without
+   JavaScript these classes are absent, so the complete native hero remains
+   visible as a sensible failure fallback. */
+.Hero.FlatRateBoardHero .containerNarrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  text-align: center;
+}
+
+.Hero.FlatRateBoardHero .Hero-title {
+  order: 1;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.FlatRateBoardHero-toggleRow {
+  order: 2;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.FlatRateBoardHero-toggle {
+  min-width: 44px;
+  min-height: 44px;
+  margin: 0 auto;
+  border: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: inherit;
+}
+
+.FlatRateBoardHero-toggle:hover,
+.FlatRateBoardHero-toggle:focus,
+.FlatRateBoardHero-toggle:active {
+  color: inherit;
+}
+
+.FlatRateBoardHero-toggle:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.FlatRateBoardHero-details {
+  order: 3;
+  width: 100%;
+}
+
+.Hero.FlatRateBoardHero--collapsed .container > :not(.containerNarrow),
+.Hero.FlatRateBoardHero--collapsed .FlatRateBoardHero-details {
+  display: none !important;
+}
+
+/* Manufacturer chips only: JavaScript adds this class from the canonical
+   navigation manifest, leaving Technician Topics and ordinary topic tags on
+   their native stored colors. */
+.TagLabel.FlatRateBrandTagLabel,
+.TagLabel.FlatRateBrandTagLabel:hover,
+.TagLabel.FlatRateBrandTagLabel:focus,
+.TagLabel.FlatRateBrandTagLabel:focus-visible {
+  --tag-bg: #c72d5d !important;
+  background-color: #c72d5d !important;
+  color: #ffffff !important;
+}
+
+.TagLabel.FlatRateBrandTagLabel .TagLabel-text,
+.TagLabel.FlatRateBrandTagLabel .TagLabel-name,
+.TagLabel.FlatRateBrandTagLabel .TagLabel-icon,
+.TagLabel.FlatRateBrandTagLabel .icon {
+  color: #ffffff !important;
 }
 
 .FlatRateBrandFamilyLinks {
@@ -1005,8 +1169,8 @@
 
 
 /* FORUM-BRAND-VOTE-TOTALS-001
- * Sidebar and Brand hero render the exact-Brand total.
- * The IndexPage center sheet suppresses that same node.
+ * Sidebar and navigation render the exact-Brand total.
+ * The Brand hero does not. The IndexPage center sheet suppresses the nav node.
  * Lime is the default/read state; pink is a secondary accent for the exact
  * Brand's positive Follow state. The number itself is never a Follow control.
  */
@@ -1067,8 +1231,51 @@
   display: none !important;
 }
 
-.TagHero .Hero-title .FlatRateBrandVoteTotal {
-  margin-left: 0.5rem;
-  font-size: 0.72em;
-  vertical-align: baseline;
+/* MAIN notifications plane. Scoped so brand Follow and discussion star keep
+   their existing primary-control rules. */
+.FlatRateMainNotifications.App-primaryControl {
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  /* The forum header is white. Preserve the owner-approved white idle plane
+     but give both idle white and unread lime a contrasting, bounded surface. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 0;
+  border-radius: 50%;
+  background-color: #252b34 !important;
+}
+
+.FlatRateMainNotifications .FlatRateMainNotifications-plane {
+  color: #ffffff;
+  font-size: 20px;
+  line-height: 1;
+  margin: 0;
+}
+
+.FlatRateMainNotifications--unread .FlatRateMainNotifications-plane {
+  color: #84cc16;
+}
+
+.FlatRateMainNotifications-badge {
+  position: absolute;
+  top: 4px;
+  right: 0;
+  min-width: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #c72d5d;
+  color: #ffffff;
+  font-size: 11px;
+  line-height: 16px;
+  text-align: center;
+}
+
+.FlatRateMainNotifications:focus-visible {
+  outline: 2px solid #84cc16;
+  outline-offset: 2px;
 }

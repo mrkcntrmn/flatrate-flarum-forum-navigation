@@ -41,6 +41,7 @@ export default class MainLiveChatPin extends Component {
     return (
       <LiveBoardPin
         href={href}
+        title="FLATRATE.WIKI"
         count={liveCount}
         countLabel={countInfo.ariaLabel}
         ariaLabel="Open Public Live chat"

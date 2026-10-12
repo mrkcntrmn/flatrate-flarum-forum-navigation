@@ -51,6 +51,7 @@ export default class BrandLivePin extends Component {
     return (
       <LiveBoardPin
         href={href}
+        title={`${name} Live`}
         count={rawCount}
         countLabel={rawCount == null ? 'Live presence count unavailable' : `${rawCount} members live`}
         ariaLabel={`Open ${name} Public Live chat`}

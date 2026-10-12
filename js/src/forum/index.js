@@ -16,10 +16,11 @@ import BrandLivePin from './components/BrandLivePin';
 import MainLandingPins from './components/MainLandingPins';
 import { applyMaintenanceBanner } from './maintenanceBanner';
 import BrandFamilyLinks from './components/BrandFamilyLinks';
-import BrandVoteTotal from './components/BrandVoteTotal';
-import ParentBrandBanner from './components/ParentBrandBanner';
 import './discussionCenterMenu';
-import registerDiscussionPhoneChrome, { isPhoneScreen } from './discussionPhoneChrome';
+import registerCompactDiscussionActivity from './compactDiscussionActivity';
+import registerDiscussionPhoneChrome from './discussionPhoneChrome';
+import registerBoardHeroDisclosure from './boardHeroDisclosure';
+import registerBrandTagLabels from './brandTagLabels';
 import { getNavigationManifest, pushToStartHref } from './utils/manifest';
 import { resolvePresentationTitle, resolvePresentationTitleMode, TECHNICIAN_TOPICS_LABEL } from './utils/presentationTitle';
 import {
@@ -37,7 +38,7 @@ import { START_NAV_ICON, START_NAV_LABEL, TECHNICIAN_TOPICS_ICON } from './utils
 import { stripNativeTagPresentation } from './utils/stripNativeTagPresentation';
 import { resolveBrandTagline } from './utils/brandTagline';
 import { hrefForBoardKey as boardHrefForKey } from './utils/boardRoutes';
-import { findBrandNodeBySlug, listDirectBrandChildren } from './utils/brandNode';
+import { findBrandNodeBySlug } from './utils/brandNode';
 import {
   addBrandLiveItem,
   getLiveBoardProvider,
@@ -45,6 +46,8 @@ import {
   removeBrandLiveItem,
 } from './utils/brandLivePin';
 import { isCleanRootIndex, mainPinIdsFromForum } from './utils/mainLandingPins';
+import { actorNotificationsAvailable, shouldShowMainNotifications } from './utils/mainNotifications';
+import MainNotificationsButton from './components/MainNotificationsButton';
 
 function resolveTagHero() {
   try {
@@ -54,6 +57,19 @@ function resolveTagHero() {
     return TagHeroModule && TagHeroModule.default ? TagHeroModule.default : TagHeroModule;
   } catch (error) {
     return null;
+  }
+}
+
+function resolveTagLabelHelpers() {
+  try {
+    const tagLabelModule = require('flarum/tags/common/helpers/tagLabel');
+    const sortTagsModule = require('flarum/tags/common/utils/sortTags');
+    return {
+      tagLabel: tagLabelModule && tagLabelModule.default ? tagLabelModule.default : tagLabelModule,
+      sortTags: sortTagsModule && sortTagsModule.default ? sortTagsModule.default : sortTagsModule,
+    };
+  } catch (error) {
+    return {};
   }
 }
 
@@ -156,6 +172,7 @@ app.initializers.add(
     });
 
     const TagHero = resolveTagHero();
+    registerBrandTagLabels({ getManifest: getNavigationManifest, ...resolveTagLabelHelpers() });
 
     app.flatRateBoardRoutes = {
       hrefForBoardKey(boardKey) {
@@ -169,6 +186,7 @@ app.initializers.add(
     };
 
     registerDiscussionPhoneChrome();
+    registerCompactDiscussionActivity();
 
     // Native Latest is the authenticated MAIN default. Do not force sort=top
     // or rewrite `/` to `/?sort=latest`.
@@ -437,6 +455,32 @@ app.initializers.add(
       );
     });
 
+    // MAIN top-right paper plane. Brand follow and discussion Follow stay on
+    // their own primary-control seams; this item is clean-root only.
+    extend(IndexPage.prototype, 'sidebarItems', function (items) {
+      if (items.items && items.items.flatrateMainNotifications) {
+        items.remove('flatrateMainNotifications');
+      }
+      const { routeName, searchParams, stickyParams, currentTag } = rootContext();
+      if (!shouldShowMainNotifications({
+        signedIn: !!(app.session && app.session.user),
+        notificationsAvailable: actorNotificationsAvailable(app),
+        isIndexPage: true,
+        isDiscussionPage: false,
+        isMessagesRoute: false,
+        isNotificationsRoute: false,
+        pathname: currentPathname(),
+        routeName,
+        searchParams,
+        stickyParams,
+        currentTag,
+        page: currentPageNumber(),
+      })) {
+        return;
+      }
+      items.add('flatrateMainNotifications', <MainNotificationsButton />, 200);
+    });
+
     // Annotate only the IndexPage title-control SelectDropdown.
     extend(IndexPage.prototype, 'sidebarItems', function (items) {
       const nav = typeof items.get === 'function' ? items.get('nav') : items.items?.nav?.content;
@@ -513,33 +557,20 @@ app.initializers.add(
         }
 
         const tagline = resolveBrandTagline({ currentTag: tag, manifest });
-        const parentBoard = listDirectBrandChildren(board).length > 0;
-        const phoneParentBanner = parentBoard && isPhoneScreen();
         const extras = [];
-
-        if (phoneParentBanner) {
-          const className = String(vnode.attrs.className || '');
-          if (!className.includes('FlatRateParentBrandBannerHost')) {
-            vnode.attrs.className = `${className} FlatRateParentBrandBannerHost`.trim();
-          }
-          extras.push(
-            <ParentBrandBanner
-              board={board}
-              tagline={tagline}
-              extra={<BrandVoteTotal board={board} key="flatrate-brand-vote-total" />}
-              key="flatrate-parent-banner"
-            />
-          );
-        } else {
-          if (tagline) {
-            extras.push(
-              <p className="FlatRateBrandTagline Hero-subtitle" key="flatrate-brand-tagline">
-                {tagline}
-              </p>
-            );
-          }
-          extras.push(<BrandFamilyLinks board={board} key="flatrate-brand-family" />);
+        const heroClass = String(vnode.attrs.className || '');
+        if (!heroClass.includes('FlatRateBrandHero')) {
+          vnode.attrs.className = `${heroClass} FlatRateBrandHero`.trim();
         }
+
+        if (tagline) {
+          extras.push(
+            <p className="FlatRateBrandTagline Hero-subtitle" key="flatrate-brand-tagline">
+              {tagline}
+            </p>
+          );
+        }
+        extras.push(<BrandFamilyLinks board={board} key="flatrate-brand-family" />);
 
         const content = Array.isArray(vnode.children) ? vnode.children : [vnode.children];
         let inserted = false;
@@ -547,40 +578,7 @@ app.initializers.add(
           const child = content[i];
           const className = child && child.attrs && String(child.attrs.className || '');
           if (className.includes('container')) {
-            const containerChildren = Array.isArray(child.children)
-              ? child.children.slice()
-              : [child.children];
-
-            // Flarum TagHero nests the title under `.containerNarrow`.
-            // Walk one level of wrappers so the total stays on the Hero title.
-            const findHeroTitle = (nodes) => {
-              const list = Array.isArray(nodes) ? nodes : [nodes];
-              for (const node of list) {
-                if (!node || !node.attrs) continue;
-                const nodeClass = String(node.attrs.className || '');
-                if (nodeClass.includes('Hero-title')) {
-                  return node;
-                }
-                if (nodeClass.includes('containerNarrow') || nodeClass.includes('container')) {
-                  const nested = findHeroTitle(node.children);
-                  if (nested) return nested;
-                }
-              }
-              return null;
-            };
-
-            // Keep the exact Brand total visually associated with the native
-            // Hero title rather than rendering it as a separate badge row.
-            const titleNode = findHeroTitle(containerChildren);
-            if (titleNode && !phoneParentBanner) {
-              const titleChildren = Array.isArray(titleNode.children)
-                ? titleNode.children.slice()
-                : [titleNode.children];
-              titleChildren.push(
-                <BrandVoteTotal board={board} key="flatrate-brand-vote-total" />
-              );
-              titleNode.children = titleChildren;
-            }
+            const containerChildren = Array.isArray(child.children) ? child.children.slice() : [child.children];
 
             const narrow = containerChildren.find((node) => {
               const nodeClass = node && node.attrs && String(node.attrs.className || '');
@@ -594,8 +592,8 @@ app.initializers.add(
               narrow.children = narrowChildren;
             } else {
               containerChildren.push(...extras.filter(Boolean));
-              child.children = containerChildren;
             }
+            child.children = containerChildren;
             inserted = true;
             break;
           }
@@ -607,6 +605,10 @@ app.initializers.add(
         }
       });
     }
+
+    // Register after Brand hero augmentation so the disclosure's details
+    // wrapper includes taglines, family links, and any earlier hero additions.
+    registerBoardHeroDisclosure(TagHero);
   },
   -50
 );
