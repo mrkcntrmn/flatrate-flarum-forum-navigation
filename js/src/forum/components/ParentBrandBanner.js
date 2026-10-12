@@ -22,6 +22,7 @@ export default class ParentBrandBanner extends Component {
     if (!children.length) return null;
 
     const tagline = this.attrs.tagline || '';
+    const extra = this.attrs.extra || null;
 
     return (
       <div className={`FlatRateParentBrandBanner ${this.expanded ? 'FlatRateParentBrandBanner--expanded' : 'FlatRateParentBrandBanner--collapsed'}`}>
@@ -31,25 +32,29 @@ export default class ParentBrandBanner extends Component {
           ) : null}
           <div className="FlatRateParentBrandBanner-row">
             <BrandFamilyLinks board={board} />
-            <button
-              type="button"
-              className="Button Button--icon FlatRateParentBrandBanner-toggle"
-              aria-expanded={this.expanded ? 'true' : 'false'}
-              aria-controls={this.controlsId}
-              aria-label={this.expanded ? 'Collapse brand details' : 'Expand brand details'}
-              onclick={(event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                this.expanded = !this.expanded;
-              }}
-            >
-              {icon(this.expanded ? 'fas fa-chevron-up' : 'fas fa-chevron-down')}
-            </button>
+            {extra ? (
+              <button
+                type="button"
+                className="Button Button--icon FlatRateParentBrandBanner-toggle"
+                aria-expanded={this.expanded ? 'true' : 'false'}
+                aria-controls={this.controlsId}
+                aria-label={this.expanded ? 'Collapse brand details' : 'Expand brand details'}
+                onclick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  this.expanded = !this.expanded;
+                }}
+              >
+                {icon(this.expanded ? 'fas fa-chevron-up' : 'fas fa-chevron-down')}
+              </button>
+            ) : null}
           </div>
         </div>
-        <div className="FlatRateParentBrandBanner-extra" id={this.controlsId} hidden={!this.expanded}>
-          {this.attrs.extra || null}
-        </div>
+        {extra ? (
+          <div className="FlatRateParentBrandBanner-extra" id={this.controlsId} hidden={!this.expanded}>
+            {extra}
+          </div>
+        ) : null}
       </div>
     );
   }
