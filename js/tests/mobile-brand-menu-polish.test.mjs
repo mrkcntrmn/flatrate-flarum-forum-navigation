@@ -176,3 +176,15 @@ test('zero Brand totals stay omitted wherever the total component is still rende
 test('canonical Brand hero suppresses the redundant native tag icon', () => {
   assert.match(less, /\.TagHero:has\(\.FlatRateBrandTagline\) \.Hero-title \.icon/);
 });
+
+test('mobile Brand hero omits the Brand name already shown in the center control', () => {
+  assert.match(discussionLess, /@media \(max-width: 767px\)/);
+  assert.match(
+    discussionLess,
+    /\.TagHero\.FlatRateBrandHero \.Hero-title\s*\{[^}]*display:\s*none !important;/s
+  );
+  assert.doesNotMatch(
+    less,
+    /\.TagHero\.FlatRateBrandHero \.Hero-title\s*\{[^}]*display:\s*none !important;/s
+  );
+});
