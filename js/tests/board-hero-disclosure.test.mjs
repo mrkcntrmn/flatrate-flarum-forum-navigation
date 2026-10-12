@@ -10,27 +10,25 @@ const source = readFileSync(join(root, 'js/src/forum/boardHeroDisclosure.js'), '
 const index = readFileSync(join(root, 'js/src/forum/index.js'), 'utf8');
 const less = readFileSync(join(root, 'resources/less/forum.less'), 'utf8');
 
-test('MAIN replaces permanent dismissal with a fresh collapsed disclosure', () => {
+test('MAIN stays visible without dismissal or a disclosure control', () => {
   assert.match(source, /override\(WelcomeHero\.prototype, 'isHidden'/);
   assert.match(source, /items\.remove\('dismiss-button'\)/);
-  assert.match(source, /this\.flatRateBoardHeroExpanded = false/);
-  assert.doesNotMatch(source, /localStorage/);
-  assert.match(source, /MAIN_HERO_DETAILS_ID/);
+  assert.doesNotMatch(source, /flatRateBoardHeroExpanded/);
+  assert.doesNotMatch(source, /fa-chevron/);
+  assert.doesNotMatch(source, /aria-expanded/);
 });
 
-test('all tag heroes use the same accessible toggle without dropping their title', () => {
+test('all tag heroes use the same static centered banner', () => {
   assert.match(index, /registerBoardHeroDisclosure\(TagHero\)/);
-  assert.match(source, /extend\(TagHero\.prototype, 'contentItems'/);
-  assert.match(source, /aria-expanded/);
-  assert.match(source, /aria-controls/);
-  assert.match(source, /FlatRateBoardHero-details/);
+  assert.match(source, /extend\(TagHero\.prototype, 'view'/);
+  assert.match(source, /FlatRateBoardHero--static/);
+  assert.doesNotMatch(source, /contentItems/);
   assert.doesNotMatch(index, /omitNativeBrandHeroTitle/);
 });
 
-test('collapsed layout is centered, keyboard visible, and has a 44px target', () => {
+test('static banner CSS keeps titles centered without toggle or collapsed rules', () => {
   assert.match(less, /\.Hero\.FlatRateBoardHero \.Hero-title\s*\{[^}]*width:\s*100%;[^}]*text-align:\s*center;/s);
-  assert.match(less, /\.FlatRateBoardHero-toggleRow\s*\{[^}]*justify-content:\s*center;/s);
-  assert.match(less, /\.FlatRateBoardHero-toggle\s*\{[^}]*min-width:\s*44px;[^}]*min-height:\s*44px;/s);
-  assert.match(less, /\.FlatRateBoardHero-toggle:focus-visible/);
-  assert.match(less, /FlatRateBoardHero--collapsed \.FlatRateBoardHero-details/);
+  assert.doesNotMatch(less, /FlatRateBoardHero-toggle/);
+  assert.doesNotMatch(less, /FlatRateBoardHero--collapsed/);
+  assert.doesNotMatch(less, /FlatRateBoardHero-details/);
 });

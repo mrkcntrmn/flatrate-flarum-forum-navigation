@@ -20,7 +20,6 @@ import './discussionCenterMenu';
 import registerCompactDiscussionActivity from './compactDiscussionActivity';
 import registerDiscussionPhoneChrome from './discussionPhoneChrome';
 import registerBoardHeroDisclosure from './boardHeroDisclosure';
-import registerBrandTagLabels from './brandTagLabels';
 import { getNavigationManifest, pushToStartHref } from './utils/manifest';
 import { resolvePresentationTitle, resolvePresentationTitleMode, TECHNICIAN_TOPICS_LABEL } from './utils/presentationTitle';
 import {
@@ -57,19 +56,6 @@ function resolveTagHero() {
     return TagHeroModule && TagHeroModule.default ? TagHeroModule.default : TagHeroModule;
   } catch (error) {
     return null;
-  }
-}
-
-function resolveTagLabelHelpers() {
-  try {
-    const tagLabelModule = require('flarum/tags/common/helpers/tagLabel');
-    const sortTagsModule = require('flarum/tags/common/utils/sortTags');
-    return {
-      tagLabel: tagLabelModule && tagLabelModule.default ? tagLabelModule.default : tagLabelModule,
-      sortTags: sortTagsModule && sortTagsModule.default ? sortTagsModule.default : sortTagsModule,
-    };
-  } catch (error) {
-    return {};
   }
 }
 
@@ -172,7 +158,6 @@ app.initializers.add(
     });
 
     const TagHero = resolveTagHero();
-    registerBrandTagLabels({ getManifest: getNavigationManifest, ...resolveTagLabelHelpers() });
 
     app.flatRateBoardRoutes = {
       hrefForBoardKey(boardKey) {
