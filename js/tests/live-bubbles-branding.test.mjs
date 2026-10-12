@@ -11,11 +11,11 @@ const livePin = readFileSync(join(root, 'js/src/forum/components/LiveBoardPin.js
 const brandPin = readFileSync(join(root, 'js/src/forum/components/BrandLivePin.js'), 'utf8');
 const mainPin = readFileSync(join(root, 'js/src/forum/components/MainLiveChatPin.js'), 'utf8');
 
-test('MAIN and Brand Live share one pink chat-bubbles glyph', () => {
+test('MAIN and Brand Live share one white chat-bubbles glyph', () => {
   assert.match(livePin, /FlatRateMainLiveChat-bubbles/);
   assert.match(mainPin, /<LiveBoardPin/);
   assert.match(brandPin, /<LiveBoardPin/);
-  assert.match(css, /\.FlatRateMainLiveChat-bubbles\s*\{[^}]*color:\s*#c72d5d;/s);
+  assert.match(css, /\.FlatRateMainLiveChat-bubbles\s*\{[^}]*color:\s*#ffffff;/s);
 });
 
 test('branding changes the bubble, not the lime PUBLIC/LIVE/globe status', () => {

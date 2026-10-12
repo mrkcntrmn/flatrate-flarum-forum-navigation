@@ -39,11 +39,11 @@ test('MAIN Live keeps FLATRATE.WIKI and a decorative chat icon after the title',
   assert.match(livePinSrc, /FlatRateMainLiveChat-bubbles" aria-hidden="true"/);
   assert.match(less, /\.FlatRateMainLiveChat-title\s*\{[^}]*font-size:\s*16px/);
   assert.match(less, /\.FlatRateMainLiveChat-title\s*\{[^}]*color:\s*#ffffff/);
-  assert.match(less, /\.FlatRateMainLiveChat-bubbles\s*\{[^}]*color:\s*#c72d5d/);
+  assert.match(less, /\.FlatRateMainLiveChat-bubbles\s*\{[^}]*color:\s*#ffffff/);
   assert.match(less, /\.FlatRateMainLiveChat-link:hover \.FlatRateMainLiveChat-bubbles/);
 });
 
-test('Audi Live and BMW Live use the brand name while board heroes retain a collapsed summary', () => {
+test('Audi Live and BMW Live use the brand name while board heroes remain static', () => {
   const audi = findBrandNodeBySlug(manifest, 'audi');
   const bmw = findBrandNodeBySlug(manifest, 'bmw');
   assert.equal(`${audi.name} Live`, 'Audi Live');

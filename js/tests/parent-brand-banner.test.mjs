@@ -15,7 +15,7 @@ const bannerSrc = readFileSync(join(root, 'js/src/forum/components/ParentBrandBa
 const linksSrc = readFileSync(join(root, 'js/src/forum/components/BrandFamilyLinks.js'), 'utf8');
 const indexSrc = readFileSync(join(root, 'js/src/forum/index.js'), 'utf8');
 
-test('CDJR collapsed banner keeps the tagline and child links without the parent name or total', () => {
+test('CDJR static banner keeps the tagline and child links without the parent name or total', () => {
   const board = findBrandNodeBySlug(manifest, 'cdjr');
   const model = parentBrandBannerModel({ board, tagline: brandTaglineByKey('cdjr') });
   assert.equal(model.disclosure, true);
@@ -26,7 +26,7 @@ test('CDJR collapsed banner keeps the tagline and child links without the parent
   assert.equal(model.childNames.includes('CDJR'), false);
 });
 
-test('GM and JLR collapsed banners follow the same manifest order', () => {
+test('GM and JLR static banners follow the same manifest order', () => {
   assert.deepEqual(
     parentBrandBannerModel({ board: findBrandNodeBySlug(manifest, 'gm'), tagline: brandTaglineByKey('gm') }),
     {
@@ -58,14 +58,15 @@ test('leaf boards do not render an empty family disclosure', () => {
   }
 });
 
-test('child links and the chevron do not share a click handler', () => {
-  assert.match(bannerSrc, /FlatRateParentBrandBanner-toggle/);
-  assert.match(bannerSrc, /aria-expanded/);
-  assert.match(bannerSrc, /aria-controls/);
+test('child links and extra content remain visible without a chevron', () => {
+  assert.doesNotMatch(bannerSrc, /FlatRateParentBrandBanner-toggle/);
+  assert.doesNotMatch(bannerSrc, /aria-expanded/);
+  assert.doesNotMatch(bannerSrc, /aria-controls/);
+  assert.doesNotMatch(bannerSrc, /fa-chevron/);
   assert.match(bannerSrc, /<BrandFamilyLinks/);
+  assert.match(bannerSrc, /FlatRateParentBrandBanner--static/);
   assert.match(linksSrc, /<Link/);
   assert.doesNotMatch(linksSrc, /expanded = !/);
-  assert.match(bannerSrc, /stopPropagation/);
 });
 
 
