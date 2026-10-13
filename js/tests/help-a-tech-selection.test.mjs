@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { selectHelpATechDiscussions, MAX_HELP_A_TECH_RESULTS } from '../src/forum/utils/helpATechSelection.js';
+import { selectHelpATechDiscussions, getActiveBoardDiscussions, MAX_HELP_A_TECH_RESULTS } from '../src/forum/utils/helpATechSelection.js';
 
 function createViewer({ id = 1, admin = true } = {}) {
   return {
@@ -96,13 +96,13 @@ test('SELECTION: strictly caps at 3 when 4 or more eligible exist', () => {
   assert.equal(selected.length, 3);
 });
 
-test('SELECTION: sorts deterministically by fewest replies first', () => {
+test('SELECTION: preserves native ordering from active board result set', () => {
   const viewer = createViewer();
   const candidates = [
-    createItem(1, 8),
-    createItem(2, 1),
-    createItem(3, 0),
-    createItem(4, 4),
+    createItem(10, 8),
+    createItem(20, 1),
+    createItem(30, 0),
+    createItem(40, 4),
   ];
   const selected = selectHelpATechDiscussions({
     discussions: candidates,
@@ -111,28 +111,30 @@ test('SELECTION: sorts deterministically by fewest replies first', () => {
     adminPreviewEnabled: true,
   });
 
-  // Expected order: item 3 (0 replies), item 2 (1 reply), item 4 (4 replies)
+  // Native ordering is preserved: items 10, 20, 30 (first 3 candidates)
   assert.equal(selected.length, 3);
-  assert.equal(selected[0].id(), 3);
-  assert.equal(selected[1].id(), 2);
-  assert.equal(selected[2].id(), 4);
+  assert.equal(selected[0].id(), 10);
+  assert.equal(selected[1].id(), 20);
+  assert.equal(selected[2].id(), 30);
 });
 
-test('SELECTION: breaks reply ties by newest creation date', () => {
-  const viewer = createViewer();
-  const candidates = [
-    createItem(1, 0, '2026-10-01T10:00:00Z'),
-    createItem(2, 0, '2026-10-05T10:00:00Z'), // newer
-    createItem(3, 0, '2026-10-03T10:00:00Z'),
-  ];
-  const selected = selectHelpATechDiscussions({
-    discussions: candidates,
-    viewer,
-    context,
-    adminPreviewEnabled: true,
-  });
-
-  assert.equal(selected[0].id(), 2); // 2026-10-05
-  assert.equal(selected[1].id(), 3); // 2026-10-03
-  assert.equal(selected[2].id(), 1); // 2026-10-01
+test('SELECTION: getActiveBoardDiscussions extracts items across loaded pages', () => {
+  const mockState = {
+    getPages: () => [
+      { number: 1, items: [createItem(1), createItem(2)] },
+      { number: 2, items: [createItem(3)] },
+    ],
+  };
+  const extracted = getActiveBoardDiscussions(mockState);
+  assert.equal(extracted.length, 3);
+  assert.equal(extracted[0].id(), 1);
+  assert.equal(extracted[1].id(), 2);
+  assert.equal(extracted[2].id(), 3);
 });
+
+test('SELECTION: getActiveBoardDiscussions returns [] on empty or invalid state', () => {
+  assert.deepEqual(getActiveBoardDiscussions(null), []);
+  assert.deepEqual(getActiveBoardDiscussions({}), []);
+  assert.deepEqual(getActiveBoardDiscussions({ getPages: () => [] }), []);
+});
+

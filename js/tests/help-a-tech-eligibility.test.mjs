@@ -150,3 +150,67 @@ test('ELIGIBILITY: missing id fails closed', () => {
   const discussion = createDiscussion({ id: null });
   assert.equal(isDiscussionEligibleForHelpATech(discussion, { viewer, context: fordContext }), false);
 });
+
+test('ELIGIBILITY: missing author identity fails closed (Finding H1-R1-04)', () => {
+  const viewer = createViewer({ id: 99 });
+  const discussionWithoutAuthor = {
+    id: () => 101,
+    title: () => '2019 F-150',
+    canReply: () => true,
+    user: () => null, // Author identity unavailable
+    tags: () => [{ slug: () => 'ford' }],
+  };
+  assert.equal(
+    isDiscussionEligibleForHelpATech(discussionWithoutAuthor, { viewer, context: fordContext }),
+    false
+  );
+});
+
+test('ELIGIBILITY: private discussions are excluded (Finding H1-R1-03)', () => {
+  const viewer = createViewer();
+  const privateDiscussion = createDiscussion();
+  privateDiscussion.isPrivateDiscussion = () => true;
+  assert.equal(isDiscussionEligibleForHelpATech(privateDiscussion, { viewer, context: fordContext }), false);
+
+  const byobuDiscussion = createDiscussion();
+  byobuDiscussion.recipientUsers = () => [{ id: () => 50 }];
+  assert.equal(isDiscussionEligibleForHelpATech(byobuDiscussion, { viewer, context: fordContext }), false);
+
+  const groupDiscussion = createDiscussion();
+  groupDiscussion.recipientGroups = () => [{ id: () => 3 }];
+  assert.equal(isDiscussionEligibleForHelpATech(groupDiscussion, { viewer, context: fordContext }), false);
+});
+
+test('ELIGIBILITY: realistic native Flarum serializer model passes (Finding H1-R1-07)', () => {
+  const viewer = createViewer();
+  // Native Flarum Discussion: canReply is boolean, hiddenAt is undefined when not hidden, isLocked is undefined
+  const nativeFlarumDiscussion = {
+    id: () => 102,
+    title: () => '2020 Silverado 5.3L Lifter Tick',
+    canReply: () => true,
+    hiddenAt: () => undefined,
+    user: () => ({ id: () => 55 }),
+    tags: () => [{ slug: () => 'ford' }],
+  };
+  assert.equal(
+    isDiscussionEligibleForHelpATech(nativeFlarumDiscussion, { viewer, context: fordContext }),
+    true
+  );
+});
+
+test('ELIGIBILITY: native Flarum discussion with hiddenAt is rejected (Finding H1-R1-07)', () => {
+  const viewer = createViewer();
+  const hiddenNativeDiscussion = {
+    id: () => 103,
+    title: 'Spam Thread',
+    canReply: true,
+    attribute: (attr) => (attr === 'hiddenAt' ? '2026-10-12T00:00:00Z' : null),
+    user: { id: 55 },
+    tags: ['ford'],
+  };
+  assert.equal(
+    isDiscussionEligibleForHelpATech(hiddenNativeDiscussion, { viewer, context: fordContext }),
+    false
+  );
+});
+

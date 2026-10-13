@@ -71,11 +71,13 @@ test('SECURITY: no post content, message body, or private chat snippet serialize
   assert.match(helpATechSrc, /discussion\.title/);
 });
 
-test('SECURITY: index mount enforces dual-gate (signed-in + adminPreviewEnabled)', () => {
+test('SECURITY: index mount enforces dual-gate and consumes active board discussions only', () => {
   assert.match(indexSrc, /adminPreviewEnabled\s*=\s*!!\(/);
   assert.match(indexSrc, /flatrateHelpATechAdminPreview/);
   assert.match(indexSrc, /if\s*\(signedIn\s*&&\s*adminPreviewEnabled\)/);
   assert.match(indexSrc, /items\.remove\(['"]flatrateHelpATech['"]\)/);
+  assert.match(indexSrc, /getActiveBoardDiscussions\(app\.discussions\)/);
+  assert.doesNotMatch(indexSrc, /app\.store\.all\(['"]discussions['"]\)/);
 });
 
 test('SECURITY: settled UI decisions preserved in Less styling', () => {

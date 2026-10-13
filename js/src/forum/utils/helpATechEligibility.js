@@ -76,7 +76,7 @@ export function isDiscussionEligibleForHelpATech(discussion, { viewer = null, co
     return false;
   }
 
-  // 2. Viewer eligibility check (H1 is admin-only)
+  // 2. Viewer eligibility check (H1 is client-gated to authenticated admin)
   if (!viewer || typeof viewer !== 'object') {
     return false;
   }
@@ -91,7 +91,7 @@ export function isDiscussionEligibleForHelpATech(discussion, { viewer = null, co
     return false;
   }
 
-  // 4. Actor reply rights (strict canReply === true)
+  // 4. Actor reply rights (strict affirmative canReply === true; Flarum DiscussionSerializer provides this)
   let canReply = false;
   if (typeof discussion.canReply === 'function') {
     canReply = discussion.canReply();
@@ -105,56 +105,97 @@ export function isDiscussionEligibleForHelpATech(discussion, { viewer = null, co
     return false;
   }
 
-  // 5. Hidden status check (fail closed if hidden)
+  // 5. Private discussion exclusion (Finding H1-R1-03: canReply=true does not mean public)
+  // Reconcile with FoF Byobu and private discussion extension contracts
+  if (
+    (typeof discussion.isPrivateDiscussion === 'function' && discussion.isPrivateDiscussion() === true) ||
+    (discussion.attribute && typeof discussion.attribute === 'function' && discussion.attribute('isPrivateDiscussion') === true) ||
+    discussion.isPrivateDiscussion === true ||
+    (discussion.attribute && typeof discussion.attribute === 'function' && discussion.attribute('isPrivate') === true) ||
+    discussion.isPrivate === true
+  ) {
+    return false;
+  }
+
+  // Recipient check: exclude any discussion targeted to recipient users or groups
+  let recipientUsers = null;
+  if (typeof discussion.recipientUsers === 'function') {
+    recipientUsers = discussion.recipientUsers();
+  } else if (discussion.attribute && typeof discussion.attribute === 'function') {
+    recipientUsers = discussion.attribute('recipientUsers');
+  } else if (discussion.recipientUsers !== undefined) {
+    recipientUsers = discussion.recipientUsers;
+  }
+  if (Array.isArray(recipientUsers) && recipientUsers.length > 0) {
+    return false;
+  }
+
+  let recipientGroups = null;
+  if (typeof discussion.recipientGroups === 'function') {
+    recipientGroups = discussion.recipientGroups();
+  } else if (discussion.attribute && typeof discussion.attribute === 'function') {
+    recipientGroups = discussion.attribute('recipientGroups');
+  } else if (discussion.recipientGroups !== undefined) {
+    recipientGroups = discussion.recipientGroups;
+  }
+  if (Array.isArray(recipientGroups) && recipientGroups.length > 0) {
+    return false;
+  }
+
+  // 6. Hidden status check (Finding H1-R1-07: Flarum conditionally serializes isHidden only when hidden)
   let isHidden = false;
   if (typeof discussion.isHidden === 'function') {
     isHidden = Boolean(discussion.isHidden());
-  } else if (discussion.isHidden !== undefined) {
-    isHidden = Boolean(discussion.isHidden);
   } else if (discussion.attribute && typeof discussion.attribute === 'function') {
     isHidden = Boolean(discussion.attribute('isHidden') || discussion.attribute('hiddenAt'));
+  } else if (discussion.isHidden !== undefined) {
+    isHidden = Boolean(discussion.isHidden);
   }
 
   if (isHidden) {
     return false;
   }
 
-  // 6. Locked status check (fail closed if locked)
+  // 7. Locked status check (Finding H1-R1-07: flarum/lock provides isLocked only when locked or extension loaded)
   let isLocked = false;
   if (typeof discussion.isLocked === 'function') {
     isLocked = Boolean(discussion.isLocked());
-  } else if (discussion.isLocked !== undefined) {
-    isLocked = Boolean(discussion.isLocked);
   } else if (discussion.attribute && typeof discussion.attribute === 'function') {
     isLocked = Boolean(discussion.attribute('isLocked'));
+  } else if (discussion.isLocked !== undefined) {
+    isLocked = Boolean(discussion.isLocked);
   }
 
   if (isLocked) {
     return false;
   }
 
-  // 7. Deleted status check
+  // 8. Deleted status check (models marked deleted in client store or soft-deleted)
   let isDeleted = false;
   if (typeof discussion.isDeleted === 'function') {
     isDeleted = Boolean(discussion.isDeleted());
-  } else if (discussion.isDeleted !== undefined) {
-    isDeleted = Boolean(discussion.isDeleted);
   } else if (discussion.attribute && typeof discussion.attribute === 'function') {
     isDeleted = Boolean(discussion.attribute('isDeleted'));
+  } else if (discussion.isDeleted !== undefined) {
+    isDeleted = Boolean(discussion.isDeleted);
   }
 
   if (isDeleted) {
     return false;
   }
 
-  // 8. Author exclusion (do not recommend own discussion to the author)
+  // 9. Author exclusion (Finding H1-R1-04: fail-closed on missing author identity)
   const viewerId = extractViewerId(viewer);
   const authorId = extractDiscussionAuthorId(discussion);
-  if (viewerId && authorId && String(viewerId) === String(authorId)) {
+  if (!viewerId || !authorId) {
+    // If author identity cannot be established affirmatively, fail closed to prevent self-recommendation
+    return false;
+  }
+  if (String(viewerId) === String(authorId)) {
     return false;
   }
 
-  // 9. Context relevance check
+  // 10. Context relevance check: discussion must have tags that match the active board context
   const tagSlugs = extractTagSlugs(discussion);
   if (!tagSlugs.length) {
     return false;

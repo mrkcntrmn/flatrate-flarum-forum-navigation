@@ -31,7 +31,7 @@ export default class HelpATech extends Component {
           {items.map((discussion) => {
             const id = typeof discussion.id === 'function' ? discussion.id() : discussion.id;
             const title = typeof discussion.title === 'function' ? discussion.title() : discussion.title;
-            const href = discussionCanonicalHref(discussion);
+            const href = discussionCanonicalHref(discussion, app);
 
             return (
               <li className="HelpATech-item" key={id}>

@@ -49,7 +49,7 @@ import { actorNotificationsAvailable, shouldShowMainNotifications } from './util
 import MainNotificationsButton from './components/MainNotificationsButton';
 import HelpATech from './components/HelpATech';
 import { resolveHelpATechContext } from './utils/helpATechContext';
-import { selectHelpATechDiscussions } from './utils/helpATechSelection';
+import { selectHelpATechDiscussions, getActiveBoardDiscussions } from './utils/helpATechSelection';
 
 function resolveTagHero() {
   try {
@@ -343,9 +343,9 @@ app.initializers.add(
         });
 
         if (helpATechContext && viewer) {
-          const loadedDiscussions = (app.store && app.store.all && app.store.all('discussions')) || [];
+          const activeDiscussions = getActiveBoardDiscussions(app.discussions);
           const candidateDiscussions = selectHelpATechDiscussions({
-            discussions: loadedDiscussions,
+            discussions: activeDiscussions,
             viewer,
             context: helpATechContext,
             adminPreviewEnabled: true,
