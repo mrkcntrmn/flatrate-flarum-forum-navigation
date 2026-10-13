@@ -9,10 +9,12 @@ namespace FlatRate\ForumNavigation;
 use Flarum\Api\Serializer\ForumSerializer;
 use Flarum\Discussion\Filter\DiscussionFilterer;
 use Flarum\Extend;
+use FlatRate\ForumNavigation\Api\HelpATechSettingsAttribute;
 use FlatRate\ForumNavigation\Api\MainLandingSettingsAttribute;
 use FlatRate\ForumNavigation\Api\MaintenanceBannerSettingsAttribute;
 use FlatRate\ForumNavigation\Api\NavigationManifestAttribute;
 use FlatRate\ForumNavigation\Api\QuickRailSettingsAttribute;
+use FlatRate\ForumNavigation\HelpATechGate;
 use FlatRate\ForumNavigation\Provider\BrandFamilyTagFilterServiceProvider;
 use FlatRate\ForumNavigation\Search\Filter\ExcludeMainPinsFilter;
 use FlatRate\ForumNavigation\Search\Filter\MainPinsFilter;
@@ -23,7 +25,8 @@ $extenders = [
         ->css(__DIR__ . '/resources/less/forum.less')
         ->css(__DIR__ . '/resources/less/discussion-center-menu.less')
         ->css(__DIR__ . '/resources/less/brand-board-toolbar.less')
-        ->css(__DIR__ . '/resources/less/drawer-home.less'),
+        ->css(__DIR__ . '/resources/less/drawer-home.less')
+        ->css(__DIR__ . '/resources/less/help-a-tech.less'),
 
     (new Extend\Frontend('admin'))
         ->js(__DIR__ . '/js/dist/admin.js'),
@@ -45,7 +48,8 @@ $extenders = [
         ->default(MaintenanceBannerSettings::SETTING_ENABLED, '1')
         ->default(MaintenanceBannerSettings::SETTING_MESSAGE, MaintenanceBannerSettings::DEFAULT_MESSAGE)
         ->default(MaintenanceBannerSettings::SETTING_COLOR, MaintenanceBannerSettings::DEFAULT_COLOR)
-        ->default(MaintenanceBannerSettings::SETTING_REVISION, MaintenanceBannerSettings::DEFAULT_REVISION),
+        ->default(MaintenanceBannerSettings::SETTING_REVISION, MaintenanceBannerSettings::DEFAULT_REVISION)
+        ->default(HelpATechGate::SETTING_ADMIN_PREVIEW, '0'),
 
     // Flarum 1.8.19 discussion list filter seam (filter[key]=value).
     // Plan docs mention SearchDriver (2.x naming); 1.8 uses Extend\Filter.
@@ -57,7 +61,8 @@ $extenders = [
         ->attributes(NavigationManifestAttribute::class)
         ->attributes(MainLandingSettingsAttribute::class)
         ->attributes(QuickRailSettingsAttribute::class)
-        ->attributes(MaintenanceBannerSettingsAttribute::class),
+        ->attributes(MaintenanceBannerSettingsAttribute::class)
+        ->attributes(HelpATechSettingsAttribute::class),
 ];
 
 if (class_exists(\Flarum\Tags\Query\TagFilterGambit::class)) {

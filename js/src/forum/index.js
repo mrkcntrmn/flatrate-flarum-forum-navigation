@@ -47,6 +47,9 @@ import {
 import { isCleanRootIndex, mainPinIdsFromForum } from './utils/mainLandingPins';
 import { actorNotificationsAvailable, shouldShowMainNotifications } from './utils/mainNotifications';
 import MainNotificationsButton from './components/MainNotificationsButton';
+import HelpATech from './components/HelpATech';
+import { resolveHelpATechContext } from './utils/helpATechContext';
+import { selectHelpATechDiscussions } from './utils/helpATechSelection';
 
 function resolveTagHero() {
   try {
@@ -315,6 +318,46 @@ app.initializers.add(
         const memberIds = mainPinIdsFromForum(app.forum, 'member');
         if (memberIds.length) {
           items.add('flatrateMainLandingPins', <MainLandingPins audience="member" />, 105);
+        }
+      }
+
+      // Help a Tech — Admin Preview (fail-closed, default off).
+      if (items.items && items.items.flatrateHelpATech) {
+        items.remove('flatrateHelpATech');
+      }
+
+      const adminPreviewEnabled = !!(
+        app.forum &&
+        app.forum.attribute &&
+        app.forum.attribute('flatrateHelpATechAdminPreview') === true
+      );
+
+      if (signedIn && adminPreviewEnabled) {
+        const viewer = app.session && app.session.user;
+        const helpATechContext = resolveHelpATechContext({
+          currentTag,
+          routeName,
+          searchParams,
+          stickyParams,
+          manifest,
+        });
+
+        if (helpATechContext && viewer) {
+          const loadedDiscussions = (app.store && app.store.all && app.store.all('discussions')) || [];
+          const candidateDiscussions = selectHelpATechDiscussions({
+            discussions: loadedDiscussions,
+            viewer,
+            context: helpATechContext,
+            adminPreviewEnabled: true,
+          });
+
+          if (candidateDiscussions.length > 0) {
+            items.add(
+              'flatrateHelpATech',
+              <HelpATech items={candidateDiscussions} context={helpATechContext} />,
+              90
+            );
+          }
         }
       }
     });
