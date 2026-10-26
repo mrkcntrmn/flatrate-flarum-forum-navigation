@@ -1,15 +1,12 @@
 # flatrate/flarum-forum-navigation
 
-FlatRate.wiki presentation navigation for Flarum 1.8.x (`flarum/core` ^1.8.19).
+Flarum 2 candidate. Native Flarum tags render the board navigation. This branch adds the tag canonical URL, `/robots.txt`, and the retired `/community` redirect. The historical presentation bundle stays in the tree and is not registered.
 
 ## What it does
 
-- Replaces the native flat primary-tag sideNav presentation with:
-  - **Push to Start** → `/t/start-here`
-  - **Technician Topics** → `/t/general-shop-discussion`
-  - **Brands** static tree (41 boards; GM/CDJR always expanded, no collapse arrows)
-- Puts the same presentation list in the phone hamburger drawer (`HeaderSecondary`); hidden in the desktop header bar
-- Retires the public Community landing page
+- Leaves desktop and mobile board navigation to native Flarum 2 tags
+- Sets a same-host canonical URL on public tag pages when Flarum leaves it empty
+- Publishes `/robots.txt` with the configured sitemap URL and disallows `/admin` and `/api/`
 - Redirects legacy `/community` to `/t/start-here` with HTTP 301
 - Leaves General Live on its durable `/live/community-general-live` identity
 - Embeds a generated navigation runtime manifest asset; does not read the main wiki repo at runtime
@@ -51,8 +48,9 @@ Disabling this extension restores native Flarum sideNav without mutating tag IDs
 
 ## Requirements
 
-- PHP ^8.1
-- Flarum `flarum/core` ^1.8.19
+- PHP ^8.3
+- Flarum `flarum/core` ^2.0.2
+- Flarum `flarum/tags` ^2.0.0
 
 ## Install
 
@@ -108,7 +106,7 @@ The control repo generates `configs/forum/navigation-runtime-manifest.json` and 
 
 ## Package CI
 
-GitHub Actions validates Composer, PHPUnit, the embedded navigation manifest (+ provenance), JS build, and a disposable Flarum **1.8.19** path-install smoke.
+GitHub Actions validates Composer, PHPUnit, the embedded navigation manifest (+ provenance), JS build, and a disposable Flarum **2.0.2** path-install smoke.
 
 ```bash
 php scripts/validate-manifest.php

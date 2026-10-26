@@ -2,15 +2,14 @@
 
 namespace FlatRate\ForumNavigation\Search\Filter;
 
-use Flarum\Filter\FilterInterface;
-use Flarum\Filter\FilterState;
 use Flarum\Settings\SettingsRepositoryInterface;
 
 /**
- * Narrow an already actor-visible discussion query to configured MAIN pins.
- * Never constructs an unscoped Discussion query. Never inspects native sticky state.
+ * Historical MAIN pin id normalization. Flarum 2 does not register this filter.
+ * Native discussion search owns the list. The id helper stays so stored pin
+ * lists keep a single fail-closed parser.
  */
-final class MainPinsFilter implements FilterInterface
+final class MainPinsFilter
 {
     public const SETTING_PUBLIC = 'flatrate-forum-navigation.public_main_pinned_discussion_ids';
     public const SETTING_MEMBER = 'flatrate-forum-navigation.member_main_pinned_discussion_ids';
@@ -27,7 +26,7 @@ final class MainPinsFilter implements FilterInterface
         return 'flatrateMainPins';
     }
 
-    public function filter(FilterState $filterState, string $filterValue, bool $negate): void
+    public function filter($filterState, string $filterValue, bool $negate): void
     {
         $audience = strtolower(trim($filterValue));
         $ids = $this->idsForAudience($audience);

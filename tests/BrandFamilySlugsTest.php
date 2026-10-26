@@ -54,12 +54,12 @@ class BrandFamilySlugsTest extends TestCase
         $extend = file_get_contents(dirname(__DIR__) . '/extend.php');
         $composer = json_decode((string) file_get_contents(dirname(__DIR__) . '/composer.json'), true);
 
-        $this->assertSame('^1.8.8', $composer['require']['flarum/tags'] ?? null);
+        $this->assertSame('^2.0.0', $composer['require']['flarum/tags'] ?? null);
         $this->assertStringContainsString('parent::constrain', $src);
         $this->assertStringContainsString('BrandFamilySlugs::expandList', $src);
         $this->assertStringNotContainsString("DB::table('discussions')", $src);
-        $this->assertStringContainsString('BrandFamilyTagFilterServiceProvider', $extend);
+        $this->assertStringNotContainsString('BrandFamilyTagFilterServiceProvider', $extend);
         $this->assertStringNotContainsString('ReplaceBrandFamilyTagFilter', $extend);
-        $this->assertStringContainsString('class_exists', $extend);
+        $this->assertStringContainsString('TagCanonical::class', $extend);
     }
 }
