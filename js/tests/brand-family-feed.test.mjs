@@ -30,13 +30,14 @@ test('leaf Brand feeds and unknown slugs stay exact', () => {
 });
 
 test('family expansion is one server filter, not client concatenation', () => {
-  assert.equal(composer.require['flarum/tags'], '^1.8.8');
+  assert.equal(composer.require['flarum/tags'], '^2.0.0');
   assert.match(filterSrc, /parent::constrain/);
   assert.match(filterSrc, /BrandFamilySlugs::expandList/);
   assert.doesNotMatch(filterSrc, /file_get_contents\('https?:/);
   assert.doesNotMatch(filterSrc, /curl_/);
-  assert.match(extendSrc, /BrandFamilyTagFilterServiceProvider/);
-  assert.match(extendSrc, /Extend\\ServiceProvider/);
+  assert.doesNotMatch(extendSrc, /BrandFamilyTagFilterServiceProvider/);
+  assert.doesNotMatch(extendSrc, /Extend\\ServiceProvider/);
+  assert.match(extendSrc, /TagCanonical::class/);
   assert.doesNotMatch(extendSrc, /ReplaceBrandFamilyTagFilter/);
   assert.doesNotMatch(extendSrc, /addFilter\(BrandFamilyTagFilter/);
   assert.doesNotMatch(readFileSync(join(root, 'js/src/forum/index.js'), 'utf8'), /\/api\/discussions\?.*chrysler/);

@@ -131,8 +131,10 @@ test('V2 settings default off and use only the independent audience gates', () =
 
   assert.match(phpGate, /center_menu_v2_admin_visible/);
   assert.match(phpGate, /center_menu_v2_user_visible/);
-  assert.match(extendPhp, /SETTING_V2_ADMIN_VISIBLE, '0'/);
-  assert.match(extendPhp, /SETTING_V2_USER_VISIBLE, '0'/);
+  assert.doesNotMatch(extendPhp, /SETTING_V2_ADMIN_VISIBLE/);
+  assert.doesNotMatch(extendPhp, /SETTING_V2_USER_VISIBLE/);
+  assert.match(extendPhp, /TagCanonical::class/);
+  assert.doesNotMatch(extendPhp, /js\/dist\/forum\.js/);
   assert.doesNotMatch(extendPhp, /registerPreference/);
 
   assert.match(locale, /heading: Center Menu V2/);

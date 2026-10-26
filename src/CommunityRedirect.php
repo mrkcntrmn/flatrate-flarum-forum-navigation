@@ -67,7 +67,7 @@ final class CommunityRedirect implements RequestHandlerInterface
         return '/' . trim($path, '/') === self::ROUTE_PATH;
     }
 
-    private static function absolutePathFromForumBaseUrl(string $forumBaseUrl, string $path): string
+    public static function absolutePathFromForumBaseUrl(string $forumBaseUrl, string $path): string
     {
         $parts = parse_url($forumBaseUrl);
         if (!is_array($parts) || empty($parts['scheme']) || empty($parts['host'])) {

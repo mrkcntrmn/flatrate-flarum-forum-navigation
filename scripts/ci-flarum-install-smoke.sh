@@ -7,9 +7,10 @@ set -euo pipefail
 export PATH="/usr/bin:/bin:/usr/local/bin:${PATH:-}"
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+git config --global --add safe.directory "${ROOT}" || true
 SMOKE_ROOT="${FLARUM_SMOKE_ROOT:-${TMPDIR:-/tmp}/flarum-nav-010c1-ci-smoke-$$}"
-FLARUM_SKELETON_VERSION="${FLARUM_SKELETON_VERSION:-1.8.19}"
-EXPECTED_CORE="${FLARUM_CORE_VERSION:-1.8.19}"
+FLARUM_SKELETON_VERSION="${FLARUM_SKELETON_VERSION:-2.0.0}"
+EXPECTED_CORE="${FLARUM_CORE_VERSION:-2.0.2}"
 
 cleanup() {
   if [[ "${KEEP_SMOKE_ROOT:-0}" != "1" ]]; then
@@ -40,9 +41,8 @@ composer require \
   --no-update \
   --no-interaction
 
-# Composer 2.10 blocks the Flysystem 1.x versions required by Flarum 1.8.x.
-# Apply only the two accepted advisory IDs for dependency resolution. The
-# advisories remain visible to the explicit audit gate below.
+# Keep the accepted advisory allowlist exact. Inactive Flarum 1.8 advisories
+# do not fail the audit; unknown advisories still do.
 php "${ROOT}/scripts/ci-composer-advisory-policy.php" apply composer.json
 php "${ROOT}/scripts/ci-composer-advisory-policy.php" verify composer.json
 
@@ -61,6 +61,9 @@ if [[ "${INSTALLED_CORE}" != "${EXPECTED_CORE}" ]]; then
   exit 1
 fi
 
+# A pull-request checkout is detached, so give the path package its branch name
+# before Composer guesses a version from HEAD.
+git -C "${ROOT}" checkout -B feat/f2-minimal-nav-seo
 composer config repositories.flatrate-forum-navigation path "${ROOT}"
 composer require "flatrate/flarum-forum-navigation:*@dev" --no-interaction --prefer-dist --no-audit
 
@@ -80,122 +83,211 @@ echo "FLARUM_CORE_VERSION=${INSTALLED_CORE}"
 echo "EXTENSION_PACKAGE=flatrate/flarum-forum-navigation"
 echo "FLARUM_CORE_INSTALL_SMOKE=PASS"
 
-# Prove the extension hooks the live Flarum 1.8.19 Navigation render seam, not a
-# dead items() path. Missing upstream Navigation.tsx is a hard compatibility
-# failure — never skip the seam assertion.
-CORE_NAVIGATION_SOURCE="${SMOKE_ROOT}/vendor/flarum/core/js/src/common/components/Navigation.tsx"
-EXTENSION_NAVIGATION_SOURCE="${ROOT}/js/src/forum/discussionCenterMenu.js"
+EXTEND_PHP="${SMOKE_ROOT}/vendor/flatrate/flarum-forum-navigation/extend.php"
+if ! grep -Fq 'TagCanonical::class' "${EXTEND_PHP}"; then
+  echo "NAVIGATION_F2_EXTENDER=FAIL missing_tag_canonical" >&2
+  exit 1
+fi
+if ! grep -Fq 'RobotsTxt::class' "${EXTEND_PHP}"; then
+  echo "NAVIGATION_F2_EXTENDER=FAIL missing_robots" >&2
+  exit 1
+fi
+if grep -Fq 'js/dist/forum.js' "${EXTEND_PHP}"; then
+  echo "NAVIGATION_F2_EXTENDER=FAIL historical_frontend_registered" >&2
+  exit 1
+fi
+echo "NAVIGATION_F2_EXTENDER=PASS"
 
-if [[ ! -f "${CORE_NAVIGATION_SOURCE}" ]]; then
-  echo "FLARUM_NAVIGATION_RENDER_SEAM=FAIL source_missing path=${CORE_NAVIGATION_SOURCE}" >&2
+INSTALL_JSON="${SMOKE_ROOT}/install.json"
+cat > "${INSTALL_JSON}" <<'EOF'
+{
+  "debug": true,
+  "baseUrl": "http://127.0.0.1:8765",
+  "databaseConfiguration": {
+    "driver": "sqlite",
+    "database": "storage/f2-nav.sqlite"
+  },
+  "adminUser": {
+    "username": "navadmin",
+    "password": "nav-admin-pass",
+    "email": "nav-admin@example.test"
+  },
+  "settings": {
+    "forum_title": "Navigation Smoke"
+  },
+  "extensions": "flarum-tags,flatrate-forum-navigation"
+}
+EOF
+
+php flarum install --file "${INSTALL_JSON}"
+rm -f "${INSTALL_JSON}"
+
+(
+  cd "${SMOKE_ROOT}/public"
+  php -S 127.0.0.1:8765 index.php > "${SMOKE_ROOT}/http.log" 2>&1
+) &
+HTTP_PID=$!
+cleanup_http() {
+  kill "${HTTP_PID}" >/dev/null 2>&1 || true
+}
+trap 'cleanup_http; cleanup' EXIT
+
+ready=0
+for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
+  if curl -s -o /dev/null http://127.0.0.1:8765/api; then
+    ready=1
+    break
+  fi
+  sleep 0.25
+done
+if [[ "${ready}" != "1" ]]; then
+  echo "NAVIGATION_F2_HTTP=FAIL server_not_ready" >&2
+  cat "${SMOKE_ROOT}/http.log" >&2 || true
   exit 1
 fi
 
-if ! grep -Fq 'this.getBackButton()' "${CORE_NAVIGATION_SOURCE}"; then
-  echo "FLARUM_NAVIGATION_RENDER_SEAM=FAIL upstream_missing_getBackButton" >&2
+TOKEN_BODY="$(mktemp)"
+TOKEN_CODE="$(
+  curl -sS -o "${TOKEN_BODY}" -w '%{http_code}' -H 'Content-Type: application/json' \
+    -d '{"identification":"navadmin","password":"nav-admin-pass"}' \
+    http://127.0.0.1:8765/api/token
+)"
+TOKEN="$(php -r '$j=json_decode(file_get_contents($argv[1]), true); echo $j["token"] ?? "";' "${TOKEN_BODY}")"
+if [[ -z "${TOKEN}" ]]; then
+  echo "NAVIGATION_F2_HTTP=FAIL admin_token status=${TOKEN_CODE}" >&2
+  cat "${TOKEN_BODY}" >&2 || true
+  cat "${SMOKE_ROOT}/http.log" >&2 || true
   exit 1
 fi
+rm -f "${TOKEN_BODY}"
 
-if ! grep -Fq 'this.getDrawerButton()' "${CORE_NAVIGATION_SOURCE}"; then
-  echo "FLARUM_NAVIGATION_RENDER_SEAM=FAIL upstream_missing_getDrawerButton" >&2
+create_tag() {
+  local name="$1"
+  local slug="$2"
+  local hidden="$3"
+  local restricted="$4"
+  local out
+  out="$(mktemp)"
+  local code
+  code="$(
+    curl -sS -o "${out}" -w '%{http_code}' -H 'Content-Type: application/json' -H "Authorization: Token ${TOKEN}" \
+      -d "{\"data\":{\"type\":\"tags\",\"attributes\":{\"name\":\"${name}\",\"slug\":\"${slug}\",\"description\":\"${name}\",\"color\":\"#888888\",\"isHidden\":${hidden}}}}" \
+      http://127.0.0.1:8765/api/tags
+  )"
+  if [[ "${code}" != "201" && "${code}" != "200" ]]; then
+    echo "NAVIGATION_F2_HTTP=FAIL create_tag slug=${slug} status=${code}" >&2
+    cat "${out}" >&2 || true
+    exit 1
+  fi
+  if [[ "${restricted}" == "true" ]]; then
+    local id
+    id="$(php -r '$j=json_decode(file_get_contents($argv[1]), true); echo $j["data"]["id"] ?? "";' "${out}")"
+    local patch
+    patch="$(mktemp)"
+    local patch_code
+    patch_code="$(
+      curl -sS -o "${patch}" -w '%{http_code}' -X PATCH -H 'Content-Type: application/json' -H "Authorization: Token ${TOKEN}" \
+        -d "{\"data\":{\"type\":\"tags\",\"id\":\"${id}\",\"attributes\":{\"isRestricted\":true}}}" \
+        "http://127.0.0.1:8765/api/tags/${id}"
+    )"
+    if [[ "${patch_code}" != "200" ]]; then
+      echo "NAVIGATION_F2_HTTP=FAIL restrict_tag slug=${slug} status=${patch_code}" >&2
+      cat "${patch}" >&2 || true
+      exit 1
+    fi
+    rm -f "${patch}"
+  fi
+  rm -f "${out}"
+}
+
+create_tag Tip tip false false
+create_tag "Start Here" start-here false false
+create_tag "General Shop Discussion" general-shop-discussion false false
+create_tag "Aston Martin" aston-martin false false
+create_tag "Hidden Room" hidden-room false true
+
+assert_canonical() {
+  local path="$1"
+  local expected="$2"
+  local out
+  out="$(mktemp)"
+  local code
+  code="$(curl -sS -o "${out}" -w '%{http_code}' "http://127.0.0.1:8765${path}")"
+  if [[ "${code}" != "200" ]]; then
+    echo "SEO_CANONICAL=FAIL path=${path} status=${code}" >&2
+    cat "${out}" >&2 || true
+    exit 1
+  fi
+  if ! grep -Fq "rel=\"canonical\" href=\"${expected}\"" "${out}"; then
+    echo "SEO_CANONICAL=FAIL path=${path} expected=${expected}" >&2
+    exit 1
+  fi
+  rm -f "${out}"
+}
+
+assert_canonical / "http://127.0.0.1:8765"
+assert_canonical /t/tip "http://127.0.0.1:8765/t/tip"
+assert_canonical /t/start-here "http://127.0.0.1:8765/t/start-here"
+assert_canonical /t/general-shop-discussion "http://127.0.0.1:8765/t/general-shop-discussion"
+assert_canonical /t/aston-martin "http://127.0.0.1:8765/t/aston-martin"
+
+COMMUNITY_HEADERS="$(curl -sI http://127.0.0.1:8765/community)"
+if ! grep -Eq 'HTTP/.* 301' <<< "${COMMUNITY_HEADERS}"; then
+  echo "NAV_COMMUNITY_REDIRECT=FAIL" >&2
+  echo "${COMMUNITY_HEADERS}" >&2
   exit 1
 fi
-
-if [[ ! -f "${EXTENSION_NAVIGATION_SOURCE}" ]]; then
-  echo "FLARUM_NAVIGATION_RENDER_SEAM=FAIL extension_source_missing" >&2
+if ! grep -Fiq 'Location: http://127.0.0.1:8765/t/start-here' <<< "${COMMUNITY_HEADERS}"; then
+  echo "NAV_COMMUNITY_REDIRECT=FAIL location" >&2
+  echo "${COMMUNITY_HEADERS}" >&2
   exit 1
 fi
+echo "NAV_COMMUNITY_REDIRECT=PASS"
 
-if ! grep -Fq "override(" "${EXTENSION_NAVIGATION_SOURCE}"; then
-  echo "FLARUM_NAVIGATION_RENDER_SEAM=FAIL extension_missing_override" >&2
+HIDDEN_BODY="$(curl -s "http://127.0.0.1:8765/t/hidden-room")"
+HIDDEN_STATUS="$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8765/t/hidden-room)"
+if [[ "${HIDDEN_STATUS}" == "200" ]]; then
+  echo "NAV_HIDDEN_TAG_DENIAL=FAIL status=200" >&2
   exit 1
 fi
-
-if ! grep -Fq "'getBackButton'" "${EXTENSION_NAVIGATION_SOURCE}"; then
-  echo "FLARUM_NAVIGATION_RENDER_SEAM=FAIL extension_missing_getBackButton" >&2
+if grep -Fq 'rel="canonical" href="http://127.0.0.1:8765/t/hidden-room"' <<< "${HIDDEN_BODY}"; then
+  echo "NAV_HIDDEN_TAG_DENIAL=FAIL canonical_published" >&2
   exit 1
 fi
-
-if ! grep -Fq "'getDrawerButton'" "${EXTENSION_NAVIGATION_SOURCE}"; then
-  echo "FLARUM_NAVIGATION_RENDER_SEAM=FAIL extension_missing_getDrawerButton" >&2
+GUEST_TAGS="$(curl -fsS http://127.0.0.1:8765/api/tags)"
+if grep -Eq '"slug": ?"hidden-room"' <<< "${GUEST_TAGS}"; then
+  echo "NAV_HIDDEN_TAG_DENIAL=FAIL listed_to_guest" >&2
   exit 1
 fi
+echo "NAV_HIDDEN_TAG_DENIAL=PASS status=${HIDDEN_STATUS}"
 
-if grep -Fq "Navigation.prototype, 'items'" "${EXTENSION_NAVIGATION_SOURCE}"; then
-  echo "FLARUM_NAVIGATION_RENDER_SEAM=FAIL obsolete_items_hook" >&2
+ROBOTS="$(curl -fsS http://127.0.0.1:8765/robots.txt)"
+if ! grep -Fq 'Sitemap: http://127.0.0.1:8765/sitemap.xml' <<< "${ROBOTS}"; then
+  echo "SEO_ROBOTS=FAIL" >&2
   exit 1
 fi
-
-# Discussion-center Brand picker must emit SelectDropdown-compatible LinkButtons
-# from the canonical Brand manifest — not a nested PresentationNav div slot.
-if ! grep -Fq 'listDiscussionBrandBoards' "${EXTENSION_NAVIGATION_SOURCE}"; then
-  echo "CENTER_BRANDS_RENDER_SOURCE=FAIL missing_listDiscussionBrandBoards" >&2
+if grep -Fq 'pikapod' <<< "${ROBOTS}"; then
+  echo "SEO_ROBOTS=FAIL host_leak" >&2
   exit 1
 fi
+echo "SEO_ROBOTS=PASS"
 
-if ! grep -Fq 'FlatRateDiscussionBrandLink' "${EXTENSION_NAVIGATION_SOURCE}"; then
-  echo "CENTER_BRANDS_RENDER_SOURCE=FAIL missing_FlatRateDiscussionBrandLink" >&2
+php flarum extension:disable flatrate-forum-navigation
+FALLBACK_ROBOTS="$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8765/robots.txt)"
+HOME_STATUS="$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8765/)"
+TIP_BODY="$(curl -fsS http://127.0.0.1:8765/t/tip)"
+if [[ "${FALLBACK_ROBOTS}" == "200" ]]; then
+  echo "NAVIGATION_DISABLE_FALLBACK=FAIL robots_still_registered" >&2
   exit 1
 fi
-
-if ! grep -Fq 'brandHref(board)' "${EXTENSION_NAVIGATION_SOURCE}"; then
-  echo "CENTER_BRANDS_RENDER_SOURCE=FAIL missing_brandHref" >&2
+if [[ "${HOME_STATUS}" != "200" ]]; then
+  echo "NAVIGATION_DISABLE_FALLBACK=FAIL home=${HOME_STATUS}" >&2
   exit 1
 fi
-
-if grep -Fq "pickerItems.add('flatratePresentationNav'" "${EXTENSION_NAVIGATION_SOURCE}"; then
-  echo "CENTER_BRANDS_RENDER_SOURCE=FAIL nested_PresentationNav_slot" >&2
+if grep -Fq 'rel="canonical" href="http://127.0.0.1:8765/t/tip"' <<< "${TIP_BODY}"; then
+  echo "NAVIGATION_DISABLE_FALLBACK=FAIL tag_canonical_still_present" >&2
   exit 1
 fi
-
-echo "CENTER_BRANDS_RENDER_SOURCE=PASS"
-echo "FLARUM_NAVIGATION_RENDER_SEAM=PASS"
-
-# Prove SelectDropdown treats each direct child as one menu item, and LinkButton
-# defaults force=true so Link creates a Mithril route-state remount key.
-CORE_DROPDOWN_SOURCE="${SMOKE_ROOT}/vendor/flarum/core/js/src/common/components/Dropdown.tsx"
-CORE_LINKBUTTON_SOURCE="${SMOKE_ROOT}/vendor/flarum/core/js/src/common/components/LinkButton.js"
-CORE_LINK_SOURCE="${SMOKE_ROOT}/vendor/flarum/core/js/src/common/components/Link.js"
-
-if [[ ! -f "${CORE_DROPDOWN_SOURCE}" ]]; then
-  echo "FLARUM_DROPDOWN_DIRECT_ITEM_SEAM=FAIL source_missing path=${CORE_DROPDOWN_SOURCE}" >&2
-  exit 1
-fi
-
-if ! grep -Fq 'listItems(vnode.children' "${CORE_DROPDOWN_SOURCE}"; then
-  echo "FLARUM_DROPDOWN_DIRECT_ITEM_SEAM=FAIL upstream_missing_listItems_children" >&2
-  exit 1
-fi
-
-echo "FLARUM_DROPDOWN_DIRECT_ITEM_SEAM=PASS"
-
-if [[ ! -f "${CORE_LINKBUTTON_SOURCE}" ]]; then
-  echo "FLARUM_LINKBUTTON_FORCE_RERENDER_SEAM=FAIL source_missing path=${CORE_LINKBUTTON_SOURCE}" >&2
-  exit 1
-fi
-
-if ! grep -Fq 'if (attrs.force === undefined) attrs.force = true;' "${CORE_LINKBUTTON_SOURCE}"; then
-  echo "FLARUM_LINKBUTTON_FORCE_RERENDER_SEAM=FAIL upstream_missing_force_default" >&2
-  exit 1
-fi
-
-if [[ ! -f "${CORE_LINK_SOURCE}" ]]; then
-  echo "FLARUM_LINKBUTTON_FORCE_RERENDER_SEAM=FAIL link_source_missing path=${CORE_LINK_SOURCE}" >&2
-  exit 1
-fi
-
-if ! grep -Fq "extract(attrs, 'force')" "${CORE_LINK_SOURCE}"; then
-  echo "FLARUM_LINKBUTTON_FORCE_RERENDER_SEAM=FAIL upstream_missing_force_extract" >&2
-  exit 1
-fi
-
-if ! grep -Fq 'options.state.key' "${CORE_LINK_SOURCE}"; then
-  echo "FLARUM_LINKBUTTON_FORCE_RERENDER_SEAM=FAIL upstream_missing_force_route_key" >&2
-  exit 1
-fi
-
-echo "FLARUM_LINKBUTTON_FORCE_RERENDER_SEAM=PASS"
-
-php "${ROOT}/scripts/assert-tag-filter-resolution.php" "${SMOKE_ROOT}"
-
+echo "NAVIGATION_DISABLE_FALLBACK=PASS"
+echo "NAVIGATION_F2_HTTP=PASS"
 echo "PRODUCTION_INSTALL=false"

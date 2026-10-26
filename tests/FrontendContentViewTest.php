@@ -56,11 +56,12 @@ class FrontendContentViewTest extends TestCase
         $root = dirname(__DIR__);
         $extend = (string) file_get_contents($root . '/extend.php');
 
-        $this->assertStringContainsString('new Extend\\View()', $extend);
-        $this->assertStringContainsString(
+        $this->assertStringNotContainsString('new Extend\\View()', $extend);
+        $this->assertStringNotContainsString(
             "->extendNamespace('flarum', __DIR__ . '/resources/views')",
             $extend
         );
+        $this->assertFileExists($root.'/resources/views/frontend/content.blade.php');
     }
     public function testMaintenanceBannerUsesSettingsDrivenRuntimeShell(): void
     {

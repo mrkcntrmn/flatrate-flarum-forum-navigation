@@ -17,6 +17,10 @@ final class BrandFamilyTagFilterResolutionTest extends TestCase
 {
     public function testContainerResolvesNativeGambitToFamilyFilter(): void
     {
+        if (!class_exists(TagFilterGambit::class)) {
+            $this->markTestSkipped('Flarum 2 uses the native tag search filter. The Flarum 1 gambit replacement is not registered.');
+        }
+
         $container = new Container();
         $container->instance(SlugManager::class, new SlugManager([]));
 
@@ -34,8 +38,8 @@ final class BrandFamilyTagFilterResolutionTest extends TestCase
         $extend = file_get_contents(dirname(__DIR__) . '/extend.php');
         $provider = file_get_contents(dirname(__DIR__) . '/src/Provider/BrandFamilyTagFilterServiceProvider.php');
 
-        $this->assertStringContainsString('BrandFamilyTagFilterServiceProvider', $extend);
-        $this->assertStringContainsString('Extend\\ServiceProvider', $extend);
+        $this->assertStringNotContainsString('BrandFamilyTagFilterServiceProvider', $extend);
+        $this->assertStringNotContainsString('Extend\\ServiceProvider', $extend);
         $this->assertStringNotContainsString('ReplaceBrandFamilyTagFilter', $extend);
         $this->assertStringNotContainsString('addFilter(BrandFamilyTagFilter', $extend);
         $this->assertStringNotContainsString('addFilter(\\FlatRate\\ForumNavigation\\Search\\Filter\\BrandFamilyTagFilter', $extend);

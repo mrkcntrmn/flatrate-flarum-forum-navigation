@@ -22,11 +22,11 @@ class QuickRailGateTest extends TestCase
             QuickRailGate::SETTING_V2_USER_VISIBLE
         );
 
-        $this->assertStringContainsString(
+        $this->assertStringNotContainsString(
             "->default(QuickRailGate::SETTING_V2_ADMIN_VISIBLE, '0')",
             $extend
         );
-        $this->assertStringContainsString(
+        $this->assertStringNotContainsString(
             "->default(QuickRailGate::SETTING_V2_USER_VISIBLE, '0')",
             $extend
         );
@@ -34,7 +34,7 @@ class QuickRailGateTest extends TestCase
         $this->assertStringNotContainsString('QuickRailGate::PREFERENCE_VISIBLE', $extend);
         $this->assertStringNotContainsString('quick_rail_user_control_enabled', $extend);
         $this->assertStringNotContainsString('quick_rail_member_default_visible', $extend);
-        $this->assertStringContainsString('QuickRailSettingsAttribute::class', $extend);
+        $this->assertStringNotContainsString('QuickRailSettingsAttribute::class', $extend);
         $this->assertStringNotContainsString('Extend\\Migration', $extend);
         $this->assertStringNotContainsString('->migration(', $extend);
         $this->assertDirectoryDoesNotExist($root . '/migrations');

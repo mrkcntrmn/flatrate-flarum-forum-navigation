@@ -29,7 +29,8 @@ test('brand board content suppresses redundant car glyphs without changing tag m
   assert.match(boardLess, /\.TagHero \.Hero-title \.fa-car/);
   assert.match(boardLess, /\.TagLabel \.fa-car/);
   assert.match(boardLess, /display: none !important/);
-  assert.match(extendPhp, /brand-board-toolbar\.less/);
+  assert.doesNotMatch(extendPhp, /brand-board-toolbar\.less/);
+  assert.match(extendPhp, /TagCanonical::class/);
 });
 
 test('brand board title uses FLATRATE.WIKI primary mark color', () => {
