@@ -345,6 +345,15 @@ app.initializers.add(
       return params;
     });
 
+    // F2 server preload does not include our member-pin exclusion. Consume it
+    // before core loadPage can bypass requestParams and render duplicate pins.
+    override(app.discussions, 'loadPage', function (original, ...args) {
+      if (this.requestParams().filter?.flatrateExcludeMainPins === 'member') {
+        app.preloadedApiDocument();
+      }
+      return original(...args);
+    });
+
     // Phone hamburger is Flarum's App-drawer, which renders HeaderSecondary.
     // Desktop keeps IndexPage sideNav; CSS hides these copies at tablet-up.
     extend(HeaderSecondary.prototype, 'items', function (items) {

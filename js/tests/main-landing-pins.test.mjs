@@ -99,3 +99,26 @@ test('board-back records one-shot open-at-top intent without disabling native Ba
   assert.equal(consumeOpenBoardAtTopIntent(), true);
   assert.equal(consumeOpenBoardAtTopIntent(), false);
 });
+
+
+test('member root loading discards the unfiltered server preload before requesting the paginated feed', () => {
+  const start = indexSrc.indexOf("    override(app.discussions, 'loadPage'");
+  const hook = indexSrc.slice(start, indexSrc.indexOf('\n    });', start) + 8);
+  let preloadConsumed = 0;
+  let loaded = 0;
+  const app = {
+    preloadedApiDocument: () => { preloadConsumed++; },
+    discussions: { requestParams: () => ({ filter: { flatrateExcludeMainPins: 'member' } }), loadPage: () => { loaded++; return 'page'; } },
+  };
+  const override = (target, method, extension) => {
+    const original = target[method].bind(target);
+    target[method] = (...args) => extension.call(target, original, ...args);
+  };
+  new Function('app', 'override', hook)(app, override);
+  assert.equal(app.discussions.loadPage(1), 'page');
+  assert.equal(preloadConsumed, 1);
+  app.discussions.requestParams = () => ({ filter: {} });
+  app.discussions.loadPage(1);
+  assert.equal(preloadConsumed, 1, 'tag/search/ordinary requests keep the native preload');
+  assert.equal(loaded, 2);
+});

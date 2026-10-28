@@ -32,8 +32,41 @@ try {
   await page.locator('.App-titleControl .Dropdown-toggle').click();
   await expect(page.locator('.App-titleControl .FlatRatePresentationNav')).toBeVisible();
   await expect(page.locator('.App-titleControl .FlatRateCenterQuickRail')).toBeVisible();
+  // Exercise the first authenticated MAIN load, including core's server preload.
+  const tokenResponse = await page.request.post(`${base}/api/token`, {
+    data: { identification: 'navadmin', password: 'nav-admin-pass' },
+  });
+  assert.equal(tokenResponse.status(), 200);
+  const { token } = await tokenResponse.json();
+  const headers = { Authorization: `Token ${token}` };
+  const tags = (await (await page.request.get(`${base}/api/tags`)).json()).data;
+  const tagId = tags.find((tag) => tag.attributes.slug === 'aston-martin').id;
+  async function discussion(title) {
+    const response = await page.request.post(`${base}/api/discussions`, { headers, data: {
+      data: { type: 'discussions', attributes: { title, content: 'Synthetic browser acceptance content.' },
+        relationships: { tags: { data: [{ type: 'tags', id: tagId }] } } },
+    } });
+    assert.equal(response.status(), 201);
+    return (await response.json()).data.id;
+  }
+  const pinId = await discussion('Pinned acceptance discussion');
+  await discussion('Ordinary acceptance discussion');
+  const settings = await page.request.post(`${base}/api/settings`, { headers, data: {
+    'flatrate-forum-navigation.member_main_pinned_discussion_ids': JSON.stringify([Number(pinId)]),
+  } });
+  assert.equal(settings.status(), 204);
+  await page.setViewportSize({ width: 1440, height: 960 });
+  await page.goto(base);
+  await page.getByRole('button', { name: 'Log In', exact: true }).click();
+  await page.getByRole('textbox', { name: 'Username or Email', exact: true }).fill('navadmin');
+  await page.locator('.LogInModal input[name="password"]').fill('nav-admin-pass');
+  await page.locator('.LogInModal').getByRole('button', { name: 'Log In', exact: true }).click();
+  await expect(page.locator('.FlatRateMainLandingPins[data-audience="member"]')).toContainText('Pinned acceptance discussion');
+  const feed = page.locator('.DiscussionList:not(.FlatRateMainLandingPins-list)');
+  await expect(feed).toContainText('Ordinary acceptance discussion');
+  await expect(feed).not.toContainText('Pinned acceptance discussion');
   assert.deepEqual(errors, [], 'Restored bundle must boot and render without JavaScript errors');
-  console.log('F2_PRESENTATION_BROWSER=PASS desktop, force-remounted boards, phone picker, quick rail');
+  console.log('F2_PRESENTATION_BROWSER=PASS desktop, force-remounted boards, phone picker, quick rail, member preload pin exclusion');
 } finally {
   await browser.close();
 }
