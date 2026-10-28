@@ -23,7 +23,7 @@ test('center popup presents MAIN on the same left-aligned column as Brand rows',
   assert.match(less, /margin-right: auto/);
   assert.match(less, /content: "MAIN"/);
   assert.match(less, /content: "\\f494"/);
-  assert.match(less, /font-family: "Font Awesome 5 Free"/);
+  assert.match(less, /font-family: var\(--fa-family-classic, "Font Awesome 5 Free"\)/);
   assert.match(less, /font-weight: 900/);
 });
 
