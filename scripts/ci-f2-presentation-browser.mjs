@@ -65,8 +65,55 @@ try {
   const feed = page.locator('.DiscussionList:not(.FlatRateMainLandingPins-list)');
   await expect(feed).toContainText('Ordinary acceptance discussion');
   await expect(feed).not.toContainText('Pinned acceptance discussion');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator('.FlatRateMainLandingPins').getByRole('link', { name: /Pinned acceptance discussion/ }).click();
+  await expect(page.locator('.DiscussionHero-title')).toHaveText('Pinned acceptance discussion');
+  const structuralBack = page.getByRole('link', { name: 'Back to Aston Martin', exact: true });
+  await expect(structuralBack).toHaveCount(1);
+  const details = page.getByRole('button', { name: 'Expand discussion details', exact: true });
+  await expect(details).toHaveAttribute('aria-expanded', 'false');
+  const heroMetrics = await details.evaluate((button) => ({
+    width: button.getBoundingClientRect().width,
+    height: button.getBoundingClientRect().height,
+    color: getComputedStyle(button).color,
+    heroColor: getComputedStyle(button.closest('.DiscussionHero')).color,
+  }));
+  assert.ok(heroMetrics.width >= 44 && heroMetrics.height >= 44);
+  assert.equal(heroMetrics.color, heroMetrics.heroColor, 'hero controls retain banner text contrast');
+  await details.click();
+  await expect(page.getByRole('button', { name: 'Collapse discussion details', exact: true })).toHaveAttribute('aria-expanded', 'true');
+  await page.locator('.FlatRateDiscussionActions .Dropdown-toggle').click();
+  await expect(page.getByRole('button', { name: 'Rename', exact: true })).toBeVisible();
+  await page.keyboard.press('Escape');
+  const follow = page.locator('.FlatRateDiscussionFollowStar');
+  await expect(follow).toHaveAttribute('aria-pressed', 'false');
+  await follow.click();
+  await expect(follow).toHaveAttribute('aria-pressed', 'true');
+  await page.reload();
+  await expect(follow).toHaveAttribute('aria-pressed', 'true');
+  await follow.click();
+  await expect(follow).toHaveAttribute('aria-pressed', 'false');
+  await page.reload();
+  await expect(follow).toHaveAttribute('aria-pressed', 'false');
+  await expect(structuralBack).toHaveCount(1);
+  await page.getByRole('button', { name: 'Write a Reply...', exact: true }).click();
+  const reply = 'Synthetic phone reply acceptance.';
+  const editor = page.locator('.Composer textarea');
+  await expect(editor).toHaveAttribute('aria-label', /.+/);
+  await editor.fill(reply);
+  const sendReply = page.getByRole('button', { name: 'Post Reply', exact: true });
+  await expect(sendReply).toBeVisible();
+  const posted = page.waitForResponse((response) => response.url().endsWith('/api/posts') && response.request().method() === 'POST');
+  await sendReply.click();
+  assert.equal((await posted).status(), 201);
+  await expect(page.getByText(reply, { exact: true })).toBeVisible();
+  await page.reload();
+  await expect(page.getByText(reply, { exact: true })).toBeVisible();
+  await structuralBack.click();
+  await expect(page).toHaveURL(`${base}/t/aston-martin`);
+  await expect(page.getByRole('link', { name: 'Back to MAIN', exact: true })).toHaveCount(1);
   assert.deepEqual(errors, [], 'Restored bundle must boot and render without JavaScript errors');
-  console.log('F2_PRESENTATION_BROWSER=PASS desktop, force-remounted boards, phone picker, quick rail, member preload pin exclusion');
+  console.log('F2_PRESENTATION_BROWSER=PASS desktop, force-remounted boards, phone picker, quick rail, member preload pin exclusion, discussion controls/follow/reply');
 } finally {
   await browser.close();
 }

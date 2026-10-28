@@ -115,7 +115,7 @@ cat > "${INSTALL_JSON}" <<'EOF'
   "settings": {
     "forum_title": "Navigation Smoke"
   },
-  "extensions": "flarum-tags,flatrate-forum-navigation"
+  "extensions": "flarum-tags,flarum-subscriptions,flatrate-forum-navigation"
 }
 EOF
 

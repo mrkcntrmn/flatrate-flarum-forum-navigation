@@ -19,11 +19,13 @@ Flarum 2 presentation restoration candidate, stacked on the native navigation/SE
 
 The forum resource publishes an explicit allowlist of presentation attributes. Native Flarum visibility constraints still apply before pin and brand-family filters narrow results. Missing quick-rail visibility settings remain false; this change does not activate Live, uploads, or an operational maintenance banner.
 
+Phone discussion navigation collapses the duplicate drawer/history structural Back controls to one owning-board arrow. Composer controls retain accessible native action names when mobile styles hide their labels, and the basic editor gets a content label. Hero controls inherit the banner text color.
+
 The previous webpack configuration emitted the removed `flarum.core.compat` runtime. Version 3.1.0 uses Flarum 2 modules. Explicit export lists preserve identifiers containing digits with that loader.
 
 ## Qualification
 
-PHP tests cover public attributes and actor-scoped SQLite pin filtering, including negation and invalid values. JavaScript tests cover the retained presentation contracts. The disposable Flarum 2.0.2 install smoke checks SEO, private-tag denial, disable fallback, and browser acceptance for desktop board transitions and the phone picker. Browser acceptance uses only synthetic local data.
+PHP tests cover public attributes and actor-scoped SQLite pin filtering, including negation and invalid values. JavaScript tests cover the retained presentation contracts. The disposable Flarum 2.0.2 install smoke checks SEO, private-tag denial, disable fallback, and browser acceptance for desktop board transitions, the phone picker, structural Back uniqueness, Follow/Unfollow persistence, moderator reachability, and saved replies. Browser acceptance uses only synthetic local data.
 
 ## Hard boundaries
 

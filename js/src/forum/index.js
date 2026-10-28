@@ -20,6 +20,7 @@ import BrandFamilyLinks from './components/BrandFamilyLinks';
 import './discussionCenterMenu';
 import registerCompactDiscussionActivity from './compactDiscussionActivity';
 import registerDiscussionPhoneChrome from './discussionPhoneChrome';
+import registerComposerAccessibility from './composerAccessibility';
 import registerBoardHeroDisclosure from './boardHeroDisclosure';
 import { getNavigationManifest, pushToStartHref } from './utils/manifest';
 import { resolvePresentationTitle, resolvePresentationTitleMode, TECHNICIAN_TOPICS_LABEL } from './utils/presentationTitle';
@@ -172,6 +173,7 @@ app.initializers.add(
     };
 
     registerDiscussionPhoneChrome();
+    registerComposerAccessibility();
     registerCompactDiscussionActivity();
 
     // Native Latest is the authenticated MAIN default. Do not force sort=top

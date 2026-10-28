@@ -186,9 +186,8 @@ app.initializers.add(
       );
     });
 
-    // Flarum 1.8.19 Navigation.view() renders through getBackButton() when
-    // app history can go back, and getDrawerButton() on direct-entry/no-history.
-    // Override both live seams with a stable owning-board LinkButton. Do not
+    // Use stable structural destinations for both the F2 history and drawer
+    // control seams. Do not
     // invoke Flarum app-history back helpers — the board route is the destination.
     override(Navigation.prototype, 'getBackButton', function (original) {
       const target = currentDiscussionBoardTarget();
@@ -224,6 +223,18 @@ app.initializers.add(
       }
 
       return original();
+    });
+
+    // F2 renders drawer and history Back together. On structural board routes
+    // both overridden controls point to the same destination; keep one arrow.
+    extend(Navigation.prototype, 'items', function (items) {
+      if (!this.attrs.drawer || !hasItem(items, 'drawer')) return;
+      const target = currentDiscussionBoardTarget() || resolveBoardStructuralBack({
+        slug: currentIndexBoardSlug(),
+        routeName: currentIndexRouteName(),
+        manifest: getNavigationManifest(),
+      });
+      if (target) items.remove('back');
     });
 
     override(SelectDropdown.prototype, 'getButtonContent', function (original, children) {
