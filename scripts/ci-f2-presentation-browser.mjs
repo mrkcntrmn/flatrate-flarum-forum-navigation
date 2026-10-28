@@ -16,9 +16,9 @@ try {
   page.on('pageerror', (error) => errors.push(error.message));
   page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
   await page.goto(base);
-  await expect(page.locator('.FlatRatePresentationNav')).toBeVisible();
   await expect(page.locator('.WelcomeHero .Hero-close')).toHaveCount(0);
   const nav = page.locator('.IndexPage-nav .FlatRatePresentationNav');
+  await expect(nav).toBeVisible();
   await expect(nav.getByRole('link', { name: 'Aston Martin', exact: true })).toHaveAttribute('href', '/t/aston-martin');
   await nav.getByRole('link', { name: 'Aston Martin', exact: true }).click();
   await expect(page).toHaveURL(`${base}/t/aston-martin`);
