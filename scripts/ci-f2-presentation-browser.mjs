@@ -25,7 +25,7 @@ try {
   // URL changes alone do not prove that the IndexPage remounted.
   await expect(page.locator('.TagHero .Hero-title')).toHaveText('Aston Martin');
   await nav.getByRole('link', { name: 'START', exact: true }).click();
-  await expect(page.locator('.TagHero .Hero-title')).toHaveText('START');
+  await expect(page.locator('.TagHero .Hero-title')).toHaveText('Start Here');
   await page.setViewportSize({ width: 393, height: 851 });
   await page.goto(base);
   await expect(page.locator('.App-titleControl')).toBeVisible();
