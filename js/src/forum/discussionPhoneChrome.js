@@ -1,3 +1,4 @@
+import { hasItem } from './utils/itemList.js';
 import app from 'flarum/forum/app';
 import { extend } from 'flarum/common/extend';
 import Button from 'flarum/common/components/Button';
@@ -25,7 +26,7 @@ function removeItem(items, key) {
     items.remove(key);
     return;
   }
-  if (items.items && items.items[key] && typeof items.remove === 'function') {
+  if (hasItem(items, key) && typeof items.remove === 'function') {
     items.remove(key);
   }
 }
@@ -53,7 +54,7 @@ export default function registerDiscussionPhoneChrome() {
     // remove only its redundant standalone control at the top of a discussion.
     removeItem(items, 'flatRateDiscussionVote');
 
-    if (items.items && items.items.flatrateJumpToTop) {
+    if (hasItem(items, 'flatrateJumpToTop')) {
       items.remove('flatrateJumpToTop');
     }
     items.add('flatrateJumpToTop', <DiscussionJumpToTop />, 90);

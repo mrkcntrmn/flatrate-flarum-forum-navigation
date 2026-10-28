@@ -63,7 +63,7 @@ fi
 
 # A pull-request checkout is detached, so give the path package its branch name
 # before Composer guesses a version from HEAD.
-git -C "${ROOT}" checkout -B feat/f2-minimal-nav-seo
+# The caller owns the source branch; do not switch it during qualification.
 composer config repositories.flatrate-forum-navigation path "${ROOT}"
 composer require "flatrate/flarum-forum-navigation:*@dev" --no-interaction --prefer-dist --no-audit
 
@@ -92,8 +92,8 @@ if ! grep -Fq 'RobotsTxt::class' "${EXTEND_PHP}"; then
   echo "NAVIGATION_F2_EXTENDER=FAIL missing_robots" >&2
   exit 1
 fi
-if grep -Fq 'js/dist/forum.js' "${EXTEND_PHP}"; then
-  echo "NAVIGATION_F2_EXTENDER=FAIL historical_frontend_registered" >&2
+if ! grep -Fq 'js/dist/forum.js' "${EXTEND_PHP}"; then
+  echo "NAVIGATION_F2_EXTENDER=FAIL restored_frontend_missing" >&2
   exit 1
 fi
 echo "NAVIGATION_F2_EXTENDER=PASS"
@@ -122,9 +122,16 @@ EOF
 php flarum install --file "${INSTALL_JSON}"
 rm -f "${INSTALL_JSON}"
 
+cat > "${SMOKE_ROOT}/public/router.php" <<'PHP'
+<?php
+$uri = urldecode(parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/');
+if ($uri !== '/' && is_file(__DIR__.$uri)) return false;
+require __DIR__.'/index.php';
+PHP
+
 (
   cd "${SMOKE_ROOT}/public"
-  php -S 127.0.0.1:8765 index.php > "${SMOKE_ROOT}/http.log" 2>&1
+  php -d memory_limit=512M -S 127.0.0.1:8765 router.php > "${SMOKE_ROOT}/http.log" 2>&1
 ) &
 HTTP_PID=$!
 cleanup_http() {
@@ -271,6 +278,10 @@ if grep -Fq 'pikapod' <<< "${ROBOTS}"; then
   exit 1
 fi
 echo "SEO_ROBOTS=PASS"
+
+if [[ "${NAVIGATION_UI_BROWSER_ACCEPTANCE:-0}" == "1" ]]; then
+  node "${ROOT}/scripts/ci-f2-presentation-browser.mjs" http://127.0.0.1:8765
+fi
 
 php flarum extension:disable flatrate-forum-navigation
 FALLBACK_ROBOTS="$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8765/robots.txt)"

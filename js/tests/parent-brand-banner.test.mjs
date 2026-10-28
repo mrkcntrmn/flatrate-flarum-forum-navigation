@@ -73,6 +73,6 @@ test('child links and extra content remain visible without a chevron', () => {
 test('TagHero is resolved inside the post-tags initializer rather than at bundle evaluation time', () => {
   assert.match(indexSrc, /function resolveTagHero\(\)/);
   assert.match(indexSrc, /const TagHero = resolveTagHero\(\);/);
-  assert.match(indexSrc, /require\('flarum\/tags\/components\/TagHero'\)/);
+  assert.match(indexSrc, /require\('ext:flarum\/tags\/forum\/components\/TagHero'\)/);
   assert.doesNotMatch(indexSrc, /let TagHero;\s*try \{/);
 });

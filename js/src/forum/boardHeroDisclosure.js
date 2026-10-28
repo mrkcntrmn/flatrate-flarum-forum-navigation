@@ -26,7 +26,7 @@ export default function registerBoardHeroDisclosure(TagHero) {
     return !String(title || '').trim() || this.hidden === true;
   });
 
-  extend(WelcomeHero.prototype, 'viewItems', function (items) {
+  extend(WelcomeHero.prototype, 'bodyItems', function (items) {
     if (items && typeof items.remove === 'function') {
       items.remove('dismiss-button');
     }

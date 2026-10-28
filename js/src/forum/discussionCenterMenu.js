@@ -1,9 +1,12 @@
+import { hasItem } from './utils/itemList.js';
 import app from 'flarum/forum/app';
 import { extend, override } from 'flarum/common/extend';
 import Button from 'flarum/common/components/Button';
 import Navigation from 'flarum/common/components/Navigation';
 import DiscussionPage from 'flarum/forum/components/DiscussionPage';
 import IndexPage from 'flarum/forum/components/IndexPage';
+import IndexSidebar from 'flarum/forum/components/IndexSidebar';
+import { openCanonicalNewDiscussion } from './utils/openCanonicalNewDiscussion';
 import LinkButton from 'flarum/common/components/LinkButton';
 import SelectDropdown from 'flarum/common/components/SelectDropdown';
 import ItemList from 'flarum/common/utils/ItemList';
@@ -20,7 +23,7 @@ import { brandHref, getNavigationManifest, tagHref } from './utils/manifest';
 import { resolveBoardStructuralBack } from './utils/boardStructuralBack';
 import { resolveIndexBoardSlug } from './utils/currentBoardContext';
 import { recordOpenBoardAtTopIntent, consumeOpenBoardAtTopIntent } from './utils/boardBackIntent';
-import icon from 'flarum/common/helpers/icon';
+import icon from './utils/icon';
 import { TECHNICIAN_TOPICS_ICON } from './utils/startNav';
 
 function currentDiscussionBoardTarget() {
@@ -165,7 +168,7 @@ app.initializers.add(
         );
       });
 
-      if (items.items && items.items.flatrateDiscussionBrandPicker) {
+      if (hasItem(items, 'flatrateDiscussionBrandPicker')) {
         items.remove('flatrateDiscussionBrandPicker');
       }
 
@@ -265,8 +268,8 @@ app.initializers.add(
 
     // Keep the phone header's right-hand primary slot available for the board
     // follow control. New Discussion moves into the list toolbar instead.
-    extend(IndexPage.prototype, 'sidebarItems', function (items) {
-      if (items.items && items.items.newDiscussion) {
+    extend(IndexSidebar.prototype, 'items', function (items) {
+      if (hasItem(items, 'newDiscussion')) {
         items.remove('newDiscussion');
       }
     });
@@ -274,13 +277,13 @@ app.initializers.add(
     // Replace the refresh / mark-all-read pair with one explicit compose action.
     // This keeps the sort control on the left and a single + action on the right.
     extend(IndexPage.prototype, 'actionItems', function (items) {
-      if (items.items && items.items.refresh) {
+      if (hasItem(items, 'refresh')) {
         items.remove('refresh');
       }
-      if (items.items && items.items.markAllAsRead) {
+      if (hasItem(items, 'markAllAsRead')) {
         items.remove('markAllAsRead');
       }
-      if (items.items && items.items.newDiscussion) {
+      if (hasItem(items, 'newDiscussion')) {
         items.remove('newDiscussion');
       }
 
@@ -296,7 +299,7 @@ app.initializers.add(
           className="Button Button--icon FlatRateInlineNewDiscussion"
           title={label}
           aria-label={label}
-          onclick={() => this.newDiscussionAction().catch(() => {})}
+          onclick={() => openCanonicalNewDiscussion(this).catch(() => {})}
           disabled={!canStartDiscussion}
         />,
         100

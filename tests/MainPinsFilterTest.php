@@ -42,8 +42,8 @@ class MainPinsFilterTest extends TestCase
         $this->assertStringNotContainsString('is_sticky', $exclude);
         $this->assertStringNotContainsString('isSticky', $exclude);
         $this->assertStringNotContainsString('DiscussionFilterer::class', $extend);
-        $this->assertStringNotContainsString('MainPinsFilter::class', $extend);
-        $this->assertStringNotContainsString('ExcludeMainPinsFilter::class', $extend);
+        $this->assertStringContainsString('F2MainPinsFilter::class', $extend);
+        $this->assertStringContainsString('F2ExcludeMainPinsFilter::class', $extend);
         $this->assertStringNotContainsString('DefaultRootSort', $extend);
     }
 }

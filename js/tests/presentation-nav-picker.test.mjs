@@ -29,12 +29,12 @@ function fakeItemList(keys) {
   };
 }
 
-test('IndexPage.navItems remains the Flarum Tags 1.8.19 seam', () => {
-  assert.match(indexSrc, /extend\(IndexPage\.prototype, 'navItems'/);
+test('IndexSidebar.navItems is the Flarum 2 navigation seam', () => {
+  assert.match(indexSrc, /extend\(IndexSidebar\.prototype, 'navItems'/);
   assert.match(indexSrc, /addTagList\.js/);
   assert.match(indexSrc, /-50/);
   assert.doesNotMatch(indexSrc, /after: 'flarum-tags'/);
-  assert.doesNotMatch(indexSrc, /from 'flarum\/forum\/components\/IndexSidebar'/);
+  assert.match(indexSrc, /from 'flarum\/forum\/components\/IndexSidebar'/);
 });
 
 test('phone hamburger drawer mounts presentation nav via HeaderSecondary', () => {
@@ -58,7 +58,7 @@ test('SelectDropdown override is annotation-scoped', () => {
   assert.match(indexSrc, /flatratePresentationTitle !== true/);
   assert.match(indexSrc, /override\(SelectDropdown\.prototype, 'getButtonContent'/);
   assert.doesNotMatch(indexSrc, /extend\(SelectDropdown\.prototype, 'getButtonContent'/);
-  assert.match(indexSrc, /extend\(IndexPage\.prototype, 'sidebarItems'/);
+  assert.match(indexSrc, /extend\(IndexSidebar\.prototype, 'items'/);
   assert.match(indexSrc, /TECHNICIAN_TOPICS_ICON/);
   assert.match(indexSrc, /fa-wrench/);
   assert.doesNotMatch(indexSrc, /BRAND_NAV_ICON/);

@@ -216,7 +216,7 @@ test('phone swaps the scrubber for the brand picker while desktop keeps scrubber
   assert.match(less, /padding-left: 1\.5rem/);
   assert.match(less, /\.FlatRateDiscussionBrandLink\.depth-2/);
   assert.match(less, /padding-left: 3rem/);
-  assert.doesNotMatch(extendPhp, /discussion-center-menu\.less/);
+  assert.match(extendPhp, /discussion-center-menu\.less/);
   assert.match(extendPhp, /TagCanonical::class/);
 });
 

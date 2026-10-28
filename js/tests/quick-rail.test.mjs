@@ -134,7 +134,7 @@ test('V2 settings default off and use only the independent audience gates', () =
   assert.doesNotMatch(extendPhp, /SETTING_V2_ADMIN_VISIBLE/);
   assert.doesNotMatch(extendPhp, /SETTING_V2_USER_VISIBLE/);
   assert.match(extendPhp, /TagCanonical::class/);
-  assert.doesNotMatch(extendPhp, /js\/dist\/forum\.js/);
+  assert.match(extendPhp, /js\/dist\/forum\.js/);
   assert.doesNotMatch(extendPhp, /registerPreference/);
 
   assert.match(locale, /heading: Center Menu V2/);
@@ -154,7 +154,7 @@ test('IndexPage and DiscussionPage share CenterQuickRail and canonical actions',
   assert.match(discussionSrc, /<CenterQuickRail manifest=\{manifest\} page=\{this\} \/>/);
   assert.match(indexSrc, /'flatrateQuickRail'/);
   assert.match(discussionSrc, /'flatrateQuickRail'/);
-  assert.match(composer, /IndexPage\.prototype\.newDiscussionAction\.call/);
+  assert.match(composer, /IndexSidebar\.prototype\.newDiscussionAction\.call/);
   assert.match(composer, /currentTag/);
   assert.doesNotMatch(composer, /DiscussionComposer/);
   assert.doesNotMatch(composer, /new DiscussionComposer/);

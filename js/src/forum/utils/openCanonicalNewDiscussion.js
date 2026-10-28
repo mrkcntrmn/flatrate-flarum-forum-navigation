@@ -1,4 +1,4 @@
-import IndexPage from 'flarum/forum/components/IndexPage';
+import IndexSidebar from 'flarum/forum/components/IndexSidebar';
 
 /**
  * Canonical Start Discussion seam.
@@ -6,7 +6,7 @@ import IndexPage from 'flarum/forum/components/IndexPage';
  * The production icon vocabulary is not one bottom-bar component:
  * - Profile: Flarum avatar helper + app.route.user (core session menu)
  * - Messages: flatrate-messaging.index route `/messages` (messaging-ui owns unread)
- * - New Discussion: IndexPage.prototype.newDiscussionAction
+ * - New Discussion: IndexSidebar.prototype.newDiscussionAction
  *   flarum/tags addTagComposer.js extends that method and reads this.currentTag()
  * - Technician Topics: navigation manifest
  * - MAIN: app.route('index')
@@ -20,12 +20,12 @@ export function openCanonicalNewDiscussion(page) {
     return page.newDiscussionAction();
   }
 
-  const host = Object.create(IndexPage.prototype);
+  const host = Object.create(IndexSidebar.prototype);
   host.currentTag = function currentTag() {
     return currentTagFromPage(page);
   };
 
-  return IndexPage.prototype.newDiscussionAction.call(host);
+  return IndexSidebar.prototype.newDiscussionAction.call(host);
 }
 
 function currentTagFromPage(page) {

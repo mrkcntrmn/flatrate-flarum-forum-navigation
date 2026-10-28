@@ -68,9 +68,9 @@ test('source wires dual-audience MAIN pins without native sticky mutation', () =
   assert.match(indexSrc, /audience="member"/);
   assert.match(indexSrc, /flatrateExcludeMainPins/);
   assert.match(pinsSrc, /flatrateMainPins/);
-  assert.doesNotMatch(extendPhp, /MainPinsFilter/);
-  assert.doesNotMatch(extendPhp, /ExcludeMainPinsFilter/);
-  assert.doesNotMatch(extendPhp, /admin\.js/);
+  assert.match(extendPhp, /MainPinsFilter/);
+  assert.match(extendPhp, /ExcludeMainPinsFilter/);
+  assert.match(extendPhp, /admin\.js/);
   assert.match(extendPhp, /TagCanonical::class/);
   assert.match(adminSrc, /SETTING_PUBLIC/);
   assert.match(adminSrc, /SETTING_MEMBER/);

@@ -1,3 +1,4 @@
+import { hasItem } from './itemList.js';
 import { hasSearchQuery, isRootDiscussionPath } from './defaultRootSort.js';
 
 /** ItemList key for the HOME START board pin. */
@@ -66,7 +67,7 @@ export function addStartBoardPinItem(items, pinVnode) {
     return items;
   }
 
-  if (items.items && items.items[START_BOARD_PIN_ITEM] && typeof items.remove === 'function') {
+  if (hasItem(items, START_BOARD_PIN_ITEM) && typeof items.remove === 'function') {
     items.remove(START_BOARD_PIN_ITEM);
   }
 
@@ -79,7 +80,7 @@ export function removeStartBoardPinItem(items) {
     return items;
   }
 
-  if (items.items && items.items[START_BOARD_PIN_ITEM]) {
+  if (hasItem(items, START_BOARD_PIN_ITEM)) {
     items.remove(START_BOARD_PIN_ITEM);
   }
 

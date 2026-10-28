@@ -1,7 +1,7 @@
 import { PICK_A_BRAND } from './presentationTitle.js';
 
-export const TECHNICIAN_TOPICS_SLUG = 'general-shop-discussion';
-export const TECHNICIAN_TOPICS_A11Y_LABEL = 'Technician Topics';
+const TECHNICIAN_TOPICS_SLUG = 'general-shop-discussion';
+const TECHNICIAN_TOPICS_A11Y_LABEL = 'Technician Topics';
 
 function tagSlug(tag) {
   if (!tag) return '';
@@ -36,7 +36,7 @@ function discussionTags(discussion) {
   return Array.isArray(discussion.tags) ? discussion.tags : [];
 }
 
-export function flattenBrandBoards(manifest) {
+function flattenBrandBoards(manifest) {
   const brandGroup = (manifest?.groups || []).find((group) => group?.mode === 'tree' && group?.id === 'brands');
   const flattened = [];
 
@@ -55,7 +55,7 @@ export function flattenBrandBoards(manifest) {
  * If both a parent brand and child marque are attached, prefer the deepest
  * matching board (for example Chevrolet over GM).
  */
-export function resolveDiscussionBrandBoard({ discussion = null, manifest = null } = {}) {
+function resolveDiscussionBrandBoard({ discussion = null, manifest = null } = {}) {
   const slugs = new Set(discussionTags(discussion).map(tagSlug).filter(Boolean));
   if (!slugs.size) return null;
 
@@ -77,7 +77,7 @@ export function resolveDiscussionBrandBoard({ discussion = null, manifest = null
  * Secondary metadata tags (for example Job Breakdown) are never used as the
  * generic fallback destination.
  */
-export function resolveDiscussionBoardTarget({ discussion = null, manifest = null } = {}) {
+function resolveDiscussionBoardTarget({ discussion = null, manifest = null } = {}) {
   const tags = discussionTags(discussion);
   if (!tags.length) return null;
 
@@ -135,7 +135,7 @@ function isTechnicianTopicsTarget(target) {
  * literal label; the wrench is a separate Font Awesome icon, not this string.
  * Fallback when no valid owning board exists: FlatRate.wiki / FLATRATE.WIKI.
  */
-export function resolveDiscussionBrandTitle({ discussion = null, manifest = null } = {}) {
+function resolveDiscussionBrandTitle({ discussion = null, manifest = null } = {}) {
   const target = resolveDiscussionBoardTarget({ discussion, manifest });
   if (!target) {
     return PICK_A_BRAND;
@@ -148,14 +148,14 @@ export function resolveDiscussionBrandTitle({ discussion = null, manifest = null
   return String(target.name || PICK_A_BRAND);
 }
 
-export function discussionCenterUsesTechnicianIcon(target) {
+function discussionCenterUsesTechnicianIcon(target) {
   return isTechnicianTopicsTarget(target);
 }
 
 /**
  * Accessible name for the discussion center control.
  */
-export function resolveDiscussionBrandAccessibleLabel({ discussion = null, manifest = null } = {}) {
+function resolveDiscussionBrandAccessibleLabel({ discussion = null, manifest = null } = {}) {
   const target = resolveDiscussionBoardTarget({ discussion, manifest });
   if (!target) {
     return PICK_A_BRAND;
@@ -167,3 +167,6 @@ export function resolveDiscussionBrandAccessibleLabel({ discussion = null, manif
 
   return String(target.name || PICK_A_BRAND);
 }
+
+// Explicit export lists preserve numeric identifiers in flarum-webpack-config 3.1.0.
+export { TECHNICIAN_TOPICS_SLUG, TECHNICIAN_TOPICS_A11Y_LABEL, flattenBrandBoards, resolveDiscussionBrandBoard, resolveDiscussionBoardTarget, resolveDiscussionBrandTitle, discussionCenterUsesTechnicianIcon, resolveDiscussionBrandAccessibleLabel };
