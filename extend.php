@@ -37,6 +37,13 @@ return [
 
     (new Extend\Routes('forum'))
         ->get('/community', 'flatrate-forum-navigation.community-redirect', CommunityRedirect::class)
-        ->get('/community/', 'flatrate-forum-navigation.community-redirect-slash', CommunityRedirect::class)
-        ->get('/robots.txt', 'flatrate-forum-navigation.robots', RobotsTxt::class),
+        ->get('/community/', 'flatrate-forum-navigation.community-redirect-slash', CommunityRedirect::class),
+
+    // FoF Sitemap 3 owns this route when present. Keep the reduced-stack
+    // fallback without registering two identical routes in the full stack.
+    (new Extend\Conditional())
+        ->whenExtensionDisabled('fof-sitemap', fn () => [
+            (new Extend\Routes('forum'))
+                ->get('/robots.txt', 'flatrate-forum-navigation.robots', RobotsTxt::class),
+        ]),
 ];
