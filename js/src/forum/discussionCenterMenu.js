@@ -286,8 +286,13 @@ app.initializers.add(
     });
 
     // Replace the refresh / mark-all-read pair with one explicit compose action.
-    // This keeps the sort control on the left and a single + action on the right.
+    // F2 core adds a mobile GlobalSearch button to this toolbar. Remove that
+    // duplicate magnifier on MAIN and Brand boards; global Search remains in
+    // the navigation drawer and desktop header.
     extend(IndexPage.prototype, 'actionItems', function (items) {
+      if (hasItem(items, 'search')) {
+        items.remove('search');
+      }
       if (hasItem(items, 'refresh')) {
         items.remove('refresh');
       }
