@@ -533,32 +533,47 @@
     order: 20;
   }
 
-  /* Core Flarum owns the search component and its actual query state. For the
-     phone drawer, visually replace the verbose core placeholder with the
-     concise requested label without changing input behavior or desktop copy. */
+  /* Flarum 2 GlobalSearch is a button, not the F1 text input. Preserve
+     its native Search Forum label, icon, click handler and modal. The F1
+     ::before/placeholder shim duplicated the label on top of the icon. */
+  .App-drawer .item-search .Search {
+    width: 100%;
+    min-width: 0;
+  }
+
   .App-drawer .item-search .Search-input {
-    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 0.75rem 13px;
+    text-align: left;
   }
 
-  .App-drawer .item-search .Search-input::before {
-    content: "Search";
-    position: absolute;
-    z-index: 1;
-    top: 50%;
-    left: 13px;
-    transform: translateY(-50%);
-    color: var(--muted-color, currentColor);
-    opacity: 0.7;
-    pointer-events: none;
+  .App-drawer .item-search .Search-input .Button-icon {
+    position: static !important;
+    float: none !important;
+    flex: 0 0 1.25rem;
+    width: 1.25rem;
+    margin: 0 !important;
+    line-height: 1;
   }
 
-  .App-drawer .item-search .Search-input:has(.FormControl:not(:placeholder-shown))::before {
-    display: none;
+  .App-drawer .item-search .Search-input .Button-label {
+    display: block;
+    min-width: 0;
+    margin: 0;
+    white-space: normal;
+    text-align: left;
   }
 
-  .App-drawer .item-search .FormControl::placeholder {
-    color: transparent !important;
-    opacity: 0 !important;
+  /* Remove these drawer shortcuts, not their underlying moderation rights
+     or the account's theme preferences. Other header surfaces remain native. */
+  .App-drawer .Header-controls > .item-flags,
+  .App-drawer .Header-controls > .item-themeSwitcher {
+    display: none !important;
   }
 
   .App-drawer .item-flatrateDrawerNav {
@@ -674,10 +689,22 @@
      Flarum supplies `far fa-comments`; overriding its glyph with the Font
      Awesome 5 Free solid warehouse codepoint is visually equivalent to
      `fas fa-warehouse` without changing the shared desktop/hamburger vnode. */
-  /* Center the common Brand column under the warehouse quick-rail control.
-     Labels stay left-aligned inside that column; child indentation is padding. */
-  .App-titleControl .Dropdown-menu {
-    --flatrate-mobile-nav-rail-offset: 0rem;
+  /* Center all menu rows against the viewport-sized sheet, not the
+     max-content title trigger or a nested list item's content width. */
+  .App-titleControl .Dropdown-menu > li:not(.item-flatrateQuickRail) {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    flex: 0 0 auto;
+  }
+
+  .App-titleControl .Dropdown-menu .FlatRatePresentationNav,
+  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-list,
+  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-tree,
+  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-children,
+  .App-titleControl .Dropdown-menu .FlatRatePresentationNav-row {
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .App-titleControl .Dropdown-menu .item-allDiscussions > a {
@@ -689,7 +716,7 @@
     width: 15rem;
     max-width: ~"calc(100% - 40px)";
     min-height: 0;
-    margin-left: ~"calc(50% - 7.5rem + var(--flatrate-mobile-nav-rail-offset, 0rem))";
+    margin-left: auto;
     margin-right: auto;
     padding: 15px 0 !important;
     text-align: left;
@@ -733,7 +760,7 @@
     width: 15rem;
     max-width: ~"calc(100% - 40px)";
     min-height: 0;
-    margin-left: ~"calc(50% - 7.5rem + var(--flatrate-mobile-nav-rail-offset, 0rem))";
+    margin-left: auto;
     margin-right: auto;
     padding: 15px 0 !important;
     text-align: left;
@@ -945,7 +972,7 @@
     max-width: ~"calc(100% - 40px)";
     box-sizing: border-box;
     min-height: 0;
-    margin-left: ~"calc(50% - 7.5rem + var(--flatrate-mobile-nav-rail-offset, 0rem))";
+    margin-left: auto;
     margin-right: auto;
     padding: 15px 0 !important;
     text-align: left;
