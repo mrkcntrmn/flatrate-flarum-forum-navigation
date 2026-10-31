@@ -749,13 +749,12 @@
     font-size: 16px;
   }
 
-  /* Phone title-control Brand links: SelectDropdown-compatible li > a rows.
-     Keep one centered Brand column, left-align every make, and indent child
-     marques from the same column edge so umbrella groups read as a tree. */
+  /* Phone title-control Brand links: center their text beneath the quick
+     rail. Child marques retain a small indentation for visible hierarchy. */
   .App-titleControl .Dropdown-menu .FlatRateDiscussionBrandLink {
     display: flex !important;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     box-sizing: border-box;
     width: 15rem;
     max-width: ~"calc(100% - 40px)";
@@ -763,8 +762,18 @@
     margin-left: auto;
     margin-right: auto;
     padding: 15px 0 !important;
-    text-align: left;
+    text-align: center;
     font-size: 16px;
+  }
+
+  .App-titleControl .Dropdown-menu .FlatRateDiscussionBrandLink .Button-label {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .App-titleControl .Dropdown-menu .FlatRateDiscussionBrandLink .FlatRateDiscussionBrandName {
+    flex: 0 1 auto;
+    text-align: center;
   }
 
   .App-titleControl .Dropdown-menu .FlatRateDiscussionBrandLink.depth-1 {
@@ -957,9 +966,8 @@
     color: var(--primary-color) !important;
   }
 
-  /* Index-page center picker: use one centered Brand column. Every top-level
-     make is left-aligned to the same edge; child marques are consistently
-     indented from that edge instead of drifting toward the menu boundary. */
+  /* Index-page center picker: center each Brand label beneath the quick rail.
+     Hierarchical children keep their own small text indent. */
   .App-titleControl .Dropdown-menu .FlatRatePresentationNav-row {
     width: 100%;
   }
@@ -967,7 +975,7 @@
   .App-titleControl .Dropdown-menu .FlatRatePresentationNav-brandLink {
     display: flex !important;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     width: 15rem;
     max-width: ~"calc(100% - 40px)";
     box-sizing: border-box;
@@ -975,7 +983,7 @@
     margin-left: auto;
     margin-right: auto;
     padding: 15px 0 !important;
-    text-align: left;
+    text-align: center;
   }
 
   .App-titleControl .Dropdown-menu .FlatRatePresentationNav-brandLink .Button-icon,
@@ -1014,7 +1022,7 @@
   .App-titleControl .Dropdown-menu .FlatRatePresentationNav-brandName {
     flex: 1 1 auto;
     min-width: 0;
-    text-align: left;
+    text-align: center;
   }
 
   .App-titleControl .Dropdown-menu .FlatRatePresentationNav-brandLink .FlatRateBrandVoteTotal {
