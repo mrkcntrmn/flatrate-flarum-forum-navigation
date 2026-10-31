@@ -19,7 +19,9 @@ test('center popup presents MAIN on the same left-aligned column as Brand rows',
   assert.match(less, /\.App-titleControl \.Dropdown-menu \.item-allDiscussions > a/);
   assert.match(less, /justify-content: flex-start/);
   assert.match(less, /width: 15rem/);
-  assert.match(less, /flatrate-mobile-nav-rail-offset/);
+  assert.match(less, /\\.App-titleControl \\.Dropdown-menu > li:not\\(\\.item-flatrateQuickRail\\)/);
+  assert.match(less, /\\.App-titleControl \\.Dropdown-menu \\.FlatRatePresentationNav-row/);
+  assert.match(less, /margin-left: auto/);
   assert.match(less, /margin-right: auto/);
   assert.match(less, /content: "MAIN"/);
   assert.match(less, /content: "\\f494"/);
