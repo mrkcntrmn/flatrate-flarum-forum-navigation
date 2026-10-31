@@ -46,6 +46,11 @@ test('IndexPage center sheet hides PresentationNav Brand totals', () => {
   assert.match(rule[1], /display:\s*none !important/);
 });
 
+test('IndexPage center Brand labels visually center beneath quick rail', () => {
+  assert.match(less, /\.App-titleControl \.Dropdown-menu \.FlatRatePresentationNav-brandLink\s*\{[^}]*justify-content: center;/s);
+  assert.match(less, /\.App-titleControl \.Dropdown-menu \.FlatRatePresentationNav-brandName\s*\{[^}]*text-align: center;/s);
+});
+
 test('IndexPage center sheet Brand names do not reserve the count tab stop', () => {
   const rule = less.match(
     /\.App-titleControl \.Dropdown-menu \.FlatRatePresentationNav-brandName\s*\{([^}]*)\}/
