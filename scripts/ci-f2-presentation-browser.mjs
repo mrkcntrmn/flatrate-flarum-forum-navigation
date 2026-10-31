@@ -32,6 +32,54 @@ try {
   await page.locator('.App-titleControl .Dropdown-toggle').click();
   await expect(page.locator('.App-titleControl .FlatRatePresentationNav')).toBeVisible();
   await expect(page.locator('.App-titleControl .FlatRateCenterQuickRail')).toBeVisible();
+  // Regression: each top-level Brand label must visually center beneath
+  // the middle quick-rail icon across supported phone widths. The old
+  // percentage margin centered inside a nested intrinsic-width ancestor.
+  for (const width of [320, 360, 390, 412, 430]) {
+    await page.setViewportSize({ width, height: 851 });
+    const acura = page.locator('.App-titleControl .FlatRatePresentationNav-brandName').filter({ hasText: /^Acura$/ }).first();
+    await expect(acura).toBeVisible();
+    const geometry = await acura.evaluate((element) => ({
+      labelCenter: (element.getBoundingClientRect().left + element.getBoundingClientRect().right) / 2,
+      viewportCenter: window.innerWidth / 2,
+      sheetWidth: element.closest('.Dropdown-menu')?.getBoundingClientRect().width,
+      scrollWidth: document.documentElement.scrollWidth,
+    }));
+    assert.ok(Math.abs(geometry.labelCenter - geometry.viewportCenter) <= 2,
+      `Brand not centered at ${width}px: ${JSON.stringify(geometry)}`);
+    assert.ok(Math.abs(geometry.sheetWidth - width) <= 2,
+      `Brand sheet not viewport-sized at ${width}px: ${JSON.stringify(geometry)}`);
+    assert.ok(geometry.scrollWidth <= width + 1, `unexpected horizontal scroll at ${width}px`);
+  }
+
+  await page.setViewportSize({ width: 390, height: 851 });
+  await page.locator('.App-titleControl .Dropdown-toggle').click();
+  await page.locator('.Navigation-drawer').click();
+  const drawerSearch = page.locator('.App-drawer .item-search button.Search-input');
+  await expect(drawerSearch).toBeVisible();
+  const searchGeometry = await drawerSearch.evaluate((element) => {
+    const icon = element.querySelector('.Button-icon').getBoundingClientRect();
+    const label = element.querySelector('.Button-label').getBoundingClientRect();
+    return {
+      gap: label.left - icon.right,
+      pseudo: getComputedStyle(element, '::before').content,
+      label: element.querySelector('.Button-labelText')?.textContent,
+    };
+  });
+  assert.ok(searchGeometry.gap >= 4, `drawer Search icon overlaps label: ${JSON.stringify(searchGeometry)}`);
+  assert.ok(searchGeometry.pseudo === 'none' || searchGeometry.pseudo === 'normal',
+    `obsolete search pseudo-label present: ${JSON.stringify(searchGeometry)}`);
+  assert.ok(searchGeometry.label?.trim(), 'native F2 Search label must remain visible');
+  for (const item of ['flags', 'themeSwitcher']) {
+    const row = page.locator(`.App-drawer .Header-controls > .item-${item}`);
+    if (await row.count()) await expect(row).toBeHidden();
+  }
+  await drawerSearch.click();
+  await expect(page.locator('.SearchModal')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await page.goto(`${base}/t/aston-martin`);
+  await expect(page.locator('.IndexPage-toolbar-action .item-search')).toHaveCount(0);
+  await expect(page.locator('.IndexPage-toolbar-action .FlatRateInlineNewDiscussion')).toHaveCount(1);
   // Exercise the first authenticated MAIN load, including core's server preload.
   const tokenResponse = await page.request.post(`${base}/api/token`, {
     data: { identification: 'navadmin', password: 'nav-admin-pass' },

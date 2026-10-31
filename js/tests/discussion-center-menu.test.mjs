@@ -208,7 +208,8 @@ test('phone swaps the scrubber for the brand picker while desktop keeps scrubber
   assert.match(less, /\.FlatRateDiscussionBrandLink/);
   assert.match(less, /width: 15rem/);
   assert.match(less, /justify-content: flex-start/);
-  assert.match(less, /flatrate-mobile-nav-rail-offset/);
+  assert.match(less, /margin-left: auto/);
+  assert.doesNotMatch(less, /flatrate-mobile-nav-rail-offset/);
   assert.match(less, /\.FlatRateDiscussionBrandLink\.depth-1/);
   assert.match(less, /padding-left: 1\.5rem/);
   assert.match(less, /\.FlatRateDiscussionBrandLink\.depth-2/);
