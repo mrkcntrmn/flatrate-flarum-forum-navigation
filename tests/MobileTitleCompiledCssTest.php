@@ -10,8 +10,9 @@ use PHPUnit\Framework\TestCase;
  * library default strictMath=false. A bare calc() is arithmetic to that
  * compiler: calc(100% - 120px) became calc(-20%), and the former caret calc
  * became calc(100.45%). Raw forum.less assertions cannot see that rewrite.
- * The title and mobile center-row geometry formulas use escaped calc strings
- * so Less.php preserves mixed-unit browser arithmetic. The caret uses a plain
+ * The title and max-width formulas use escaped calc strings so Less.php
+ * preserves mixed-unit browser arithmetic. Center rows use auto margins
+ * instead of a percentage offset. The caret uses a plain
  * 100% offset after removing horizontal button padding so it is flush to the
  * centered label.
  */
@@ -66,9 +67,16 @@ class MobileTitleCompiledCssTest extends TestCase
         $this->assertStringNotContainsString('calc(60%)', $css);
         $this->assertStringNotContainsString('calc(42.5%)', $css);
         $this->assertSame(4, substr_count($css, 'max-width:calc(100% - 40px)'));
+        // F2's full-width sheet/list items center the 15rem Brand column
+        // using auto margins; percentage offsets were relative to nested
+        // intrinsic widths and shifted the menu toward the left edge.
         $this->assertSame(
-            4,
+            0,
             substr_count($css, 'margin-left:calc(50% - 7.5rem + var(--flatrate-mobile-nav-rail-offset')
+        );
+        $this->assertMatchesRegularExpression(
+            '/\\.App-titleControl \\.Dropdown-menu \\.FlatRatePresentationNav-brandLink\\{[^}]*margin-left:auto;/',
+            $css
         );
         $this->assertMatchesRegularExpression(
             '/\.App-titleControl>\.Dropdown-toggle\{[^}]*padding-left:0 !important;[^}]*padding-right:0 !important;/',
