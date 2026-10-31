@@ -1,11 +1,12 @@
+import { hasItem } from './utils/itemList.js';
 import app from 'flarum/forum/app';
-import ForumApplication from 'flarum/forum/ForumApplication';
 import { extend, override } from 'flarum/common/extend';
 import IndexPage from 'flarum/forum/components/IndexPage';
+import IndexSidebar from 'flarum/forum/components/IndexSidebar';
 import HeaderSecondary from 'flarum/forum/components/HeaderSecondary';
 import LinkButton from 'flarum/common/components/LinkButton';
 import SelectDropdown from 'flarum/common/components/SelectDropdown';
-import icon from 'flarum/common/helpers/icon';
+import icon from './utils/icon';
 
 import PresentationNav from './components/PresentationNav';
 import CenterQuickRail from './components/CenterQuickRail';
@@ -19,6 +20,7 @@ import BrandFamilyLinks from './components/BrandFamilyLinks';
 import './discussionCenterMenu';
 import registerCompactDiscussionActivity from './compactDiscussionActivity';
 import registerDiscussionPhoneChrome from './discussionPhoneChrome';
+import registerComposerAccessibility from './composerAccessibility';
 import registerBoardHeroDisclosure from './boardHeroDisclosure';
 import { getNavigationManifest, pushToStartHref } from './utils/manifest';
 import { resolvePresentationTitle, resolvePresentationTitleMode, TECHNICIAN_TOPICS_LABEL } from './utils/presentationTitle';
@@ -52,7 +54,7 @@ function resolveTagHero() {
   try {
     // Resolve inside the initializer, after flarum-tags has registered compat.
     // A module-eval miss stays null for the rest of the page.
-    const TagHeroModule = require('flarum/tags/components/TagHero');
+    const TagHeroModule = require('ext:flarum/tags/forum/components/TagHero');
     return TagHeroModule && TagHeroModule.default ? TagHeroModule.default : TagHeroModule;
   } catch (error) {
     return null;
@@ -84,7 +86,7 @@ function currentPageNumber() {
 
 function followingDrawerHref() {
   const params =
-    app.search && typeof app.search.stickyParams === 'function' ? app.search.stickyParams() : {};
+    app.search?.state && typeof app.search.state.stickyParams === 'function' ? app.search.state.stickyParams() : {};
   if (app.routes && app.routes.following) {
     return app.route('following', params);
   }
@@ -98,11 +100,11 @@ function rootContext() {
     (current && current.data && current.data.routeName) ||
     '';
   const searchParams =
-    (app.search && typeof app.search.params === 'function' && app.search.params()) || {};
+    (app.search?.state && typeof app.search.state.params === 'function' && app.search.state.params()) || {};
   const stickyParams =
-    (app.search && typeof app.search.stickyParams === 'function' && app.search.stickyParams()) || {};
+    (app.search?.state && typeof app.search.state.stickyParams === 'function' && app.search.state.stickyParams()) || {};
   const currentTag =
-    current && typeof current.currentTag === 'function' ? current.currentTag() : null;
+    typeof app.currentTag === 'function' ? app.currentTag() : null;
 
   return { routeName, searchParams, stickyParams, currentTag };
 }
@@ -114,12 +116,12 @@ function currentPresentationContext() {
     (app.current && app.current.data && app.current.data.routeName) ||
     '';
   const searchContext =
-    (app.search && typeof app.search.params === 'function' && app.search.params()) || {};
+    (app.search?.state && typeof app.search.state.params === 'function' && app.search.state.params()) || {};
   const routeContext =
-    (app.search && typeof app.search.stickyParams === 'function' && app.search.stickyParams()) || {};
+    (app.search?.state && typeof app.search.state.stickyParams === 'function' && app.search.state.stickyParams()) || {};
   let currentTag = null;
-  if (current && typeof current.currentTag === 'function') {
-    currentTag = current.currentTag();
+  if (typeof app.currentTag === 'function') {
+    currentTag = app.currentTag();
   }
   const tagSlug = (searchContext && searchContext.tags) || (routeContext && routeContext.tags);
   if (!currentTag && tagSlug && app.store && typeof app.store.all === 'function') {
@@ -153,7 +155,7 @@ app.initializers.add(
   () => {
     // Flarum assigns app.forum after initializers return, then calls mount.
     // Applying here used to see a missing forum model and delete the shell.
-    extend(ForumApplication.prototype, 'mount', function () {
+    extend(app, 'mount', function () {
       applyMaintenanceBanner(app);
     });
 
@@ -171,12 +173,13 @@ app.initializers.add(
     };
 
     registerDiscussionPhoneChrome();
+    registerComposerAccessibility();
     registerCompactDiscussionActivity();
 
     // Native Latest is the authenticated MAIN default. Do not force sort=top
     // or rewrite `/` to `/?sort=latest`.
 
-    extend(IndexPage.prototype, 'navItems', function (items) {
+    extend(IndexSidebar.prototype, 'navItems', function (items) {
       // Registered after flarum-tags so removals apply after tag injection.
       stripNativeTagPresentation(items);
 
@@ -185,11 +188,11 @@ app.initializers.add(
         return;
       }
 
-      if (items.items && items.items.flatrateQuickRail) {
+      if (hasItem(items, 'flatrateQuickRail')) {
         items.remove('flatrateQuickRail');
       }
 
-      if (items.items && items.items.flatratePresentationNav) {
+      if (hasItem(items, 'flatratePresentationNav')) {
         items.remove('flatratePresentationNav');
       }
 
@@ -201,7 +204,7 @@ app.initializers.add(
 
       items.add(
         'flatratePresentationNav',
-        <PresentationNav manifest={manifest} currentTag={this.currentTag?.() || null} />,
+        <PresentationNav manifest={manifest} currentTag={app.currentTag?.() || null} />,
         -14
       );
 
@@ -235,13 +238,13 @@ app.initializers.add(
       if (!signedIn && cleanRoot) {
         removeMainLiveChatItem(items);
         removeStartBoardPinItem(items);
-        if (items.items && items.items.toolbar) {
+        if (hasItem(items, 'toolbar')) {
           items.remove('toolbar');
         }
-        if (items.items && items.items.discussionList) {
+        if (hasItem(items, 'discussionList')) {
           items.remove('discussionList');
         }
-        if (items.items && items.items.flatrateMainLandingPins) {
+        if (hasItem(items, 'flatrateMainLandingPins')) {
           items.remove('flatrateMainLandingPins');
         }
         items.add(
@@ -307,7 +310,7 @@ app.initializers.add(
       }
 
       // Member MAIN pins on clean root page 1 only.
-      if (items.items && items.items.flatrateMainLandingPins) {
+      if (hasItem(items, 'flatrateMainLandingPins')) {
         items.remove('flatrateMainLandingPins');
       }
 
@@ -344,11 +347,20 @@ app.initializers.add(
       return params;
     });
 
+    // F2 server preload does not include our member-pin exclusion. Consume it
+    // before core loadPage can bypass requestParams and render duplicate pins.
+    override(app.discussions, 'loadPage', function (original, ...args) {
+      if (this.requestParams().filter?.flatrateExcludeMainPins === 'member') {
+        app.preloadedApiDocument();
+      }
+      return original(...args);
+    });
+
     // Phone hamburger is Flarum's App-drawer, which renders HeaderSecondary.
     // Desktop keeps IndexPage sideNav; CSS hides these copies at tablet-up.
     extend(HeaderSecondary.prototype, 'items', function (items) {
       if (app.session && app.session.user && app.routes && app.routes.following) {
-        if (items.items && items.items.flatrateDrawerFollowing) {
+        if (hasItem(items, 'flatrateDrawerFollowing')) {
           items.remove('flatrateDrawerFollowing');
         }
 
@@ -373,7 +385,7 @@ app.initializers.add(
         return;
       }
 
-      if (items.items && items.items.flatrateDrawerStart) {
+      if (hasItem(items, 'flatrateDrawerStart')) {
         items.remove('flatrateDrawerStart');
       }
 
@@ -398,7 +410,7 @@ app.initializers.add(
 
       // MAIN is a phone-drawer affordance that sits immediately above the
       // brand tree. Internal class names may still say Home.
-      if (items.items && items.items.flatrateDrawerHome) {
+      if (hasItem(items, 'flatrateDrawerHome')) {
         items.remove('flatrateDrawerHome');
       }
 
@@ -422,7 +434,7 @@ app.initializers.add(
         -19
       );
 
-      if (items.items && items.items.flatrateDrawerNav) {
+      if (hasItem(items, 'flatrateDrawerNav')) {
         items.remove('flatrateDrawerNav');
       }
 
@@ -442,8 +454,8 @@ app.initializers.add(
 
     // MAIN top-right paper plane. Brand follow and discussion Follow stay on
     // their own primary-control seams; this item is clean-root only.
-    extend(IndexPage.prototype, 'sidebarItems', function (items) {
-      if (items.items && items.items.flatrateMainNotifications) {
+    extend(IndexSidebar.prototype, 'items', function (items) {
+      if (hasItem(items, 'flatrateMainNotifications')) {
         items.remove('flatrateMainNotifications');
       }
       const { routeName, searchParams, stickyParams, currentTag } = rootContext();
@@ -467,7 +479,7 @@ app.initializers.add(
     });
 
     // Annotate only the IndexPage title-control SelectDropdown.
-    extend(IndexPage.prototype, 'sidebarItems', function (items) {
+    extend(IndexSidebar.prototype, 'items', function (items) {
       const nav = typeof items.get === 'function' ? items.get('nav') : items.items?.nav?.content;
       if (nav && nav.attrs) {
         nav.attrs.flatratePresentationTitle = true;

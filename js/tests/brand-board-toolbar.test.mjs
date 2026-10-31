@@ -17,11 +17,11 @@ test('brand board toolbar replaces refresh and mark-all-read with inline compose
   assert.match(discussionSrc, /'newDiscussion'/);
   assert.match(discussionSrc, /icon="fas fa-plus"/);
   assert.match(discussionSrc, /FlatRateInlineNewDiscussion/);
-  assert.match(discussionSrc, /this\.newDiscussionAction\(\)/);
+  assert.match(discussionSrc, /openCanonicalNewDiscussion\(this\)/);
 });
 
 test('new discussion no longer occupies the phone primary-control slot', () => {
-  assert.match(discussionSrc, /extend\(IndexPage\.prototype, 'sidebarItems'/);
+  assert.match(discussionSrc, /extend\(IndexSidebar\.prototype, 'items'/);
   assert.match(discussionSrc, /items\.remove\('newDiscussion'\)/);
 });
 
@@ -29,7 +29,7 @@ test('brand board content suppresses redundant car glyphs without changing tag m
   assert.match(boardLess, /\.TagHero \.Hero-title \.fa-car/);
   assert.match(boardLess, /\.TagLabel \.fa-car/);
   assert.match(boardLess, /display: none !important/);
-  assert.doesNotMatch(extendPhp, /brand-board-toolbar\.less/);
+  assert.match(extendPhp, /brand-board-toolbar\.less/);
   assert.match(extendPhp, /TagCanonical::class/);
 });
 

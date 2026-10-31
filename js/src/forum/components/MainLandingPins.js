@@ -34,7 +34,7 @@ export default class MainLandingPins extends Component {
       return null;
     }
 
-    const params = (app.search && typeof app.search.params === 'function' && app.search.params()) || {};
+    const params = (app.search?.state && typeof app.search.state.params === 'function' && app.search.state.params()) || {};
 
     return (
       <div className="FlatRateMainLandingPins" data-audience={this.attrs.audience}>

@@ -7,6 +7,8 @@
  * Keep allDiscussions and following. Qualify `separator` so an unrelated
  * plugin separator is not removed unless Tags presentation is present.
  */
+import { itemKeys } from './itemList.js';
+
 const TAGS_PRESENTATION_KEYS = new Set(['tags', 'moreTags']);
 
 export function isNativeTagItemKey(key) {
@@ -16,9 +18,9 @@ export function isNativeTagItemKey(key) {
 }
 
 export function stripNativeTagPresentation(items) {
-  if (!items || !items.items) return items;
+  if (!items) return items;
 
-  const keys = Object.keys(items.items);
+  const keys = itemKeys(items);
   const hasTagsPresentation = keys.some((key) => isNativeTagItemKey(key));
 
   for (const key of keys) {

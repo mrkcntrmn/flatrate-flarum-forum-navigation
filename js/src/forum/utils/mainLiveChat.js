@@ -1,3 +1,4 @@
+import { hasItem } from './itemList.js';
 /**
  * MAIN General Live synthetic row helpers.
  * Presentation only — consumes Live Chat provider; never creates a Discussion.
@@ -132,7 +133,7 @@ export function addMainLiveChatItem(items, pinVnode) {
     return items;
   }
 
-  if (items.items && items.items[MAIN_LIVE_CHAT_ITEM] && typeof items.remove === 'function') {
+  if (hasItem(items, MAIN_LIVE_CHAT_ITEM) && typeof items.remove === 'function') {
     items.remove(MAIN_LIVE_CHAT_ITEM);
   }
 
@@ -145,7 +146,7 @@ export function removeMainLiveChatItem(items) {
     return items;
   }
 
-  if (items.items && items.items[MAIN_LIVE_CHAT_ITEM]) {
+  if (hasItem(items, MAIN_LIVE_CHAT_ITEM)) {
     items.remove(MAIN_LIVE_CHAT_ITEM);
   }
 

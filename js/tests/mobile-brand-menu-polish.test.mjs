@@ -53,38 +53,37 @@ test('center-menu brands use a centered left-aligned column with consistent chil
   assert.match(less, /\.App-titleControl \.Dropdown-menu \.FlatRatePresentationNav-brandLink/);
   assert.match(less, /width: 15rem/);
   assert.match(less, /max-width: ~"calc\(100% - 40px\)";/);
-  assert.match(less, /--flatrate-mobile-nav-rail-offset:\s*0rem;/);
-  assert.doesNotMatch(less, /--flatrate-mobile-nav-rail-offset:\s*0\.75rem/);
-  assert.doesNotMatch(discussionLess, /--flatrate-mobile-nav-rail-offset,\s*0\.75rem/);
-  assert.match(discussionLess, /--flatrate-mobile-nav-rail-offset,\s*0rem/);
+  assert.match(less, /\.App-titleControl \.Dropdown-menu > li:not\(\.item-flatrateQuickRail\)\s*\{[^}]*width: 100%;/s);
+  assert.match(less, /\.App-titleControl \.Dropdown-menu \.FlatRatePresentationNav-row/);
+  assert.match(less, /margin-left: auto/);
+  assert.match(discussionLess, /margin-left: auto/);
   assert.match(less, /margin-right: auto/);
-  assert.match(less, /justify-content: flex-start/);
-  assert.match(less, /text-align: left/);
+  assert.match(less, /justify-content: center/);
+  assert.match(less, /text-align: center/);
   assert.match(less, /\.FlatRatePresentationNav-brand\.depth-1/);
   assert.match(less, /padding-left: 1\.5rem !important/);
   assert.match(less, /\.FlatRatePresentationNav-brand\.depth-2/);
   assert.match(less, /padding-left: 3rem !important/);
   assert.match(less, /\.FlatRatePresentationNav-brandLink \.icon/);
+  assert.match(less, /\.App-titleControl \.Dropdown-menu \.FlatRateDiscussionBrandLink \.FlatRateDiscussionBrandName/);
   assert.match(less, /display: none !important/);
   assert.match(less, /\.FlatRateCenterQuickRail\s*\{[^}]*justify-content: space-evenly/s);
   assert.match(less, /\.FlatRateCenterQuickRail--guest,\s*\.FlatRateCenterQuickRail--v1\s*\{[^}]*justify-content: center/s);
 });
 
 
-test('mobile center-row calc geometry stays escaped for Less.php', () => {
+test('mobile Brand rows center with auto margins rather than percent offsets', () => {
   const forumMax = less.match(/max-width: ~"calc\(100% - 40px\)";/g) ?? [];
-  const forumMargin = less.match(/margin-left: ~"calc\(50% - 7\.5rem \+ var\(--flatrate-mobile-nav-rail-offset, 0rem\)\)";/g) ?? [];
   const discussionMax = discussionLess.match(/max-width: ~"calc\(100% - 40px\)";/g) ?? [];
-  const discussionMargin = discussionLess.match(/margin-left: ~"calc\(50% - 7\.5rem \+ var\(--flatrate-mobile-nav-rail-offset, 0rem\)\)";/g) ?? [];
-
   assert.equal(forumMax.length, 3);
-  assert.equal(forumMargin.length, 3);
   assert.equal(discussionMax.length, 1);
-  assert.equal(discussionMargin.length, 1);
+  assert.doesNotMatch(less, /margin-left: ~"calc\(50% - 7\.5rem/);
+  assert.doesNotMatch(discussionLess, /margin-left: ~"calc\(50% - 7\.5rem/);
+  assert.match(less, /\.App-titleControl \.Dropdown-menu \.FlatRatePresentationNav-brandLink\s*\{[^}]*margin-left: auto;/s);
+  assert.match(less, /\.App-titleControl \.Dropdown-menu \.FlatRateDiscussionBrandLink\s*\{[^}]*margin-left: auto;/s);
+  assert.match(discussionLess, /\.FlatRateDiscussionBrandLink\s*\{[^}]*margin-left: auto;/s);
   assert.doesNotMatch(less, /max-width: calc\(100% - 40px\);/);
-  assert.doesNotMatch(less, /margin-left: calc\(50% - 7\.5rem/);
   assert.doesNotMatch(discussionLess, /max-width: calc\(100% - 40px\);/);
-  assert.doesNotMatch(discussionLess, /margin-left: calc\(50% - 7\.5rem/);
 });
 
 test('mobile Follow is star-only while preserving the FoF SubscriptionButton mutation surface', () => {

@@ -17,8 +17,23 @@ test('phone drawer promotes Search above the FlatRate.wiki header without changi
   assert.match(less, /\.App-drawer \.Header-secondary > \.Header-controls > \.item-session\s*\{[\s\S]*?order:\s*10;/);
 });
 
-test('phone drawer shows the concise Search placeholder while retaining the native input behavior', () => {
-  assert.match(less, /\.App-drawer \.item-search \.Search-input::before\s*\{[\s\S]*?content:\s*"Search";/);
-  assert.match(less, /\.App-drawer \.item-search \.FormControl::placeholder\s*\{[\s\S]*?color:\s*transparent\s*!important;/);
-  assert.match(less, /\.App-drawer \.item-search \.Search-input:has\(\.FormControl:not\(:placeholder-shown\)\)::before/);
+test('F2 phone drawer renders native GlobalSearch button without the old overlaid placeholder', () => {
+  assert.match(less, /\.App-drawer \.item-search \.Search-input\s*\{[^}]*display:\s*flex;[^}]*align-items:\s*center;/s);
+  assert.match(less, /\.App-drawer \.item-search \.Search-input \.Button-icon\s*\{[^}]*position:\s*static !important;/s);
+  assert.match(less, /\.App-drawer \.item-search \.Search-input \.Button-label\s*\{[^}]*text-align:\s*left;/s);
+  assert.doesNotMatch(less, /\.App-drawer \.item-search \.Search-input::before/);
+  assert.doesNotMatch(less, /\.App-drawer \.item-search \.FormControl::placeholder/);
+});
+
+test('F2 drawer hides Flags and theme switcher without suppressing moderation or theme features elsewhere', () => {
+  assert.match(less, /\.App-drawer \.Header-controls > \.item-flags,\s*\.App-drawer \.Header-controls > \.item-themeSwitcher\s*\{[^}]*display:\s*none !important;/s);
+  assert.doesNotMatch(less, /\.Header-controls > \.item-flags\s*\{/);
+});
+
+test('F2 index action toolbar suppresses duplicate search but preserves native GlobalSearch surfaces', () => {
+  const source = readFileSync(join(root, 'js/src/forum/discussionCenterMenu.js'), 'utf8');
+  const start = source.indexOf("extend(IndexPage.prototype, 'actionItems'");
+  assert.ok(start >= 0, 'IndexPage actionItems hook absent');
+  assert.match(source.slice(start), /if \(hasItem\(items, 'search'\)\) \{\s*items\.remove\('search'\);/);
+  assert.match(source.slice(start), /items\.add\(\s*'newDiscussion'/);
 });

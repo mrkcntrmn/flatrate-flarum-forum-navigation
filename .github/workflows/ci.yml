@@ -73,11 +73,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: js/package-lock.json
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
           tools: composer:v2
           coverage: none
           extensions: curl, dom, fileinfo, gd, mbstring, openssl, pdo, pdo_sqlite, tokenizer, xml, xmlwriter, zip
+          ini-values: memory_limit=512M
+      - name: Install browser acceptance dependencies
+        run: npm ci --prefix js
+      - name: Install acceptance Chromium
+        working-directory: js
+        run: npx playwright install --with-deps chromium
       - name: Disposable Flarum 2.0.2 resolve/install
+        env:
+          NAVIGATION_UI_BROWSER_ACCEPTANCE: '1'
         run: bash scripts/ci-flarum-install-smoke.sh

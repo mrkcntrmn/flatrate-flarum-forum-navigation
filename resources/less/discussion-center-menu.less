@@ -239,7 +239,7 @@
   justify-content: flex-start;
   width: 15rem;
   max-width: ~"calc(100% - 40px)";
-  margin-left: ~"calc(50% - 7.5rem + var(--flatrate-mobile-nav-rail-offset, 0rem))";
+  margin-left: auto;
   margin-right: auto;
   padding-left: 0;
   padding-right: 0;
@@ -252,4 +252,18 @@
 
 .FlatRateDiscussionBrandPicker .Dropdown-menu .FlatRateDiscussionBrandLink.depth-2 {
   padding-left: 3rem;
+}
+
+@media (max-width: 767px) {
+  // Use the hero's text color for controls on its colored background.
+  .DiscussionHero .FlatRateDiscussionHero-toggle,
+  .DiscussionHero .FlatRateDiscussionActions .Dropdown-toggle {
+    color: inherit;
+    &:focus-visible { outline-color: currentColor; }
+  }
+
+  .Composer .Button--icon {
+    min-width: 44px;
+    min-height: 44px;
+  }
 }

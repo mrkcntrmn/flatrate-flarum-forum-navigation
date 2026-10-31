@@ -1,13 +1,13 @@
-export const SETTING_V2_ADMIN_VISIBLE = 'flatrate-forum-navigation.center_menu_v2_admin_visible';
-export const SETTING_V2_USER_VISIBLE = 'flatrate-forum-navigation.center_menu_v2_user_visible';
+const SETTING_V2_ADMIN_VISIBLE = 'flatrate-forum-navigation.center_menu_v2_admin_visible';
+const SETTING_V2_USER_VISIBLE = 'flatrate-forum-navigation.center_menu_v2_user_visible';
 
-export const FORUM_ATTR_V2_ADMIN_VISIBLE = 'flatrateCenterMenuV2AdminVisible';
-export const FORUM_ATTR_V2_USER_VISIBLE = 'flatrateCenterMenuV2UserVisible';
+const FORUM_ATTR_V2_ADMIN_VISIBLE = 'flatrateCenterMenuV2AdminVisible';
+const FORUM_ATTR_V2_USER_VISIBLE = 'flatrateCenterMenuV2UserVisible';
 
-export const CENTER_MENU_V1 = 'v1';
-export const CENTER_MENU_V2 = 'v2';
+const CENTER_MENU_V1 = 'v1';
+const CENTER_MENU_V2 = 'v2';
 
-export const MEMBER_QUICK_RAIL_ORDER = Object.freeze([
+const MEMBER_QUICK_RAIL_ORDER = Object.freeze([
   'profile',
   'messages',
   'new_discussion',
@@ -15,7 +15,7 @@ export const MEMBER_QUICK_RAIL_ORDER = Object.freeze([
   'main',
 ]);
 
-export function normalizeSettingBool(value, missingDefault) {
+function normalizeSettingBool(value, missingDefault) {
   if (value === undefined || value === null || value === '') {
     return !!missingDefault;
   }
@@ -33,14 +33,14 @@ export function normalizeSettingBool(value, missingDefault) {
   return !!missingDefault;
 }
 
-export function getCenterMenuV2Config(forum) {
+function getCenterMenuV2Config(forum) {
   return {
     adminVisible: readForumBool(forum, FORUM_ATTR_V2_ADMIN_VISIBLE, false),
     userVisible: readForumBool(forum, FORUM_ATTR_V2_USER_VISIBLE, false),
   };
 }
 
-export function isAdminUser(user) {
+function isAdminUser(user) {
   if (!user) return false;
 
   if (typeof user.isAdmin === 'function') {
@@ -54,7 +54,7 @@ export function isAdminUser(user) {
   return false;
 }
 
-export function centerMenuVersion({ forum, user }) {
+function centerMenuVersion({ forum, user }) {
   if (!user) {
     return CENTER_MENU_V1;
   }
@@ -68,7 +68,7 @@ export function centerMenuVersion({ forum, user }) {
   return config.userVisible ? CENTER_MENU_V2 : CENTER_MENU_V1;
 }
 
-export function centerMenuControlIds({ forum, user }) {
+function centerMenuControlIds({ forum, user }) {
   if (centerMenuVersion({ forum, user }) === CENTER_MENU_V2) {
     return MEMBER_QUICK_RAIL_ORDER.slice();
   }
@@ -83,3 +83,6 @@ function readForumBool(forum, key, missingDefault) {
 
   return normalizeSettingBool(forum.attribute(key), missingDefault);
 }
+
+// Explicit export lists preserve numeric identifiers in flarum-webpack-config 3.1.0.
+export { SETTING_V2_ADMIN_VISIBLE, SETTING_V2_USER_VISIBLE, FORUM_ATTR_V2_ADMIN_VISIBLE, FORUM_ATTR_V2_USER_VISIBLE, CENTER_MENU_V1, CENTER_MENU_V2, MEMBER_QUICK_RAIL_ORDER, normalizeSettingBool, getCenterMenuV2Config, isAdminUser, centerMenuVersion, centerMenuControlIds };

@@ -2,7 +2,7 @@ import { override } from 'flarum/common/extend';
 import TerminalPost from 'flarum/forum/components/TerminalPost';
 import humanTime from 'flarum/common/helpers/humanTime';
 import username from 'flarum/common/helpers/username';
-import icon from 'flarum/common/helpers/icon';
+import icon from './utils/icon';
 
 import { showDiscussionActivityTime } from './utils/discussionActivityTime';
 

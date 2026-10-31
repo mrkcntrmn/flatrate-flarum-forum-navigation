@@ -2,8 +2,8 @@ import app from 'flarum/forum/app';
 import Component from 'flarum/common/Component';
 import Link from 'flarum/common/components/Link';
 import Button from 'flarum/common/components/Button';
-import avatar from 'flarum/common/helpers/avatar';
-import icon from 'flarum/common/helpers/icon';
+import avatar from '../utils/avatar';
+import icon from '../utils/icon';
 import extractText from 'flarum/common/utils/extractText';
 import classList from 'flarum/common/utils/classList';
 
@@ -114,6 +114,7 @@ export default class CenterQuickRail extends Component {
       return (
         <Link
           className="FlatRateCenterQuickRail-control"
+          force
           href={technicianTopicsHref(this.attrs.manifest)}
           aria-label={label}
           title={label}
@@ -128,6 +129,7 @@ export default class CenterQuickRail extends Component {
     return (
       <Link
         className="FlatRateCenterQuickRail-control"
+        force
         href={app.route('index')}
         aria-label={label}
         title={label}

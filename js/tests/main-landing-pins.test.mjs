@@ -68,9 +68,9 @@ test('source wires dual-audience MAIN pins without native sticky mutation', () =
   assert.match(indexSrc, /audience="member"/);
   assert.match(indexSrc, /flatrateExcludeMainPins/);
   assert.match(pinsSrc, /flatrateMainPins/);
-  assert.doesNotMatch(extendPhp, /MainPinsFilter/);
-  assert.doesNotMatch(extendPhp, /ExcludeMainPinsFilter/);
-  assert.doesNotMatch(extendPhp, /admin\.js/);
+  assert.match(extendPhp, /MainPinsFilter/);
+  assert.match(extendPhp, /ExcludeMainPinsFilter/);
+  assert.match(extendPhp, /admin\.js/);
   assert.match(extendPhp, /TagCanonical::class/);
   assert.match(adminSrc, /SETTING_PUBLIC/);
   assert.match(adminSrc, /SETTING_MEMBER/);
@@ -98,4 +98,27 @@ test('board-back records one-shot open-at-top intent without disabling native Ba
   assert.equal(store.get(OPEN_BOARD_AT_TOP_KEY), '1');
   assert.equal(consumeOpenBoardAtTopIntent(), true);
   assert.equal(consumeOpenBoardAtTopIntent(), false);
+});
+
+
+test('member root loading discards the unfiltered server preload before requesting the paginated feed', () => {
+  const start = indexSrc.indexOf("    override(app.discussions, 'loadPage'");
+  const hook = indexSrc.slice(start, indexSrc.indexOf('\n    });', start) + 8);
+  let preloadConsumed = 0;
+  let loaded = 0;
+  const app = {
+    preloadedApiDocument: () => { preloadConsumed++; },
+    discussions: { requestParams: () => ({ filter: { flatrateExcludeMainPins: 'member' } }), loadPage: () => { loaded++; return 'page'; } },
+  };
+  const override = (target, method, extension) => {
+    const original = target[method].bind(target);
+    target[method] = (...args) => extension.call(target, original, ...args);
+  };
+  new Function('app', 'override', hook)(app, override);
+  assert.equal(app.discussions.loadPage(1), 'page');
+  assert.equal(preloadConsumed, 1);
+  app.discussions.requestParams = () => ({ filter: {} });
+  app.discussions.loadPage(1);
+  assert.equal(preloadConsumed, 1, 'tag/search/ordinary requests keep the native preload');
+  assert.equal(loaded, 2);
 });

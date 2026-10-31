@@ -1,6 +1,6 @@
 import Component from 'flarum/common/Component';
 import Link from 'flarum/common/components/Link';
-import icon from 'flarum/common/helpers/icon';
+import icon from '../utils/icon';
 
 import { getNavigationManifest, pushToStartHref } from '../utils/manifest';
 import { START_NAV_ICON, START_NAV_LABEL } from '../utils/startNav';

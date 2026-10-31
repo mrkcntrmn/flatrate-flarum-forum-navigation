@@ -1,7 +1,7 @@
 import Component from 'flarum/common/Component';
 import Link from 'flarum/common/components/Link';
 import classList from 'flarum/common/utils/classList';
-import icon from 'flarum/common/helpers/icon';
+import icon from '../utils/icon';
 
 import BrandVoteTotal from './BrandVoteTotal';
 import { brandHref, groupLinkHref } from '../utils/manifest';
@@ -50,6 +50,7 @@ export default class PresentationNav extends Component {
               hasIcon: Boolean(linkIcon),
             })}
             href={groupLinkHref(group, this.attrs.manifest)}
+            force
           >
             {linkIcon ? icon(linkIcon) : null}
             {start ? START_NAV_LABEL : group.label}
@@ -86,6 +87,7 @@ export default class PresentationNav extends Component {
           <Link
             className={classList('FlatRatePresentationNav-link', 'FlatRatePresentationNav-brandLink', 'hasIcon')}
             href={brandHref(board)}
+            force
           >
             {icon(BRAND_NAV_ICON)}
             <span className="FlatRatePresentationNav-brandName">{board.name}</span>

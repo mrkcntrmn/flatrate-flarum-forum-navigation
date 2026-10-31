@@ -1,3 +1,4 @@
+import { hasItem } from './itemList.js';
 /**
  * Brand-board Live pin visibility. Presentation only.
  * The row is not a Discussion and does not follow discussion sort or search.
@@ -142,7 +143,7 @@ export function activateBrandLive(board, provider) {
 
 export function addBrandLiveItem(items, vnode) {
   if (!items || typeof items.add !== 'function') return items;
-  if (items.items && items.items[BRAND_LIVE_ITEM] && typeof items.remove === 'function') {
+  if (hasItem(items, BRAND_LIVE_ITEM) && typeof items.remove === 'function') {
     items.remove(BRAND_LIVE_ITEM);
   }
   items.add(BRAND_LIVE_ITEM, vnode, BRAND_LIVE_PRIORITY);
@@ -151,7 +152,7 @@ export function addBrandLiveItem(items, vnode) {
 
 export function removeBrandLiveItem(items) {
   if (!items || typeof items.remove !== 'function') return items;
-  if (items.items && items.items[BRAND_LIVE_ITEM]) {
+  if (hasItem(items, BRAND_LIVE_ITEM)) {
     items.remove(BRAND_LIVE_ITEM);
   }
   return items;

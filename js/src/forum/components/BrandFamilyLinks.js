@@ -23,7 +23,7 @@ export default class BrandFamilyLinks extends Component {
           {children.map((child, index) => (
             <li className="FlatRateBrandFamilyLinks-item" key={child.boardKey || child.slug}>
               {index > 0 ? <span className="FlatRateBrandFamilyLinks-sep" aria-hidden="true">·</span> : null}
-              <Link className="FlatRateBrandFamilyLinks-link" href={brandHref(child)}>
+              <Link force className="FlatRateBrandFamilyLinks-link" href={brandHref(child)}>
                 {child.name}
               </Link>
             </li>

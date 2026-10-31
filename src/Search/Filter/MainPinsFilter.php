@@ -5,9 +5,8 @@ namespace FlatRate\ForumNavigation\Search\Filter;
 use Flarum\Settings\SettingsRepositoryInterface;
 
 /**
- * Historical MAIN pin id normalization. Flarum 2 does not register this filter.
- * Native discussion search owns the list. The id helper stays so stored pin
- * lists keep a single fail-closed parser.
+ * Shared MAIN pin id normalization. Flarum 2 registers F2MainPinsFilter;
+ * stored pin lists retain this single fail-closed parser.
  */
 final class MainPinsFilter
 {

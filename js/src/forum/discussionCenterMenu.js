@@ -1,9 +1,12 @@
+import { hasItem } from './utils/itemList.js';
 import app from 'flarum/forum/app';
 import { extend, override } from 'flarum/common/extend';
 import Button from 'flarum/common/components/Button';
 import Navigation from 'flarum/common/components/Navigation';
 import DiscussionPage from 'flarum/forum/components/DiscussionPage';
 import IndexPage from 'flarum/forum/components/IndexPage';
+import IndexSidebar from 'flarum/forum/components/IndexSidebar';
+import { openCanonicalNewDiscussion } from './utils/openCanonicalNewDiscussion';
 import LinkButton from 'flarum/common/components/LinkButton';
 import SelectDropdown from 'flarum/common/components/SelectDropdown';
 import ItemList from 'flarum/common/utils/ItemList';
@@ -20,7 +23,7 @@ import { brandHref, getNavigationManifest, tagHref } from './utils/manifest';
 import { resolveBoardStructuralBack } from './utils/boardStructuralBack';
 import { resolveIndexBoardSlug } from './utils/currentBoardContext';
 import { recordOpenBoardAtTopIntent, consumeOpenBoardAtTopIntent } from './utils/boardBackIntent';
-import icon from 'flarum/common/helpers/icon';
+import icon from './utils/icon';
 import { TECHNICIAN_TOPICS_ICON } from './utils/startNav';
 
 function currentDiscussionBoardTarget() {
@@ -165,7 +168,7 @@ app.initializers.add(
         );
       });
 
-      if (items.items && items.items.flatrateDiscussionBrandPicker) {
+      if (hasItem(items, 'flatrateDiscussionBrandPicker')) {
         items.remove('flatrateDiscussionBrandPicker');
       }
 
@@ -183,9 +186,8 @@ app.initializers.add(
       );
     });
 
-    // Flarum 1.8.19 Navigation.view() renders through getBackButton() when
-    // app history can go back, and getDrawerButton() on direct-entry/no-history.
-    // Override both live seams with a stable owning-board LinkButton. Do not
+    // Use stable structural destinations for both the F2 history and drawer
+    // control seams. Do not
     // invoke Flarum app-history back helpers — the board route is the destination.
     override(Navigation.prototype, 'getBackButton', function (original) {
       const target = currentDiscussionBoardTarget();
@@ -221,6 +223,18 @@ app.initializers.add(
       }
 
       return original();
+    });
+
+    // F2 renders drawer and history Back together. On structural board routes
+    // both overridden controls point to the same destination; keep one arrow.
+    extend(Navigation.prototype, 'items', function (items) {
+      if (!this.attrs.drawer || !hasItem(items, 'drawer')) return;
+      const target = currentDiscussionBoardTarget() || resolveBoardStructuralBack({
+        slug: currentIndexBoardSlug(),
+        routeName: currentIndexRouteName(),
+        manifest: getNavigationManifest(),
+      });
+      if (target) items.remove('back');
     });
 
     override(SelectDropdown.prototype, 'getButtonContent', function (original, children) {
@@ -265,22 +279,27 @@ app.initializers.add(
 
     // Keep the phone header's right-hand primary slot available for the board
     // follow control. New Discussion moves into the list toolbar instead.
-    extend(IndexPage.prototype, 'sidebarItems', function (items) {
-      if (items.items && items.items.newDiscussion) {
+    extend(IndexSidebar.prototype, 'items', function (items) {
+      if (hasItem(items, 'newDiscussion')) {
         items.remove('newDiscussion');
       }
     });
 
     // Replace the refresh / mark-all-read pair with one explicit compose action.
-    // This keeps the sort control on the left and a single + action on the right.
+    // F2 core adds a mobile GlobalSearch button to this toolbar. Remove that
+    // duplicate magnifier on MAIN and Brand boards; global Search remains in
+    // the navigation drawer and desktop header.
     extend(IndexPage.prototype, 'actionItems', function (items) {
-      if (items.items && items.items.refresh) {
+      if (hasItem(items, 'search')) {
+        items.remove('search');
+      }
+      if (hasItem(items, 'refresh')) {
         items.remove('refresh');
       }
-      if (items.items && items.items.markAllAsRead) {
+      if (hasItem(items, 'markAllAsRead')) {
         items.remove('markAllAsRead');
       }
-      if (items.items && items.items.newDiscussion) {
+      if (hasItem(items, 'newDiscussion')) {
         items.remove('newDiscussion');
       }
 
@@ -296,7 +315,7 @@ app.initializers.add(
           className="Button Button--icon FlatRateInlineNewDiscussion"
           title={label}
           aria-label={label}
-          onclick={() => this.newDiscussionAction().catch(() => {})}
+          onclick={() => openCanonicalNewDiscussion(this).catch(() => {})}
           disabled={!canStartDiscussion}
         />,
         100

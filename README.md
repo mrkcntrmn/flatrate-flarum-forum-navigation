@@ -1,29 +1,31 @@
 # flatrate/flarum-forum-navigation
 
-Flarum 2 candidate. Native Flarum tags render the board navigation. This branch adds the tag canonical URL, `/robots.txt`, and the retired `/community` redirect. The historical presentation bundle stays in the tree and is not registered.
+Flarum 2 presentation restoration candidate, stacked on the native navigation/SEO migration. Registers the retained FlatRate forum/admin bundles, styles, translations, and fallback view. Adapts the existing presentation to Flarum 2 without changing tag identities or enabling Live.
 
 ## What it does
 
-- Leaves desktop and mobile board navigation to native Flarum 2 tags
+- Restores the manifest-driven FlatRate desktop navigation and phone board picker
+- Restores board banners, curated MAIN pins, discussion controls, and gated quick navigation
+- Uses Flarum 2 IndexSidebar, ItemList, component, search-state, and admin registry APIs
 - Sets a same-host canonical URL on public tag pages when Flarum leaves it empty
 - Publishes `/robots.txt` with the configured sitemap URL and disallows `/admin` and `/api/`
 - Redirects legacy `/community` to `/t/start-here` with HTTP 301
 - Leaves General Live on its durable `/live/community-general-live` identity
 - Embeds a generated navigation runtime manifest asset; does not read the main wiki repo at runtime
 - Keeps Flarum's built-in loader/error fallback UX, while marking non-content fallback chrome `data-nosnippet` so it cannot displace technician discussion text in Google snippets
-- Provides an admin-managed site-wide maintenance banner with enable/disable, plain-text message, approved color selection, and versioned local dismissal
+- Retains maintenance banner source for later qualification; this candidate does not publish or activate its public settings
 
-## Maintenance banner
+## Flarum 2 compatibility
 
-The extension admin page owns the operational maintenance notice. The banner no longer requires a source edit for routine status changes.
+The forum resource publishes an explicit allowlist of presentation attributes. Native Flarum visibility constraints still apply before pin and brand-family filters narrow results. Missing quick-rail visibility settings remain false; this change does not activate Live, uploads, or an operational maintenance banner.
 
-- **Enable maintenance banner** controls public visibility.
-- **Status message** is plain text and limited to 280 characters in the admin UI.
-- **Banner color** is restricted to the approved red/orange/yellow/blue/green/pink palette.
-- Every successful save rotates a non-secret dismissal revision so a changed notice can reappear to clients that dismissed the prior revision.
-- Missing settings preserve the currently deployed compatibility defaults: enabled, `FLATRATE.WIKI is undergoing maintenance.`, red, and dismissal revision `2026-09-24-1600`.
-- A blank or invalid public message fails closed and does not render.
-- The public forum serializer exposes only presentation-safe banner state; admin capability is not serialized.
+Phone discussion navigation collapses the duplicate drawer/history structural Back controls to one owning-board arrow. Composer controls retain accessible native action names when mobile styles hide their labels, and the basic editor gets a content label. Hero controls inherit the banner text color.
+
+The previous webpack configuration emitted the removed `flarum.core.compat` runtime. Version 3.1.0 uses Flarum 2 modules. Explicit export lists preserve identifiers containing digits with that loader.
+
+## Qualification
+
+PHP tests cover public attributes and actor-scoped SQLite pin filtering, including negation and invalid values. JavaScript tests cover the retained presentation contracts. The disposable Flarum 2.0.2 install smoke checks SEO, private-tag denial, disable fallback, and browser acceptance for desktop board transitions, the phone picker, structural Back uniqueness, Follow/Unfollow persistence, moderator reachability, and saved replies. Browser acceptance uses only synthetic local data.
 
 ## Hard boundaries
 
@@ -97,7 +99,7 @@ npm run build
 ```bash
 composer install
 composer test
-node --test js/tests/presentation-nav-static.test.mjs js/tests/presentation-nav-picker.test.mjs js/tests/community-live-route.test.mjs
+node --test js/tests/*.test.mjs
 ```
 
 ## Manifest sync

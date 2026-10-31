@@ -56,8 +56,8 @@ class FrontendContentViewTest extends TestCase
         $root = dirname(__DIR__);
         $extend = (string) file_get_contents($root . '/extend.php');
 
-        $this->assertStringNotContainsString('new Extend\\View()', $extend);
-        $this->assertStringNotContainsString(
+        $this->assertStringContainsString('(new Extend\\View())', $extend);
+        $this->assertStringContainsString(
             "->extendNamespace('flarum', __DIR__ . '/resources/views')",
             $extend
         );

@@ -5,7 +5,7 @@ import MaintenanceBannerSettings from './components/MaintenanceBannerSettings';
 import QuickRailSettings from './components/QuickRailSettings';
 
 app.initializers.add('flatrate-forum-navigation-admin', () => {
-  app.extensionData
+  (app.registry || app.extensionData)
     .for('flatrate-forum-navigation')
     .registerPage(class ForumNavigationAdminPage extends ExtensionPage {
       content() {

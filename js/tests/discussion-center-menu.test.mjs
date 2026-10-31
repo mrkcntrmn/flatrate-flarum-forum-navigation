@@ -162,7 +162,7 @@ test('DiscussionPage center popup is the shared quick rail plus Brand rows witho
   assert.match(discussionSrc, /className=\{`App-titleControl FlatRateDiscussionBrandPicker/);
 });
 
-test('discussion back arrow overrides the Flarum 1.8.19 live back-button seam', () => {
+test('discussion back arrow overrides the live back-button seam', () => {
   assert.match(
     discussionSrc,
     /override\(\s*Navigation\.prototype,\s*'getBackButton'/
@@ -173,10 +173,7 @@ test('discussion back arrow overrides the Flarum 1.8.19 live back-button seam', 
   assert.match(discussionSrc, /FlatRateDiscussionBackToBoard/);
   assert.match(discussionSrc, /aria-label=\{`Back to \$\{target\.name\}`\}\s*\n\s*force/);
 
-  assert.doesNotMatch(
-    discussionSrc,
-    /extend\(\s*Navigation\.prototype,\s*'items'/
-  );
+  assert.match(discussionSrc, /extend\(\s*Navigation\.prototype,\s*'items'/);
   assert.doesNotMatch(discussionSrc, /history\.back/);
   assert.doesNotMatch(discussionSrc, /history\.backUrl/);
   assert.doesNotMatch(discussionSrc, /m\.route\.set/);
@@ -211,12 +208,13 @@ test('phone swaps the scrubber for the brand picker while desktop keeps scrubber
   assert.match(less, /\.FlatRateDiscussionBrandLink/);
   assert.match(less, /width: 15rem/);
   assert.match(less, /justify-content: flex-start/);
-  assert.match(less, /flatrate-mobile-nav-rail-offset/);
+  assert.match(less, /margin-left: auto/);
+  assert.doesNotMatch(less, /flatrate-mobile-nav-rail-offset/);
   assert.match(less, /\.FlatRateDiscussionBrandLink\.depth-1/);
   assert.match(less, /padding-left: 1\.5rem/);
   assert.match(less, /\.FlatRateDiscussionBrandLink\.depth-2/);
   assert.match(less, /padding-left: 3rem/);
-  assert.doesNotMatch(extendPhp, /discussion-center-menu\.less/);
+  assert.match(extendPhp, /discussion-center-menu\.less/);
   assert.match(extendPhp, /TagCanonical::class/);
 });
 
@@ -246,4 +244,28 @@ test('discussion CSS mask does not force FLATRATE.WIKI on contextual titles', ()
   assert.match(discussionSrc, /FlatRateBoardBackToMain/);
   assert.match(discussionSrc, /aria-label="Back to MAIN"/);
   assert.match(discussionSrc, /resolveBoardStructuralBack/);
+});
+
+
+test('F2 phone navigation keeps one structural arrow with and without history', () => {
+  const start = discussionSrc.indexOf("    extend(Navigation.prototype, 'items'");
+  const hook = discussionSrc.slice(start, discussionSrc.indexOf('\n    });', start) + 8);
+  const Navigation = { prototype: {} };
+  let structural = true;
+  let extension;
+  new Function('Navigation', 'extend', 'hasItem', 'currentDiscussionBoardTarget', 'resolveBoardStructuralBack', 'currentIndexBoardSlug', 'currentIndexRouteName', 'getNavigationManifest', hook)(
+    Navigation, (_, method, callback) => { assert.equal(method, 'items'); extension = callback; },
+    (items, key) => items.has(key), () => structural ? { slug: 'toyota' } : null,
+    () => null, () => '', () => '', () => ({})
+  );
+  function rendered(drawer, keys) {
+    const set = new Set(keys);
+    extension.call({ attrs: { drawer } }, { has: (key) => set.has(key), remove: (key) => set.delete(key) });
+    return Array.from(set);
+  }
+  assert.deepEqual(rendered(true, ['drawer', 'back']), ['drawer']);
+  assert.deepEqual(rendered(true, ['drawer']), ['drawer']);
+  assert.deepEqual(rendered(false, ['back']), ['back']);
+  structural = false;
+  assert.deepEqual(rendered(true, ['drawer', 'back']), ['drawer', 'back']);
 });

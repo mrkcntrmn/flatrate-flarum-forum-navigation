@@ -38,6 +38,6 @@ test('MAIN drawer action is phone-only and its LESS is registered', () => {
   assert.match(homeLess, /@media \(max-width: 767px\)/);
   assert.match(homeLess, /\.App-drawer \.item-flatrateDrawerHome/);
   assert.match(homeLess, /@media \(min-width: 768px\)[\s\S]*?\.item-flatrateDrawerHome\s*\{\s*display:\s*none\s*!important;/);
-  assert.doesNotMatch(extendPhp, /drawer-home\.less/);
+  assert.match(extendPhp, /drawer-home\.less/);
   assert.match(extendPhp, /TagCanonical::class/);
 });

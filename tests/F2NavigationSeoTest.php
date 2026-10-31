@@ -89,7 +89,7 @@ final class F2NavigationSeoTest extends TestCase
         );
     }
 
-    public function testF2ExtenderLeavesNativeNavigationInPlace(): void
+    public function testF2ExtenderRestoresPresentationAndKeepsNativeCanonicals(): void
     {
         $extend = (string) file_get_contents(dirname(__DIR__).'/extend.php');
 
@@ -99,10 +99,10 @@ final class F2NavigationSeoTest extends TestCase
             "->get('/community', 'flatrate-forum-navigation.community-redirect', CommunityRedirect::class)",
             $extend
         );
-        $this->assertStringNotContainsString('js/dist/forum.js', $extend);
-        $this->assertStringNotContainsString('js/dist/admin.js', $extend);
+        $this->assertStringContainsString('js/dist/forum.js', $extend);
+        $this->assertStringContainsString('js/dist/admin.js', $extend);
         $this->assertStringNotContainsString('DiscussionFilterer', $extend);
-        $this->assertStringNotContainsString('Extend\\View()', $extend);
+        $this->assertStringContainsString('Extend\\View()', $extend);
         $this->assertStringNotContainsString('forum.flatrate.wiki', $extend);
         $this->assertStringNotContainsString('pikapod', $extend);
     }
