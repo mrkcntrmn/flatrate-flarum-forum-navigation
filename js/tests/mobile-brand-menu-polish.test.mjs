@@ -58,13 +58,14 @@ test('center-menu brands use a centered left-aligned column with consistent chil
   assert.match(less, /margin-left: auto/);
   assert.match(discussionLess, /margin-left: auto/);
   assert.match(less, /margin-right: auto/);
-  assert.match(less, /justify-content: flex-start/);
-  assert.match(less, /text-align: left/);
+  assert.match(less, /justify-content: center/);
+  assert.match(less, /text-align: center/);
   assert.match(less, /\.FlatRatePresentationNav-brand\.depth-1/);
   assert.match(less, /padding-left: 1\.5rem !important/);
   assert.match(less, /\.FlatRatePresentationNav-brand\.depth-2/);
   assert.match(less, /padding-left: 3rem !important/);
   assert.match(less, /\.FlatRatePresentationNav-brandLink \.icon/);
+  assert.match(less, /\.App-titleControl \.Dropdown-menu \.FlatRateDiscussionBrandLink \.FlatRateDiscussionBrandName/);
   assert.match(less, /display: none !important/);
   assert.match(less, /\.FlatRateCenterQuickRail\s*\{[^}]*justify-content: space-evenly/s);
   assert.match(less, /\.FlatRateCenterQuickRail--guest,\s*\.FlatRateCenterQuickRail--v1\s*\{[^}]*justify-content: center/s);
